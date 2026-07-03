@@ -178,6 +178,105 @@ INSERT INTO bareme_ir (min, max, taux, deduction, type) VALUES
     (180000.01, 9999999.99, 37.00, 27400.00, 'annuel');
 
 -- -----------------------------------------------------------
+-- Services (départements)
+-- -----------------------------------------------------------
+CREATE TABLE IF NOT EXISTS services (
+    id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    societe_id      INT UNSIGNED        NOT NULL,
+    nom             VARCHAR(100)        NOT NULL,
+    description     TEXT,
+    actif           TINYINT(1)          NOT NULL DEFAULT 1,
+    created_at      DATETIME            NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (societe_id) REFERENCES societes(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- -----------------------------------------------------------
+-- Paramètres CNSS / AMO (par société)
+-- -----------------------------------------------------------
+CREATE TABLE IF NOT EXISTS parametres_cnss_amo (
+    id                  INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    societe_id          INT UNSIGNED    NOT NULL UNIQUE,
+    plafond_cnss        DECIMAL(10,2)   NOT NULL DEFAULT 6000.00,
+    taux_cnss_salarial  DECIMAL(5,2)    NOT NULL DEFAULT 4.48,
+    taux_cnss_patronal  DECIMAL(5,2)    NOT NULL DEFAULT 8.98,
+    taux_amo_salarial   DECIMAL(5,2)    NOT NULL DEFAULT 2.26,
+    taux_amo_patronal   DECIMAL(5,2)    NOT NULL DEFAULT 4.11,
+    taux_ams_salarial   DECIMAL(5,2)    NOT NULL DEFAULT 0.00,
+    taux_ams_patronal   DECIMAL(5,2)    NOT NULL DEFAULT 0.00,
+    created_at          DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at          DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (societe_id) REFERENCES societes(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- -----------------------------------------------------------
+-- Rubriques de gains
+-- -----------------------------------------------------------
+CREATE TABLE IF NOT EXISTS rubriques_gains (
+    id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    societe_id      INT UNSIGNED        NOT NULL,
+    code            VARCHAR(20)         NOT NULL,
+    libelle         VARCHAR(100)        NOT NULL,
+    type_montant    ENUM('fixe','proportionnel') NOT NULL DEFAULT 'fixe',
+    valeur_defaut   DECIMAL(10,2)       NOT NULL DEFAULT 0.00,
+    imposable       TINYINT(1)          NOT NULL DEFAULT 1,
+    actif           TINYINT(1)          NOT NULL DEFAULT 1,
+    created_at      DATETIME            NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (societe_id) REFERENCES societes(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- -----------------------------------------------------------
+-- Rubriques de retenues
+-- -----------------------------------------------------------
+CREATE TABLE IF NOT EXISTS rubriques_retenues (
+    id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    societe_id      INT UNSIGNED        NOT NULL,
+    code            VARCHAR(20)         NOT NULL,
+    libelle         VARCHAR(100)        NOT NULL,
+    type_montant    ENUM('fixe','proportionnel') NOT NULL DEFAULT 'fixe',
+    valeur_defaut   DECIMAL(10,2)       NOT NULL DEFAULT 0.00,
+    actif           TINYINT(1)          NOT NULL DEFAULT 1,
+    created_at      DATETIME            NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (societe_id) REFERENCES societes(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- -----------------------------------------------------------
+-- Organismes sociaux
+-- -----------------------------------------------------------
+CREATE TABLE IF NOT EXISTS organismes (
+    id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    societe_id      INT UNSIGNED        NOT NULL,
+    nom             VARCHAR(100)        NOT NULL,
+    type            ENUM('cnss','amo','cimr','mutuelle','autre') NOT NULL DEFAULT 'autre',
+    login           VARCHAR(100),
+    mot_de_passe    VARCHAR(255),
+    actif           TINYINT(1)          NOT NULL DEFAULT 1,
+    created_at      DATETIME            NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (societe_id) REFERENCES societes(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- -----------------------------------------------------------
+-- Modèles d'attestation
+-- -----------------------------------------------------------
+CREATE TABLE IF NOT EXISTS modeles_attestation (
+    id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    societe_id      INT UNSIGNED        NOT NULL,
+    titre           VARCHAR(200)        NOT NULL,
+    contenu         TEXT                NOT NULL,
+    actif           TINYINT(1)          NOT NULL DEFAULT 1,
+    created_at      DATETIME            NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (societe_id) REFERENCES societes(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- -----------------------------------------------------------
+-- Colonnes ajoutées aux salariés
+-- -----------------------------------------------------------
+ALTER TABLE salaries
+    ADD COLUMN service_id        INT UNSIGNED    DEFAULT NULL AFTER societe_id,
+    ADD COLUMN avances_salaire   DECIMAL(10,2)   NOT NULL DEFAULT 0.00 AFTER avantage_logement,
+    ADD COLUMN mutuelle          DECIMAL(10,2)   NOT NULL DEFAULT 0.00 AFTER avances_salaire,
+    ADD FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE SET NULL;
+
+-- -----------------------------------------------------------
 -- Index utilisateur par défaut (password: admin123)
 -- -----------------------------------------------------------
 INSERT INTO users (nom, email, password, role)

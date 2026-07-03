@@ -3,14 +3,25 @@
         <h3><?= $salarie ? 'Modifier' : 'Nouveau' ?> salarié</h3>
     </div>
     <form method="POST">
-        <div class="form-group">
-            <label>Société *</label>
-            <select name="societe_id" class="form-control" required>
-                <option value="">— Sélectionner —</option>
-                <?php foreach ($societes as $so): ?>
-                <option value="<?= $so['id'] ?>" <?= ($fromSociete ?? $salarie['societe_id'] ?? '') == $so['id'] ? 'selected' : '' ?>><?= htmlspecialchars($so['raison_sociale']) ?></option>
-                <?php endforeach; ?>
-            </select>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Société *</label>
+                <select name="societe_id" class="form-control" required onchange="document.getElementById('service_group').style.display=this.value ? 'flex' : 'none'">
+                    <option value="">— Sélectionner —</option>
+                    <?php foreach ($societes as $so): ?>
+                    <option value="<?= $so['id'] ?>" <?= ($fromSociete ?? $salarie['societe_id'] ?? '') == $so['id'] ? 'selected' : '' ?>><?= htmlspecialchars($so['raison_sociale']) ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="form-group" id="service_group" style="display:<?= ($salarie['societe_id'] ?? $fromSociete) ? 'block' : 'none' ?>">
+                <label>Service</label>
+                <select name="service_id" class="form-control">
+                    <option value="">— Aucun —</option>
+                    <?php foreach ($services as $sv): ?>
+                    <option value="<?= $sv['id'] ?>" <?= ($salarie['service_id'] ?? '') == $sv['id'] ? 'selected' : '' ?>><?= htmlspecialchars($sv['nom']) ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
         </div>
         <div class="form-row">
             <div class="form-group">

@@ -1,0 +1,34 @@
+  <!-- 5. CNSS EDI AUTOMATION ENGINE (DAMANCOM INTERFACE) -->
+  <CNSS_EDI_Automation>
+    <Authentication>
+      <SecureVault>
+        Store credentials (Damancom Username, Password, Certificate/Private Key) securely in a cryptographically encrypted vault (using pgcrypto or Supabase Vault).
+        Never expose passwords in plain text or frontend logs.
+      </SecureVault>
+    </Authentication>
+
+    <EDIGeneration>
+      <FileFormat>Official CNSS/Damancom fixed-width text format or XML for Monthly Wage Declaration (Bordereau de Déclaration de Salaires).</FileFormat>
+      <DataPayload>
+        Each employee row must contain: Matricule CNSS (9 digits), Nom/Prénom, Salaire Brut Réel, Salaire Brut Plafonné (6000.00 MAD cap), and Number of days worked (Max 26 days per month).
+      </DataPayload>
+    </EDIGeneration>
+
+    <AutomationWorkflow>
+      <Step name="Validation">Run an internal validation test to ensure all employees have a valid 9-digit CNSS number and structural anomalies are flagged.</Step>
+      <Step name="File Compile">Generate the compliant EDI file payload from the current month's calculated payroll table.</Step>
+      <Step name="Transmission simulation">
+        Provide a UI interface inside "Declarations" showing a "Téléverser vers Damancom" button. 
+        Implement a secure backend worker (or API route) that uses a headless browser automation script (like Puppeteer/Playwright) or direct secure endpoints to authenticate into the Damancom portal using the encrypted credentials, upload the generated EDI file, and parse the return status (Accepté / Erreur).
+      </Step>
+    </AutomationWorkflow>
+
+    <UI_Components>
+      <CredentialsForm title="Configuration Damancom">
+        Inputs: Adhérent ID, Code Utilisateur, Mot de passe, and an optional Certificate File picker.
+      </CredentialsForm>
+      <SyncStatus>
+        Display a historical table of EDI submissions with statuses: "En attente", "Transmis à la CNSS", "Validé (Accusé de réception disponible)", or "Rejeté (avec logs d'erreurs détaillés)".
+      </SyncStatus>
+    </UI_Components>
+  </CNSS_EDI_Automation>

@@ -137,7 +137,18 @@ class PaieController extends Controller
         }
 
         $societeId = $periode['societe_id'];
-        $salaries = $this->db->query("SELECT id, salaire_base, indemnite_transport, indemnite_panier, indemnite_representation, avantage_logement, nb_enfants FROM salaries WHERE societe_id = $societeId AND actif = 1")->fetchAll();
+        $cnssParams = $this->db->query("SELECT * FROM parametres_cnss_amo WHERE societe_id = $societeId")->fetch();
+        if (!$cnssParams) {
+            $cnssParams = [
+                'plafond_cnss' => 6000,
+                'taux_cnss_salarial' => 4.48,
+                'taux_cnss_patronal' => 8.98,
+                'taux_amo_salarial' => 2.26,
+                'taux_amo_patronal' => 4.11,
+            ];
+        }
+
+        $salaries = $this->db->query("SELECT id, salaire_base, indemnite_transport, indemnite_panier, indemnite_representation, avantage_logement, nb_enfants, avances_salaire, mutuelle FROM salaries WHERE societe_id = $societeId AND actif = 1")->fetchAll();
 
         foreach ($salaries as $s) {
             $salaireBrut   = (float) $s['salaire_base'];
@@ -147,28 +158,30 @@ class PaieController extends Controller
             $logement      = (float) $s['avantage_logement'];
 
             $sb = $salaireBrut + $transport + $panier + $representation + $logement;
-            $plafonne = min($sb, 6000);
-            $cnss = round($plafonne * 4.48 / 100, 2);
-            $amo  = round($sb * 2.26 / 100, 2);
+            $plafonne = min($sb, (float) $cnssParams['plafond_cnss']);
+            $cnss = round($plafonne * (float) $cnssParams['taux_cnss_salarial'] / 100, 2);
+            $amo  = round($sb * (float) $cnssParams['taux_amo_salarial'] / 100, 2);
             $sni  = round($sb - ($cnss + $amo), 2);
 
             $ir = $this->calculateIr($sni);
 
             $deductionsFamiliales = $s['nb_enfants'] * 30;
-            $netAvant = $sni - $ir - $deductionsFamiliales;
+            $avances = (float) $s['avances_salaire'];
+            $mutuelle = (float) $s['mutuelle'];
+            $netAvant = $sni - $ir - $deductionsFamiliales - $avances - $mutuelle;
             $net = round(max($netAvant, 0), 2);
 
-            $cnssPatronale = round($sb * 8.98 / 100 + $sb * 8 / 100, 2);
-            $amoPatronale  = round($sb * 4.11 / 100, 2);
+            $cnssPatronale = round($sb * (float) $cnssParams['taux_cnss_patronal'] / 100, 2);
+            $amoPatronale  = round($sb * (float) $cnssParams['taux_amo_patronal'] / 100, 2);
 
             $stmtPaie = $this->db->prepare("
-                INSERT INTO paies (periode_id, salarie_id, societe_id, jours_travailles, salaire_brut, salaire_plafonne_cnss, indemnite_transport, indemnite_panier, indemnite_representation, avantage_logement, cnss_salariale, amo_salariale, sni, ir, deductions_familiales, net_avant_retenues, net_a_payer, cnss_patronale, amo_patronale)
-                VALUES (?, ?, ?, 30, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO paies (periode_id, salarie_id, societe_id, jours_travailles, salaire_brut, salaire_plafonne_cnss, indemnite_transport, indemnite_panier, indemnite_representation, avantage_logement, cnss_salariale, amo_salariale, mutuelle, sni, ir, deductions_familiales, autres_retenues, net_avant_retenues, net_a_payer, cnss_patronale, amo_patronale)
+                VALUES (?, ?, ?, 30, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ");
             $stmtPaie->execute([
                 $id, $s['id'], $societeId, $sb, $plafonne,
                 $transport, $panier, $representation, $logement,
-                $cnss, $amo, $sni, $ir, $deductionsFamiliales, $net, $net,
+                $cnss, $amo, $mutuelle, $sni, $ir, $deductionsFamiliales, $avances, $net, $net,
                 $cnssPatronale, $amoPatronale,
             ]);
         }

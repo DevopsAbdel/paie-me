@@ -44,28 +44,32 @@ class SalarieController extends Controller
 
         if ($this->isPost()) {
             $data = $this->getPostData();
+            $services = $this->db->query("SELECT * FROM services WHERE societe_id = " . (int)$data['societe_id'] . " ORDER BY nom")->fetchAll();
             $stmt = $this->db->prepare("
-                INSERT INTO salaries (societe_id, matricule, nom_famille, prenom, adresse, date_naissance, date_embauche, cin, cnss, situation_familiale, nb_enfants, poste, type_contrat, salaire_base, type_salaire, frequence_paiement, mode_paiement, rib, indemnite_transport, indemnite_panier, indemnite_representation, avantage_logement)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO salaries (societe_id, service_id, matricule, nom_famille, prenom, adresse, date_naissance, date_embauche, cin, cnss, situation_familiale, nb_enfants, poste, type_contrat, salaire_base, type_salaire, frequence_paiement, mode_paiement, rib, indemnite_transport, indemnite_panier, indemnite_representation, avantage_logement, avances_salaire, mutuelle)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ");
             $stmt->execute([
-                $data['societe_id'], $data['matricule'], $data['nom_famille'], $data['prenom'],
+                $data['societe_id'], $data['service_id'], $data['matricule'], $data['nom_famille'], $data['prenom'],
                 $data['adresse'], $data['date_naissance'], $data['date_embauche'], $data['cin'],
                 $data['cnss'], $data['situation_familiale'], $data['nb_enfants'], $data['poste'],
                 $data['type_contrat'], $data['salaire_base'], $data['type_salaire'],
                 $data['frequence_paiement'], $data['mode_paiement'], $data['rib'],
                 $data['indemnite_transport'], $data['indemnite_panier'],
                 $data['indemnite_representation'], $data['avantage_logement'],
+                $data['avances_salaire'], $data['mutuelle'],
             ]);
 
             Session::setFlash('success', 'Salarié ajouté avec succès.');
             $this->redirect($fromSociete ? '/paie-me/societes/' . $fromSociete . '?tab=salaries' : '/paie-me/salaries');
         }
 
+        $services = $fromSociete ? $this->db->query("SELECT * FROM services WHERE societe_id = $fromSociete ORDER BY nom")->fetchAll() : [];
         $this->render('salaries/form.php', [
             'title'       => 'Nouveau salarié',
             'salarie'     => null,
             'societes'    => $societes,
+            'services'    => $services,
             'fromSociete' => $fromSociete,
         ]);
     }
@@ -89,17 +93,18 @@ class SalarieController extends Controller
         if ($this->isPost()) {
             $data = $this->getPostData();
             $stmt = $this->db->prepare("
-                UPDATE salaries SET societe_id=?, matricule=?, nom_famille=?, prenom=?, adresse=?, date_naissance=?, date_embauche=?, cin=?, cnss=?, situation_familiale=?, nb_enfants=?, poste=?, type_contrat=?, salaire_base=?, type_salaire=?, frequence_paiement=?, mode_paiement=?, rib=?, indemnite_transport=?, indemnite_panier=?, indemnite_representation=?, avantage_logement=?
+                UPDATE salaries SET societe_id=?, service_id=?, matricule=?, nom_famille=?, prenom=?, adresse=?, date_naissance=?, date_embauche=?, cin=?, cnss=?, situation_familiale=?, nb_enfants=?, poste=?, type_contrat=?, salaire_base=?, type_salaire=?, frequence_paiement=?, mode_paiement=?, rib=?, indemnite_transport=?, indemnite_panier=?, indemnite_representation=?, avantage_logement=?, avances_salaire=?, mutuelle=?
                 WHERE id = ?
             ");
             $stmt->execute([
-                $data['societe_id'], $data['matricule'], $data['nom_famille'], $data['prenom'],
+                $data['societe_id'], $data['service_id'], $data['matricule'], $data['nom_famille'], $data['prenom'],
                 $data['adresse'], $data['date_naissance'], $data['date_embauche'], $data['cin'],
                 $data['cnss'], $data['situation_familiale'], $data['nb_enfants'], $data['poste'],
                 $data['type_contrat'], $data['salaire_base'], $data['type_salaire'],
                 $data['frequence_paiement'], $data['mode_paiement'], $data['rib'],
                 $data['indemnite_transport'], $data['indemnite_panier'],
-                $data['indemnite_representation'], $data['avantage_logement'], $id,
+                $data['indemnite_representation'], $data['avantage_logement'],
+                $data['avances_salaire'], $data['mutuelle'], $id,
             ]);
 
             Session::setFlash('success', 'Salarié mis à jour.');
@@ -108,11 +113,14 @@ class SalarieController extends Controller
         }
 
         $fromSociete = isset($_GET['from_societe']) ? (int) $_GET['from_societe'] : null;
+        $societeId = $salarie['societe_id'];
+        $services = $this->db->query("SELECT * FROM services WHERE societe_id = $societeId ORDER BY nom")->fetchAll();
 
         $this->render('salaries/form.php', [
             'title'       => 'Modifier salarié',
             'salarie'     => $salarie,
             'societes'    => $societes,
+            'services'    => $services,
             'fromSociete' => $fromSociete,
         ]);
     }
@@ -133,6 +141,7 @@ class SalarieController extends Controller
     {
         return [
             'societe_id'             => $_POST['societe_id'] ?? 0,
+            'service_id'             => $_POST['service_id'] ?? null,
             'matricule'              => $_POST['matricule'] ?? '',
             'nom_famille'            => $_POST['nom_famille'] ?? '',
             'prenom'                 => $_POST['prenom'] ?? '',
@@ -154,6 +163,8 @@ class SalarieController extends Controller
             'indemnite_panier'       => $_POST['indemnite_panier'] ?? 780.00,
             'indemnite_representation' => $_POST['indemnite_representation'] ?? 0,
             'avantage_logement'      => $_POST['avantage_logement'] ?? 0,
+            'avances_salaire'        => $_POST['avances_salaire'] ?? 0,
+            'mutuelle'               => $_POST['mutuelle'] ?? 0,
         ];
     }
 

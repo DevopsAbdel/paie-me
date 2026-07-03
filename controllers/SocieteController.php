@@ -170,6 +170,22 @@ class SocieteController extends Controller
             'cnss'           => $societe['cnss'],
         ]);
 
+        // Delete actions via GET
+        $deleteActions = [
+            'delete_service'    => 'services',
+            'delete_gain'       => 'rubriques_gains',
+            'delete_retenue'    => 'rubriques_retenues',
+            'delete_organisme'  => 'organismes',
+            'delete_attestation' => 'modeles_attestation',
+        ];
+        foreach ($deleteActions as $param => $table) {
+            if (isset($_GET[$param])) {
+                $this->db->exec("DELETE FROM $table WHERE id = " . (int)$_GET[$param] . " AND societe_id = $id");
+                Session::setFlash('success', 'Supprimé avec succès.');
+                $this->redirect('/paie-me/societes/' . $id . '/parametres?tab=' . str_replace('delete_', '', $param));
+            }
+        }
+
         if ($this->isPost()) {
             $sousTab = $_POST['sous_tab'] ?? 'banque';
 
@@ -183,6 +199,51 @@ class SocieteController extends Controller
                     $stmt->execute([$min, $max, $taux, $deduction, $type, $idBareme]);
                 }
                 Session::setFlash('success', 'Barème IR mis à jour.');
+            } elseif ($sousTab === 'cnss_amo') {
+                $stmt = $this->db->prepare("
+                    INSERT INTO parametres_cnss_amo (societe_id, plafond_cnss, taux_cnss_salarial, taux_cnss_patronal, taux_amo_salarial, taux_amo_patronal)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                    ON DUPLICATE KEY UPDATE plafond_cnss=VALUES(plafond_cnss), taux_cnss_salarial=VALUES(taux_cnss_salarial), taux_cnss_patronal=VALUES(taux_cnss_patronal), taux_amo_salarial=VALUES(taux_amo_salarial), taux_amo_patronal=VALUES(taux_amo_patronal)
+                ");
+                $stmt->execute([
+                    $id,
+                    $_POST['plafond_cnss'] ?? 6000,
+                    $_POST['taux_cnss_salarial'] ?? 4.48,
+                    $_POST['taux_cnss_patronal'] ?? 8.98,
+                    $_POST['taux_amo_salarial'] ?? 2.26,
+                    $_POST['taux_amo_patronal'] ?? 4.11,
+                ]);
+                Session::setFlash('success', 'Taux CNSS/AMO mis à jour.');
+            } elseif ($sousTab === 'services') {
+                if (!empty($_POST['service_nom'])) {
+                    $stmt = $this->db->prepare("INSERT INTO services (societe_id, nom, description) VALUES (?, ?, ?)");
+                    $stmt->execute([$id, $_POST['service_nom'], $_POST['service_description'] ?? '']);
+                    Session::setFlash('success', 'Service ajouté.');
+                }
+            } elseif ($sousTab === 'gains') {
+                if (!empty($_POST['code'])) {
+                    $stmt = $this->db->prepare("INSERT INTO rubriques_gains (societe_id, code, libelle, type_montant, valeur_defaut) VALUES (?, ?, ?, ?, ?)");
+                    $stmt->execute([$id, $_POST['code'], $_POST['libelle'], $_POST['type_montant'] ?? 'fixe', $_POST['valeur_defaut'] ?? 0]);
+                    Session::setFlash('success', 'Gain ajouté.');
+                }
+            } elseif ($sousTab === 'retenues') {
+                if (!empty($_POST['code'])) {
+                    $stmt = $this->db->prepare("INSERT INTO rubriques_retenues (societe_id, code, libelle, type_montant, valeur_defaut) VALUES (?, ?, ?, ?, ?)");
+                    $stmt->execute([$id, $_POST['code'], $_POST['libelle'], $_POST['type_montant'] ?? 'fixe', $_POST['valeur_defaut'] ?? 0]);
+                    Session::setFlash('success', 'Retenue ajoutée.');
+                }
+            } elseif ($sousTab === 'organismes') {
+                if (!empty($_POST['nom'])) {
+                    $stmt = $this->db->prepare("INSERT INTO organismes (societe_id, nom, type, login, mot_de_passe) VALUES (?, ?, ?, ?, ?)");
+                    $stmt->execute([$id, $_POST['nom'], $_POST['type'] ?? 'autre', $_POST['login'] ?? '', $_POST['mot_de_passe'] ?? '']);
+                    Session::setFlash('success', 'Organisme ajouté.');
+                }
+            } elseif ($sousTab === 'attestations') {
+                if (!empty($_POST['titre'])) {
+                    $stmt = $this->db->prepare("INSERT INTO modeles_attestation (societe_id, titre, contenu) VALUES (?, ?, ?)");
+                    $stmt->execute([$id, $_POST['titre'], $_POST['contenu'] ?? '']);
+                    Session::setFlash('success', 'Modèle d\'attestation ajouté.');
+                }
             } else {
                 $stmt = $this->db->prepare("
                     UPDATE societes SET banque=?, agence=?, rib=?, damancom_login=?, damancom_password=?, simpl_login=?, simpl_password=?, cimr_login=?, cimr_password=?
@@ -208,12 +269,25 @@ class SocieteController extends Controller
 
         $baremeMensuel = $this->db->query("SELECT * FROM bareme_ir WHERE type='mensuel' ORDER BY `min`")->fetchAll();
         $baremeAnnuel  = $this->db->query("SELECT * FROM bareme_ir WHERE type='annuel' ORDER BY `min`")->fetchAll();
+        $cnssParams = $this->db->query("SELECT * FROM parametres_cnss_amo WHERE societe_id = $id")->fetch();
+        if (!$cnssParams) $cnssParams = ['plafond_cnss'=>6000,'taux_cnss_salarial'=>4.48,'taux_cnss_patronal'=>8.98,'taux_amo_salarial'=>2.26,'taux_amo_patronal'=>4.11];
+        $services = $this->db->query("SELECT * FROM services WHERE societe_id = $id ORDER BY nom")->fetchAll();
+        $gains = $this->db->query("SELECT * FROM rubriques_gains WHERE societe_id = $id ORDER BY code")->fetchAll();
+        $retenues = $this->db->query("SELECT * FROM rubriques_retenues WHERE societe_id = $id ORDER BY code")->fetchAll();
+        $organismes = $this->db->query("SELECT * FROM organismes WHERE societe_id = $id ORDER BY nom")->fetchAll();
+        $attestations = $this->db->query("SELECT * FROM modeles_attestation WHERE societe_id = $id ORDER BY titre")->fetchAll();
 
         $this->render('societes/parametres.php', [
             'title'         => 'Paramètres — ' . $societe['raison_sociale'],
             'societe'       => $societe,
             'bareme'        => $baremeMensuel,
             'baremeAnnuel'  => $baremeAnnuel,
+            'cnssParams'    => $cnssParams,
+            'services'      => $services,
+            'gains'         => $gains,
+            'retenues'      => $retenues,
+            'organismes'    => $organismes,
+            'attestations'  => $attestations,
         ]);
     }
 
