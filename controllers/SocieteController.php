@@ -185,7 +185,7 @@ class SocieteController extends Controller
             $this->redirect('/paie-me/societes/' . $id . '/parametres?tab=' . ($_POST['sous_tab'] ?? 'banque'));
         }
 
-        $bareme = $this->db->query("SELECT * FROM bareme_ir ORDER BY borne_inf")->fetchAll();
+        $bareme = $this->db->query("SELECT * FROM bareme_ir ORDER BY `min`")->fetchAll();
 
         $this->render('societes/parametres.php', [
             'title'   => 'Paramètres — ' . $societe['raison_sociale'],

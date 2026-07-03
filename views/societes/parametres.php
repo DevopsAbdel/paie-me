@@ -115,7 +115,7 @@ $baseUrl = '/paie-me/societes/' . $societe['id'] . '/parametres';
             <tbody>
                 <?php foreach ($bareme as $b): ?>
                 <tr>
-                    <td><?= number_format($b['borne_inf'], 0, ',', ' ') . ' — ' . number_format($b['borne_sup'], 0, ',', ' ') ?></td>
+                    <td><?= number_format($b['min'], 0, ',', ' ') . ' — ' . number_format($b['max'], 0, ',', ' ') ?></td>
                     <td><?= ($b['taux'] * 100) ?>%</td>
                     <td><?= number_format($b['deduction'], 2, ',', ' ') ?> MAD</td>
                 </tr>
