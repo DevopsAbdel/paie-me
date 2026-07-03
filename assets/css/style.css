@@ -412,8 +412,15 @@ select.form-control {
 }
 
 /* ── Login page ── */
-.login-wrapper {
+main:not(.main-content) {
     min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-wrapper {
+    width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -427,26 +434,34 @@ select.form-control {
     padding: 2.5rem;
     width: 100%;
     max-width: 420px;
+    text-align: center;
 }
 
 .login-card h1 {
-    text-align: center;
     font-size: 1.5rem;
     margin-bottom: 0.25rem;
     color: var(--accent);
 }
 
 .login-card .subtitle {
-    text-align: center;
     color: var(--text-muted);
     font-size: 0.875rem;
     margin-bottom: 2rem;
+}
+
+.login-card form {
+    text-align: left;
+}
+
+.login-card .form-group {
+    text-align: left;
 }
 
 .login-card .btn {
     width: 100%;
     justify-content: center;
     padding: 0.75rem;
+    font-size: 1rem;
 }
 
 /* ── Responsive ── */
