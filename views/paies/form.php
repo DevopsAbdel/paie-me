@@ -8,7 +8,7 @@
             <select name="societe_id" class="form-control" required>
                 <option value="">— Sélectionner —</option>
                 <?php foreach ($societes as $so): ?>
-                <option value="<?= $so['id'] ?>"><?= htmlspecialchars($so['raison_sociale']) ?></option>
+                <option value="<?= $so['id'] ?>" <?= ($fromSociete ?? '') == $so['id'] ? 'selected' : '' ?>><?= htmlspecialchars($so['raison_sociale']) ?></option>
                 <?php endforeach; ?>
             </select>
         </div>

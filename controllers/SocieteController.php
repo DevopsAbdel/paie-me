@@ -57,6 +57,28 @@ class SocieteController extends Controller
         ]);
     }
 
+    public function show(int $id): void
+    {
+        $userId = Session::get('user_id');
+        $societe = $this->db->query("SELECT * FROM societes WHERE id = $id AND user_id = $userId")->fetch();
+
+        if (!$societe) {
+            Session::setFlash('error', 'Société introuvable.');
+            $this->redirect('/paie-me/societes');
+        }
+
+        $salaries = $this->db->query("SELECT * FROM salaries WHERE societe_id = $id AND actif = 1 ORDER BY nom_famille, prenom")->fetchAll();
+        $periodes = $this->db->query("SELECT p.*, (SELECT COUNT(*) FROM paies WHERE periode_id = p.id) as nb_paies FROM periodes p WHERE p.societe_id = $id ORDER BY p.annee DESC, p.mois DESC")->fetchAll();
+
+        $this->render('societes/show.php', [
+            'title'     => $societe['raison_sociale'],
+            'societe'   => $societe,
+            'salaries'  => $salaries,
+            'periodes'  => $periodes,
+            'societeId' => $id,
+        ]);
+    }
+
     public function edit(int $id): void
     {
         $userId = Session::get('user_id');

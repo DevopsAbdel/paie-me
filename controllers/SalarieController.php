@@ -40,6 +40,7 @@ class SalarieController extends Controller
     {
         $userId = Session::get('user_id');
         $societes = $this->db->query("SELECT id, raison_sociale FROM societes WHERE user_id = $userId ORDER BY raison_sociale")->fetchAll();
+        $fromSociete = isset($_GET['from_societe']) ? (int) $_GET['from_societe'] : null;
 
         if ($this->isPost()) {
             $data = $this->getPostData();
@@ -58,13 +59,14 @@ class SalarieController extends Controller
             ]);
 
             Session::setFlash('success', 'Salarié ajouté avec succès.');
-            $this->redirect('/paie-me/salaries');
+            $this->redirect($fromSociete ? '/paie-me/societes/' . $fromSociete . '?tab=salaries' : '/paie-me/salaries');
         }
 
         $this->render('salaries/form.php', [
-            'title'    => 'Nouveau salarié',
-            'salarie'  => null,
-            'societes' => $societes,
+            'title'       => 'Nouveau salarié',
+            'salarie'     => null,
+            'societes'    => $societes,
+            'fromSociete' => $fromSociete,
         ]);
     }
 
@@ -101,13 +103,17 @@ class SalarieController extends Controller
             ]);
 
             Session::setFlash('success', 'Salarié mis à jour.');
-            $this->redirect('/paie-me/salaries');
+            $societeId = $data['societe_id'] ?? $salarie['societe_id'];
+            $this->redirect('/paie-me/societes/' . $societeId . '?tab=salaries');
         }
 
+        $fromSociete = isset($_GET['from_societe']) ? (int) $_GET['from_societe'] : null;
+
         $this->render('salaries/form.php', [
-            'title'    => 'Modifier salarié',
-            'salarie'  => $salarie,
-            'societes' => $societes,
+            'title'       => 'Modifier salarié',
+            'salarie'     => $salarie,
+            'societes'    => $societes,
+            'fromSociete' => $fromSociete,
         ]);
     }
 

@@ -20,6 +20,7 @@ Router::get('/dashboard',              [DashboardController::class, 'index']);
 Router::get('/societes',               [SocieteController::class, 'index']);
 Router::get('/societes/create',        [SocieteController::class, 'create']);
 Router::post('/societes/create',       [SocieteController::class, 'create']);
+Router::get('/societes/{id}',          [SocieteController::class, 'show']);
 Router::get('/societes/{id}/edit',     [SocieteController::class, 'edit']);
 Router::post('/societes/{id}/edit',    [SocieteController::class, 'edit']);
 Router::get('/societes/{id}/delete',   [SocieteController::class, 'delete']);

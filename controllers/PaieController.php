@@ -42,6 +42,8 @@ class PaieController extends Controller
         $userId = Session::get('user_id');
         $societes = $this->db->query("SELECT id, raison_sociale FROM societes WHERE user_id = $userId ORDER BY raison_sociale")->fetchAll();
 
+        $fromSociete = isset($_GET['from_societe']) ? (int) $_GET['from_societe'] : null;
+
         if ($this->isPost()) {
             $societeId  = (int) ($_POST['societe_id'] ?? 0);
             $mois       = (int) ($_POST['mois'] ?? 0);
@@ -109,8 +111,9 @@ class PaieController extends Controller
         }
 
         $this->render('paies/form.php', [
-            'title'    => 'Nouvelle période de paie',
-            'societes' => $societes,
+            'title'       => 'Nouvelle période de paie',
+            'societes'    => $societes,
+            'fromSociete' => $fromSociete,
         ]);
     }
 

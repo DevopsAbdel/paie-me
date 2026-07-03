@@ -27,7 +27,7 @@
                 <tbody>
                     <?php foreach ($societes as $s): ?>
                     <tr>
-                        <td><?= htmlspecialchars($s['raison_sociale']) ?></td>
+                        <td><a href="/paie-me/societes/<?= $s['id'] ?>" style="font-weight:600;"><?= htmlspecialchars($s['raison_sociale']) ?></a></td>
                         <td><?= $s['forme_juridique'] ?></td>
                         <td><?= htmlspecialchars($s['ice']) ?></td>
                         <td><?= htmlspecialchars($s['if_fiscal']) ?></td>
@@ -35,6 +35,7 @@
                         <td><?= htmlspecialchars($s['cnss']) ?></td>
                         <td><?= htmlspecialchars($s['ville']) ?></td>
                         <td class="table-actions">
+                            <a href="/paie-me/societes/<?= $s['id'] ?>" class="btn btn-primary btn-sm">Ouvrir</a>
                             <a href="/paie-me/societes/<?= $s['id'] ?>/edit" class="btn btn-secondary btn-sm">Modifier</a>
                             <a href="/paie-me/societes/<?= $s['id'] ?>/delete" class="btn btn-danger btn-sm" onclick="return confirm('Supprimer cette société ?')">Supprimer</a>
                         </td>
