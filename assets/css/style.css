@@ -450,12 +450,11 @@ main:not(.main-content) {
 }
 
 .login-card form {
-    max-width: 320px;
-    margin: 0 auto;
+    width: 100%;
 }
 
 .login-card .form-group {
-    text-align: left;
+    text-align: center;
 }
 
 .login-card .btn {
