@@ -58,12 +58,27 @@ if (Test-Path $mysqlExe) {
     Write-Error "mysql.exe introuvable. Vérifie le chemin XAMPP."
 }
 
-# ── Lancer le navigateur ──
+# ── Lancer Chrome avec auto-login ──
 if (-not $NoBrowser) {
-    Write-Info "Ouverture de $ProjectUrl ..."
-    Start-Process $ProjectUrl
+    Write-Info "Ouverture de Chrome avec connexion automatique..."
+    $loginHtml = Join-Path $env:TEMP "paie-me-login.html"
+    @"
+<!DOCTYPE html>
+<html><body>
+<form id="f" action="$ProjectUrl/login" method="POST">
+    <input name="email" value="admin@paie-me.ma">
+    <input name="password" value="admin123">
+</form>
+<script>document.getElementById('f').submit()</script>
+</body></html>
+"@ | Out-File -Encoding utf8NoBOM -FilePath $loginHtml
+    $chrome = Get-ChildItem -Path @("$env:ProgramFiles\Google\Chrome\Application\chrome.exe", "${env:ProgramFiles(x86)}\Google\Chrome\Application\chrome.exe", "$env:LOCALAPPDATA\Google\Chrome\Application\chrome.exe") -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty FullName
+    if ($chrome) {
+        Start-Process -FilePath $chrome -ArgumentList "--new-window `"$loginHtml`" --window-size=1366,768"
+    } else {
+        Write-Error "Chrome introuvable. Ouverture par defaut."
+        Start-Process $loginHtml
+    }
 }
 
 Write-Ok "Projet prêt sur $ProjectUrl"
-Write-Host "  Login : admin@paie-me.ma" -ForegroundColor Gray
-Write-Host "  Mot de passe : admin123" -ForegroundColor Gray
