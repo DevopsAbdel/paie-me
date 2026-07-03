@@ -21,10 +21,21 @@
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>BULLETIN DE PAIE</h1>
-        <p><strong><?= htmlspecialchars($b['raison_sociale']) ?></strong></p>
-        <p>ICE: <?= htmlspecialchars($b['ice']) ?> | IF: <?= htmlspecialchars($b['if_fiscal']) ?> | CNSS: <?= htmlspecialchars($b['cnss_societe']) ?></p>
+    <div class="header" style="display:flex; align-items:center; gap:15px; text-align:left; border-bottom:3px solid #3b82f6; padding-bottom:15px;">
+        <div style="width:50px; height:50px; background:#3b82f6; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:700; color:#fff;">
+            <?= strtoupper(mb_substr($b['raison_sociale'], 0, 2)) ?>
+        </div>
+        <div style="flex:1;">
+            <h1 style="font-size:16px; margin:0; color:#3b82f6;"><?= htmlspecialchars($b['raison_sociale']) ?></h1>
+            <p style="margin:2px 0; font-size:10px; color:#666;">
+                ICE: <?= htmlspecialchars($b['ice']) ?> | IF: <?= htmlspecialchars($b['if_fiscal']) ?> | CNSS: <?= htmlspecialchars($b['cnss_societe']) ?>
+            </p>
+            <p style="margin:0; font-size:10px; color:#666;">
+                <?= htmlspecialchars($b['adresse'] ?? '') ?>
+                <?php if ($b['telephone']): ?> | Tél: <?= htmlspecialchars($b['telephone']) ?><?php endif; ?>
+                <?php if ($b['email']): ?> | <?= htmlspecialchars($b['email']) ?><?php endif; ?>
+            </p>
+        </div>
     </div>
 
     <table class="infos">
@@ -74,8 +85,20 @@
 
     <div class="net">Net à payer : <?= number_format($b['net_a_payer'], 2, ',', ' ') ?> MAD</div>
 
-    <div class="footer">
-        Document généré par Paie Me — Application de gestion de paie conforme aux normes marocaines.
+    <div class="footer" style="display:flex; justify-content:space-between; align-items:center;">
+        <div style="display:flex; align-items:center; gap:6px;">
+            <div style="width:24px; height:24px; background:#3b82f6; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; color:#fff;">
+                <?= strtoupper(mb_substr($b['raison_sociale'], 0, 2)) ?>
+            </div>
+            <span><?= htmlspecialchars($b['raison_sociale']) ?></span>
+        </div>
+        <div style="text-align:right; font-size:9px;">
+            <?= htmlspecialchars($b['adresse'] ?? '') ?>
+            <?php if ($b['telephone']): ?> | Tél: <?= htmlspecialchars($b['telephone']) ?><?php endif; ?>
+            <?php if ($b['email']): ?> | <?= htmlspecialchars($b['email']) ?><?php endif; ?>
+            <br>
+            ICE: <?= htmlspecialchars($b['ice']) ?> | IF: <?= htmlspecialchars($b['if_fiscal']) ?> | CNSS: <?= htmlspecialchars($b['cnss_societe']) ?>
+        </div>
     </div>
 </body>
 </html>

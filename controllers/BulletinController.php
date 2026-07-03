@@ -76,6 +76,7 @@ class BulletinController extends Controller
                    s.date_embauche, s.situation_familiale, s.nb_enfants, s.indemnite_transport,
                    s.indemnite_panier, s.indemnite_representation, s.avantage_logement, s.salaire_base,
                    so.raison_sociale, so.ice, so.if_fiscal, so.cnss as cnss_societe, so.rc, so.ville,
+                   so.adresse, so.telephone, so.email, so.logo, so.banque, so.rib,
                    p.mois, p.annee
             FROM bulletins b
             JOIN paies pa ON b.paie_id = pa.id
