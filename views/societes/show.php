@@ -35,9 +35,6 @@ $baseUrl = '/paie-me/societes/' . $societe['id'];
     <a href="<?= $baseUrl ?>?tab=ir" style="padding:0.75rem 1.25rem; color:<?= $tab === 'ir' ? 'var(--accent)' : 'var(--text-muted)' ?>; border-bottom:2px solid <?= $tab === 'ir' ? 'var(--accent)' : 'transparent' ?>; margin-bottom:-2px; font-weight:<?= $tab === 'ir' ? '600' : '400' ?>; text-decoration:none; transition:all 0.2s;">
         IR
     </a>
-    <a href="<?= $baseUrl ?>?tab=parametres" style="padding:0.75rem 1.25rem; color:<?= $tab === 'parametres' ? 'var(--accent)' : 'var(--text-muted)' ?>; border-bottom:2px solid <?= $tab === 'parametres' ? 'var(--accent)' : 'transparent' ?>; margin-bottom:-2px; font-weight:<?= $tab === 'parametres' ? '600' : '400' ?>; text-decoration:none; transition:all 0.2s;">
-        Paramètres
-    </a>
 </div>
 
 <?php if ($tab === 'infos'): ?>
@@ -270,76 +267,5 @@ $baseUrl = '/paie-me/societes/' . $societe['id'];
         </div>
     </div>
     <?php endif; ?>
-</div>
-
-<?php elseif ($tab === 'parametres'): ?>
-<div class="card">
-    <div class="card-header"><h3>Paramètres — <?= htmlspecialchars($societe['raison_sociale']) ?></h3></div>
-    <form method="post" action="/paie-me/societes/<?= $societe['id'] ?>/parameters">
-    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px,1fr)); gap:1.5rem;">
-
-        <div class="card" style="margin:0;">
-            <h4 style="color:var(--accent); margin-bottom:1rem;">Banque</h4>
-            <div class="form-group">
-                <label>Banque</label>
-                <input type="text" name="banque" value="<?= htmlspecialchars($societe['banque'] ?? '') ?>" class="form-control" placeholder="Nom de la banque">
-            </div>
-            <div class="form-group">
-                <label>Agence</label>
-                <input type="text" name="agence" value="<?= htmlspecialchars($societe['agence'] ?? '') ?>" class="form-control" placeholder="Agence bancaire">
-            </div>
-            <div class="form-group">
-                <label>RIB</label>
-                <input type="text" name="rib" value="<?= htmlspecialchars($societe['rib'] ?? '') ?>" class="form-control" placeholder="RIB">
-            </div>
-        </div>
-
-        <div class="card" style="margin:0;">
-            <h4 style="color:var(--accent); margin-bottom:1rem;">Comptes téléservices</h4>
-            <div class="form-group">
-                <label>Damancom (CNSS)</label>
-                <input type="text" name="compte_damancom" value="<?= htmlspecialchars($societe['compte_damancom'] ?? '') ?>" class="form-control" placeholder="Compte Damancom">
-                <small style="color:var(--text-muted); font-size:0.75rem;">Compte utilisateur pour la déclaration CNSS en ligne</small>
-            </div>
-            <div class="form-group">
-                <label>SIMPL (Impôts)</label>
-                <input type="text" name="compte_simpl" value="<?= htmlspecialchars($societe['compte_simpl'] ?? '') ?>" class="form-control" placeholder="Compte SIMPL">
-                <small style="color:var(--text-muted); font-size:0.75rem;">Compte pour la déclaration IR via SIMPL</small>
-            </div>
-            <div class="form-group">
-                <label>CIMR (Retraite)</label>
-                <input type="text" name="compte_cimr" value="<?= htmlspecialchars($societe['compte_cimr'] ?? '') ?>" class="form-control" placeholder="Compte CIMR">
-                <small style="color:var(--text-muted); font-size:0.75rem;">Caisse Interprofessionnelle Marocaine de Retraite</small>
-            </div>
-        </div>
-
-        <div class="card" style="margin:0;">
-            <h4 style="color:var(--accent); margin-bottom:1rem;">Barème IR</h4>
-            <p style="color:var(--text-muted); font-size:0.875rem;">Barème progressif 2025</p>
-            <p style="font-size:0.8125rem; color:var(--text-muted);">
-                Tranches et taux chargés automatiquement depuis la base de données.<br>
-                Mise à jour annuelle requise en janvier.
-            </p>
-        </div>
-
-        <div class="card" style="margin:0;">
-            <h4 style="color:var(--accent); margin-bottom:1rem;">Codification</h4>
-            <div class="form-group">
-                <label>Préfixe matricule</label>
-                <input type="text" value="EMP-" class="form-control" disabled>
-                <small style="color:var(--text-muted); font-size:0.75rem;">Préfixe automatique pour les matricules salariés</small>
-            </div>
-            <div class="form-group">
-                <label>Préfixe bulletin</label>
-                <input type="text" value="BUL-" class="form-control" disabled>
-                <small style="color:var(--text-muted); font-size:0.75rem;">Préfixe des numéros de bulletin</small>
-            </div>
-        </div>
-
-    </div>
-    <div style="margin-top:1rem; padding:1rem 0; border-top:1px solid var(--border);">
-        <button type="submit" class="btn btn-primary">Enregistrer les paramètres</button>
-    </div>
-    </form>
 </div>
 <?php endif; ?>

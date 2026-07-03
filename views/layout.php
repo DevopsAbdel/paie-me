@@ -63,6 +63,12 @@
                 <span>IR / SIMPL</span>
             </a>
         </li>
+        <li>
+            <a href="/paie-me/societes/<?= $ctx['id'] ?>/parametres" class="<?= str_contains($_SERVER['REQUEST_URI'], '/parametres') ? 'active' : '' ?>">
+                <span class="icon" data-lucide="settings"></span>
+                <span>Paramètres</span>
+            </a>
+        </li>
         <?php else: ?>
         <li>
             <a href="/paie-me/dashboard" class="<?= str_contains($_SERVER['REQUEST_URI'], '/dashboard') ? 'active' : '' ?>">

@@ -149,7 +149,7 @@ class SocieteController extends Controller
         $this->redirect('/paie-me/societes');
     }
 
-    public function parameters(int $id): void
+    public function parametres(int $id): void
     {
         $userId = Session::get('user_id');
         $societe = $this->db->query("SELECT * FROM societes WHERE id = $id AND user_id = $userId")->fetch();
@@ -158,6 +158,13 @@ class SocieteController extends Controller
             Session::setFlash('error', 'Société introuvable.');
             $this->redirect('/paie-me/societes');
         }
+
+        Session::set('societe_context', [
+            'id'             => $societe['id'],
+            'raison_sociale' => $societe['raison_sociale'],
+            'ice'            => $societe['ice'],
+            'cnss'           => $societe['cnss'],
+        ]);
 
         if ($this->isPost()) {
             $stmt = $this->db->prepare("
@@ -175,10 +182,16 @@ class SocieteController extends Controller
             ]);
 
             Session::setFlash('success', 'Paramètres mis à jour.');
-            $this->redirect('/paie-me/societes/' . $id . '?tab=parametres');
+            $this->redirect('/paie-me/societes/' . $id . '/parametres?tab=' . ($_POST['sous_tab'] ?? 'banque'));
         }
 
-        $this->redirect('/paie-me/societes/' . $id . '?tab=parametres');
+        $bareme = $this->db->query("SELECT * FROM bareme_ir ORDER BY borne_inf")->fetchAll();
+
+        $this->render('societes/parametres.php', [
+            'title'   => 'Paramètres — ' . $societe['raison_sociale'],
+            'societe' => $societe,
+            'bareme'  => $bareme,
+        ]);
     }
 
     private function getPostData(): array
