@@ -1,0 +1,24 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "username": "DevopsAbdel",
+  "default_agent": "general",
+  "instructions": ["AGENTS.md"],
+  "agent": {
+    "chrome-devtools": {
+      "description": "Frontend debugging, CSS/JS inspection, console errors, network analysis",
+      "mode": "subagent"
+    },
+    "sql": {
+      "description": "Database schema design, SQL queries, MySQL optimization",
+      "mode": "subagent"
+    },
+    "awesome-design": {
+      "description": "UI/UX design, dark mode CSS, responsive layouts, accessibility",
+      "mode": "subagent"
+    },
+    "git-cli": {
+      "description": "Git operations, PowerShell CLI, project scaffolding, automation",
+      "mode": "subagent"
+    }
+  }
+}
