@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: 'DejaVu Sans', sans-serif; font-size: 12px; color: #222; }
+        .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #333; padding-bottom: 10px; }
+        .header h1 { font-size: 18px; margin: 0; }
+        .header p { margin: 2px 0; font-size: 11px; color: #555; }
+        .infos { width: 100%; margin-bottom: 15px; }
+        .infos td { vertical-align: top; padding: 4px 8px; }
+        .infos-left { width: 50%; }
+        .infos-right { width: 50%; text-align: right; }
+        table.details { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
+        table.details th { background: #e5e7eb; padding: 6px 8px; text-align: left; font-size: 11px; }
+        table.details td { padding: 4px 8px; border-bottom: 1px solid #ddd; }
+        table.details .right { text-align: right; }
+        table.details .bold { font-weight: bold; }
+        .net { background: #f3f4f6; padding: 10px 15px; text-align: right; font-size: 16px; font-weight: bold; border-radius: 4px; margin-top: 10px; }
+        .footer { text-align: center; margin-top: 30px; font-size: 10px; color: #999; border-top: 1px solid #ddd; padding-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>BULLETIN DE PAIE</h1>
+        <p><strong><?= htmlspecialchars($b['raison_sociale']) ?></strong></p>
+        <p>ICE: <?= htmlspecialchars($b['ice']) ?> | IF: <?= htmlspecialchars($b['if_fiscal']) ?> | CNSS: <?= htmlspecialchars($b['cnss_societe']) ?></p>
+    </div>
+
+    <table class="infos">
+        <tr>
+            <td class="infos-left">
+                <strong>Salarié:</strong> <?= htmlspecialchars($b['nom_famille'] . ' ' . $b['prenom']) ?><br>
+                <strong>Matricule:</strong> <?= htmlspecialchars($b['matricule']) ?><br>
+                <strong>CIN:</strong> <?= htmlspecialchars($b['cin']) ?><br>
+                <strong>CNSS:</strong> <?= htmlspecialchars($b['cnss_num']) ?><br>
+                <strong>Poste:</strong> <?= htmlspecialchars($b['poste']) ?><br>
+                <strong>Date d'embauche:</strong> <?= $b['date_embauche'] ?>
+            </td>
+            <td class="infos-right">
+                <strong>Période:</strong> <?= str_pad($b['mois'], 2, '0', STR_PAD_LEFT) . '/' . $b['annee'] ?><br>
+                <strong>N° Bulletin:</strong> <?= htmlspecialchars($b['numero']) ?><br>
+                <strong>Date:</strong> <?= $b['date_emission'] ?>
+            </td>
+        </tr>
+    </table>
+
+    <h3>Éléments du salaire</h3>
+    <table class="details">
+        <tr><th>Libellé</th><th class="right">Montant (MAD)</th></tr>
+        <tr><td>Salaire de base</td><td class="right"><?= number_format($b['salaire_base'], 2, ',', ' ') ?></td></tr>
+        <tr><td>Indemnité de transport</td><td class="right"><?= number_format($b['indemnite_transport'], 2, ',', ' ') ?></td></tr>
+        <tr><td>Indemnité de panier</td><td class="right"><?= number_format($b['indemnite_panier'], 2, ',', ' ') ?></td></tr>
+        <?php if ((float)$b['indemnite_representation'] > 0): ?>
+        <tr><td>Indemnité de représentation</td><td class="right"><?= number_format($b['indemnite_representation'], 2, ',', ' ') ?></td></tr>
+        <?php endif; ?>
+        <?php if ((float)$b['avantage_logement'] > 0): ?>
+        <tr><td>Avantage logement</td><td class="right"><?= number_format($b['avantage_logement'], 2, ',', ' ') ?></td></tr>
+        <?php endif; ?>
+        <tr class="bold"><td>Salaire brut</td><td class="right"><?= number_format($b['salaire_brut'], 2, ',', ' ') ?></td></tr>
+    </table>
+
+    <h3>Cotisations et retenues</h3>
+    <table class="details">
+        <tr><th>Libellé</th><th class="right">Montant (MAD)</th></tr>
+        <tr><td>CNSS (part salariale)</td><td class="right"><?= number_format($b['cnss_salariale'], 2, ',', ' ') ?></td></tr>
+        <tr><td>AMO (part salariale)</td><td class="right"><?= number_format($b['amo_salariale'], 2, ',', ' ') ?></td></tr>
+        <tr class="bold"><td>Salaire net imposable (SNI)</td><td class="right"><?= number_format($b['sni'], 2, ',', ' ') ?></td></tr>
+        <tr><td>Impôt sur le revenu (IR)</td><td class="right"><?= number_format($b['ir'], 2, ',', ' ') ?></td></tr>
+        <?php if ((float)$b['deductions_familiales'] > 0): ?>
+        <tr><td>Déductions familiales</td><td class="right"><?= number_format($b['deductions_familiales'], 2, ',', ' ') ?></td></tr>
+        <?php endif; ?>
+    </table>
+
+    <div class="net">Net à payer : <?= number_format($b['net_a_payer'], 2, ',', ' ') ?> MAD</div>
+
+    <div class="footer">
+        Document généré par Paie Me — Application de gestion de paie conforme aux normes marocaines.
+    </div>
+</body>
+</html>

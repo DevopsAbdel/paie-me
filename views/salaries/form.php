@@ -1,0 +1,144 @@
+<div class="card">
+    <div class="card-header">
+        <h3><?= $salarie ? 'Modifier' : 'Nouveau' ?> salarié</h3>
+    </div>
+    <form method="POST">
+        <div class="form-group">
+            <label>Société *</label>
+            <select name="societe_id" class="form-control" required>
+                <option value="">— Sélectionner —</option>
+                <?php foreach ($societes as $so): ?>
+                <option value="<?= $so['id'] ?>" <?= ($salarie['societe_id'] ?? '') == $so['id'] ? 'selected' : '' ?>><?= htmlspecialchars($so['raison_sociale']) ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Matricule *</label>
+                <input type="text" name="matricule" class="form-control" value="<?= $salarie['matricule'] ?? '' ?>" required>
+            </div>
+            <div class="form-group">
+                <label>Nom de famille *</label>
+                <input type="text" name="nom_famille" class="form-control" value="<?= $salarie['nom_famille'] ?? '' ?>" required>
+            </div>
+            <div class="form-group">
+                <label>Prénom *</label>
+                <input type="text" name="prenom" class="form-control" value="<?= $salarie['prenom'] ?? '' ?>" required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Adresse</label>
+            <textarea name="adresse" class="form-control" rows="2"><?= $salarie['adresse'] ?? '' ?></textarea>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Date de naissance</label>
+                <input type="date" name="date_naissance" class="form-control" value="<?= $salarie['date_naissance'] ?? '' ?>">
+            </div>
+            <div class="form-group">
+                <label>Date d'embauche</label>
+                <input type="date" name="date_embauche" class="form-control" value="<?= $salarie['date_embauche'] ?? '' ?>">
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>CIN</label>
+                <input type="text" name="cin" class="form-control" value="<?= $salarie['cin'] ?? '' ?>">
+            </div>
+            <div class="form-group">
+                <label>CNSS</label>
+                <input type="text" name="cnss" class="form-control" value="<?= $salarie['cnss'] ?? '' ?>">
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Situation familiale</label>
+                <select name="situation_familiale" class="form-control">
+                    <option value="celibataire" <?= ($salarie['situation_familiale'] ?? '') === 'celibataire' ? 'selected' : '' ?>>Célibataire</option>
+                    <option value="marie" <?= ($salarie['situation_familiale'] ?? '') === 'marie' ? 'selected' : '' ?>>Marié(e)</option>
+                    <option value="divorce" <?= ($salarie['situation_familiale'] ?? '') === 'divorce' ? 'selected' : '' ?>>Divorcé(e)</option>
+                    <option value="veuf" <?= ($salarie['situation_familiale'] ?? '') === 'veuf' ? 'selected' : '' ?>>Veuf/Veuve</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Nombre d'enfants</label>
+                <input type="number" name="nb_enfants" class="form-control" value="<?= $salarie['nb_enfants'] ?? 0 ?>" min="0">
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Poste / Fonction</label>
+                <input type="text" name="poste" class="form-control" value="<?= $salarie['poste'] ?? '' ?>">
+            </div>
+            <div class="form-group">
+                <label>Type de contrat</label>
+                <select name="type_contrat" class="form-control">
+                    <option value="CDI" <?= ($salarie['type_contrat'] ?? '') === 'CDI' ? 'selected' : '' ?>>CDI</option>
+                    <option value="CDD" <?= ($salarie['type_contrat'] ?? '') === 'CDD' ? 'selected' : '' ?>>CDD</option>
+                    <option value="stage" <?= ($salarie['type_contrat'] ?? '') === 'stage' ? 'selected' : '' ?>>Stage</option>
+                    <option value="interim" <?= ($salarie['type_contrat'] ?? '') === 'interim' ? 'selected' : '' ?>>Intérim</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Salaire de base *</label>
+                <input type="number" step="0.01" name="salaire_base" class="form-control" value="<?= $salarie['salaire_base'] ?? 0 ?>" required>
+            </div>
+            <div class="form-group">
+                <label>Type de salaire</label>
+                <select name="type_salaire" class="form-control">
+                    <option value="mensuel" <?= ($salarie['type_salaire'] ?? '') === 'mensuel' ? 'selected' : '' ?>>Mensuel</option>
+                    <option value="horaire" <?= ($salarie['type_salaire'] ?? '') === 'horaire' ? 'selected' : '' ?>>Horaire</option>
+                    <option value="journalier" <?= ($salarie['type_salaire'] ?? '') === 'journalier' ? 'selected' : '' ?>>Journalier</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Fréquence de paiement</label>
+                <select name="frequence_paiement" class="form-control">
+                    <option value="mensuel" <?= ($salarie['frequence_paiement'] ?? '') === 'mensuel' ? 'selected' : '' ?>>Mensuel</option>
+                    <option value="quinzaine" <?= ($salarie['frequence_paiement'] ?? '') === 'quinzaine' ? 'selected' : '' ?>>Quinzaine</option>
+                    <option value="hebdomadaire" <?= ($salarie['frequence_paiement'] ?? '') === 'hebdomadaire' ? 'selected' : '' ?>>Hebdomadaire</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Mode de paiement</label>
+                <select name="mode_paiement" class="form-control">
+                    <option value="virement" <?= ($salarie['mode_paiement'] ?? '') === 'virement' ? 'selected' : '' ?>>Virement</option>
+                    <option value="cheque" <?= ($salarie['mode_paiement'] ?? '') === 'cheque' ? 'selected' : '' ?>>Chèque</option>
+                    <option value="especes" <?= ($salarie['mode_paiement'] ?? '') === 'especes' ? 'selected' : '' ?>>Espèces</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>RIB</label>
+                <input type="text" name="rib" class="form-control" value="<?= $salarie['rib'] ?? '' ?>">
+            </div>
+        </div>
+        <hr style="border-color: var(--border); margin: 1rem 0;">
+        <h4 style="margin-bottom:1rem;">Indemnités et avantages</h4>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Indemnité de transport</label>
+                <input type="number" step="0.01" name="indemnite_transport" class="form-control" value="<?= $salarie['indemnite_transport'] ?? 500 ?>">
+            </div>
+            <div class="form-group">
+                <label>Indemnité de panier</label>
+                <input type="number" step="0.01" name="indemnite_panier" class="form-control" value="<?= $salarie['indemnite_panier'] ?? 780 ?>">
+            </div>
+            <div class="form-group">
+                <label>Indemnité de représentation</label>
+                <input type="number" step="0.01" name="indemnite_representation" class="form-control" value="<?= $salarie['indemnite_representation'] ?? 0 ?>">
+            </div>
+            <div class="form-group">
+                <label>Avantage logement</label>
+                <input type="number" step="0.01" name="avantage_logement" class="form-control" value="<?= $salarie['avantage_logement'] ?? 0 ?>">
+            </div>
+        </div>
+        <div style="display:flex; gap:0.75rem; margin-top:1rem;">
+            <button type="submit" class="btn btn-primary">Enregistrer</button>
+            <a href="/paie-me/salaries" class="btn btn-secondary">Annuler</a>
+        </div>
+    </form>
+</div>
