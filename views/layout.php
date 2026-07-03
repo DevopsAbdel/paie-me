@@ -82,6 +82,7 @@
                 <li><a href="<?= $base ?>organismes" style="display:block; padding:0.3rem 0.5rem; color:<?= str_contains($uri, '/organismes')?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">Organismes</a></li>
                 <li><a href="<?= $base ?>attestations" style="display:block; padding:0.3rem 0.5rem; color:<?= str_contains($uri, '/attestations')?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">Attestations</a></li>
                 <li><a href="<?= $base ?>codification" style="display:block; padding:0.3rem 0.5rem; color:<?= str_contains($uri, '/codification')?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">Codification</a></li>
+                <li><a href="<?= $base ?>journal" style="display:block; padding:0.3rem 0.5rem; color:<?= str_contains($uri, '/journal')?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">Journal comptable</a></li>
             </ul>
             <?php endif; ?>
         </li>

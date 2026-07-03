@@ -293,6 +293,7 @@ class SocieteController extends Controller
             'retenues'     => 'Rubriques de retenues',
             'organismes'   => 'Organismes',
             'attestations' => 'Modèles d\'attestation',
+            'journal'      => 'Journal de comptabilisation',
         ];
         $subView = 'banque';
         if (in_array($sous_tab, array_keys($titles))) {
