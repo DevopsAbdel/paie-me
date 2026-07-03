@@ -159,15 +159,23 @@ CREATE TABLE IF NOT EXISTS bareme_ir (
     min         DECIMAL(10,2) NOT NULL,
     max         DECIMAL(10,2) NOT NULL,
     taux        DECIMAL(5,2)  NOT NULL,
-    deduction   DECIMAL(10,2) NOT NULL
+    deduction   DECIMAL(10,2) NOT NULL,
+    type        ENUM('mensuel','annuel') NOT NULL DEFAULT 'mensuel'
 ) ENGINE=InnoDB;
 
-INSERT INTO bareme_ir (min, max, taux, deduction) VALUES
-    (0.00,    3333.00,    0.00,   0.00),
-    (3333.01, 5000.00,   10.00, 333.33),
-    (5000.01, 6667.00,   20.00, 833.33),
-    (6667.01, 15000.00,  30.00, 1500.00),
-    (15000.01, 999999.99, 34.00, 2100.00);
+INSERT INTO bareme_ir (min, max, taux, deduction, type) VALUES
+    (0.00,    3333.00,    0.00,   0.00,    'mensuel'),
+    (3334.00, 5000.00,   10.00, 250.00,   'mensuel'),
+    (5001.00, 6666.67,   20.00, 666.67,   'mensuel'),
+    (6667.00, 8333.00,   30.00, 1166.67,  'mensuel'),
+    (8334.00, 15000.00,  34.00, 1433.33,  'mensuel'),
+    (15000.01, 999999.99, 37.00, 2033.33, 'mensuel'),
+    (0.00,    40000.00,   0.00,   0.00,    'annuel'),
+    (40001.00, 60000.00,  10.00, 4000.00,  'annuel'),
+    (60001.00, 80000.00,  20.00, 10000.00, 'annuel'),
+    (80001.00, 100000.00, 30.00, 18000.00, 'annuel'),
+    (100001.00, 180000.00, 34.00, 22000.00, 'annuel'),
+    (180000.01, 9999999.99, 37.00, 27400.00, 'annuel');
 
 -- -----------------------------------------------------------
 -- Index utilisateur par défaut (password: admin123)

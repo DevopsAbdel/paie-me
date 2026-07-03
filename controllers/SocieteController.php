@@ -171,33 +171,49 @@ class SocieteController extends Controller
         ]);
 
         if ($this->isPost()) {
-            $stmt = $this->db->prepare("
-                UPDATE societes SET banque=?, agence=?, rib=?, damancom_login=?, damancom_password=?, simpl_login=?, simpl_password=?, cimr_login=?, cimr_password=?
-                WHERE id = ?
-            ");
-            $stmt->execute([
-                $_POST['banque'] ?? '',
-                $_POST['agence'] ?? '',
-                $_POST['rib'] ?? '',
-                $_POST['damancom_login'] ?? '',
-                $_POST['damancom_password'] ?? '',
-                $_POST['simpl_login'] ?? '',
-                $_POST['simpl_password'] ?? '',
-                $_POST['cimr_login'] ?? '',
-                $_POST['cimr_password'] ?? '',
-                $id,
-            ]);
+            $sousTab = $_POST['sous_tab'] ?? 'banque';
 
-            Session::setFlash('success', 'Paramètres mis à jour.');
-            $this->redirect('/paie-me/societes/' . $id . '/parametres?tab=' . ($_POST['sous_tab'] ?? 'banque'));
+            if ($sousTab === 'bareme') {
+                foreach ($_POST['min'] ?? [] as $idBareme => $min) {
+                    $max = $_POST['max'][$idBareme] ?? 0;
+                    $taux = $_POST['taux'][$idBareme] ?? 0;
+                    $deduction = $_POST['deduction'][$idBareme] ?? 0;
+                    $type = $_POST['type'][$idBareme] ?? 'mensuel';
+                    $stmt = $this->db->prepare("UPDATE bareme_ir SET min=?, max=?, taux=?, deduction=?, type=? WHERE id=?");
+                    $stmt->execute([$min, $max, $taux, $deduction, $type, $idBareme]);
+                }
+                Session::setFlash('success', 'Barème IR mis à jour.');
+            } else {
+                $stmt = $this->db->prepare("
+                    UPDATE societes SET banque=?, agence=?, rib=?, damancom_login=?, damancom_password=?, simpl_login=?, simpl_password=?, cimr_login=?, cimr_password=?
+                    WHERE id = ?
+                ");
+                $stmt->execute([
+                    $_POST['banque'] ?? '',
+                    $_POST['agence'] ?? '',
+                    $_POST['rib'] ?? '',
+                    $_POST['damancom_login'] ?? '',
+                    $_POST['damancom_password'] ?? '',
+                    $_POST['simpl_login'] ?? '',
+                    $_POST['simpl_password'] ?? '',
+                    $_POST['cimr_login'] ?? '',
+                    $_POST['cimr_password'] ?? '',
+                    $id,
+                ]);
+                Session::setFlash('success', 'Paramètres mis à jour.');
+            }
+
+            $this->redirect('/paie-me/societes/' . $id . '/parametres?tab=' . $sousTab);
         }
 
-        $bareme = $this->db->query("SELECT * FROM bareme_ir ORDER BY `min`")->fetchAll();
+        $baremeMensuel = $this->db->query("SELECT * FROM bareme_ir WHERE type='mensuel' ORDER BY `min`")->fetchAll();
+        $baremeAnnuel  = $this->db->query("SELECT * FROM bareme_ir WHERE type='annuel' ORDER BY `min`")->fetchAll();
 
         $this->render('societes/parametres.php', [
-            'title'   => 'Paramètres — ' . $societe['raison_sociale'],
-            'societe' => $societe,
-            'bareme'  => $bareme,
+            'title'         => 'Paramètres — ' . $societe['raison_sociale'],
+            'societe'       => $societe,
+            'bareme'        => $baremeMensuel,
+            'baremeAnnuel'  => $baremeAnnuel,
         ]);
     }
 
