@@ -18,7 +18,13 @@ class Router
 
     public static function dispatch(string $method, string $uri): void
     {
-        $uri = trim(parse_url($uri, PHP_URL_PATH), '/');
+        $uri = parse_url($uri, PHP_URL_PATH);
+        $uri = preg_replace('#^/paie-me#', '', $uri);
+        $uri = trim($uri, '/');
+
+        if ($uri === '' && isset($_GET['url'])) {
+            $uri = trim($_GET['url'], '/');
+        }
 
         foreach (self::$routes[$method] ?? [] as $route) {
             $pattern = preg_replace('/\{(\w+)\}/', '(?P<$1>[^/]+)', $route['uri']);

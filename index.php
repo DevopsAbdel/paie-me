@@ -1,10 +1,22 @@
 <?php
 
-require_once __DIR__ . '/Core/Router.php';
-require_once __DIR__ . '/Core/Controller.php';
-require_once __DIR__ . '/Core/Model.php';
-require_once __DIR__ . '/Core/Session.php';
-require_once __DIR__ . '/Core/Helper.php';
+spl_autoload_register(function (string $class) {
+    $prefixes = [
+        'Core\\'        => __DIR__ . '/Core/',
+        'Controllers\\' => __DIR__ . '/controllers/',
+    ];
+    foreach ($prefixes as $prefix => $baseDir) {
+        $len = strlen($prefix);
+        if (strncmp($prefix, $class, $len) === 0) {
+            $relative = substr($class, $len);
+            $file = $baseDir . str_replace('\\', '/', $relative) . '.php';
+            if (file_exists($file)) {
+                require $file;
+                return;
+            }
+        }
+    }
+});
 
 use Core\Session;
 use Core\Router;

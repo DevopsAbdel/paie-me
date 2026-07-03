@@ -9,7 +9,7 @@ abstract class Model
 {
     protected static PDO|null $db = null;
 
-    protected static function db(): PDO
+    public static function db(): PDO
     {
         if (self::$db === null) {
             $config = require __DIR__ . '/../config/database.php';

@@ -171,5 +171,5 @@ INSERT INTO bareme_ir (min, max, taux, deduction) VALUES
 -- -----------------------------------------------------------
 INSERT INTO users (nom, email, password, role)
 VALUES ('Administrateur', 'admin@paie-me.ma',
-        '$2y$12$LJ3m4ys3Lk0TSwHnbfOMiOXPm1Qlq5JxG7qH4OVy3eK8q5Ym9qX6y',
+        '$2y$10$DRPsKOgLy.Ib4oKPT8oX/.2gRRWXSCgQz3UdUMLbbiyYvVOnX6fhq',
         'admin');

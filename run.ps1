@@ -42,14 +42,14 @@ if (-not $mysql) {
 # ── Base de données ──
 $mysqlExe = "$XamppPath\mysql\bin\mysql.exe"
 if (Test-Path $mysqlExe) {
-    $dbExists = & $mysqlExe -u root -e "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = 'paie_me'" 2>$null
+        $dbExists = & $mysqlExe -u root -e "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = 'paie_me'" 2>$null
     if (-not $dbExists -or $ResetDB) {
         if ($ResetDB) {
             Write-Info "Réinitialisation de la base..."
             & $mysqlExe -u root -e "DROP DATABASE IF EXISTS paie_me"
         }
         Write-Info "Import du schéma SQL..."
-        & $mysqlExe -u root < "$PSScriptRoot\database\schema.sql"
+        Get-Content "$PSScriptRoot\database\schema.sql" | & $mysqlExe -u root
         Write-Ok "Base 'paie_me' créée"
     } else {
         Write-Ok "Base 'paie_me' déjà existante"
