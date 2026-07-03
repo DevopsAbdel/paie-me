@@ -54,6 +54,13 @@ class PaieController extends Controller
                 $this->redirect('/paie-me/paies/create');
             }
 
+            $existing = $this->db->prepare("SELECT id FROM periodes WHERE societe_id = ? AND mois = ? AND annee = ?");
+            $existing->execute([$societeId, $mois, $annee]);
+            if ($existing->fetch()) {
+                Session::setFlash('error', 'Cette période existe déjà pour cette société.');
+                $this->redirect('/paie-me/paies/create');
+            }
+
             $stmt = $this->db->prepare("
                 INSERT INTO periodes (societe_id, mois, annee, date_debut, date_fin)
                 VALUES (?, ?, ?, ?, ?)
