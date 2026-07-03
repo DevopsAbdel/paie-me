@@ -1,6 +1,6 @@
 <div class="login-wrapper">
     <div class="login-card" style="text-align:center;">
-        <div style="font-size:2.5rem; margin-bottom:0.5rem;">&#9632;</div>
+        <i data-lucide="wallet" style="width:40px;height:40px;stroke:var(--accent);stroke-width:1.5;margin-bottom:0.5rem;"></i>
         <h1>Paie Me</h1>
         <p class="subtitle">Gestion de paie — Maroc</p>
 

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $title ?? 'Paie Me' ?> — Paie Me</title>
     <link rel="stylesheet" href="/paie-me/assets/css/style.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
 
@@ -17,50 +18,50 @@
     <ul class="sidebar-nav">
         <li>
             <a href="/paie-me/dashboard" class="<?= str_contains($_SERVER['REQUEST_URI'], '/dashboard') ? 'active' : '' ?>">
-                <span class="icon">&#9632;</span>
+                <span class="icon" data-lucide="layout-dashboard"></span>
                 <span>Dashboard</span>
             </a>
         </li>
         <li>
             <a href="/paie-me/societes" class="<?= str_contains($_SERVER['REQUEST_URI'], '/societes') ? 'active' : '' ?>">
-                <span class="icon">&#9632;</span>
+                <span class="icon" data-lucide="building-2"></span>
                 <span>Sociétés</span>
             </a>
         </li>
         <li>
             <a href="/paie-me/salaries" class="<?= str_contains($_SERVER['REQUEST_URI'], '/salaries') ? 'active' : '' ?>">
-                <span class="icon">&#9632;</span>
+                <span class="icon" data-lucide="users"></span>
                 <span>Salariés</span>
             </a>
         </li>
         <li>
             <a href="/paie-me/paies" class="<?= str_contains($_SERVER['REQUEST_URI'], '/paies') ? 'active' : '' ?>">
-                <span class="icon">&#9632;</span>
+                <span class="icon" data-lucide="wallet"></span>
                 <span>Paies</span>
             </a>
         </li>
         <li>
             <a href="/paie-me/bulletins" class="<?= str_contains($_SERVER['REQUEST_URI'], '/bulletins') ? 'active' : '' ?>">
-                <span class="icon">&#9632;</span>
+                <span class="icon" data-lucide="file-text"></span>
                 <span>Bulletins</span>
             </a>
         </li>
         <li>
             <a href="/paie-me/damancom" class="<?= str_contains($_SERVER['REQUEST_URI'], '/damancom') ? 'active' : '' ?>">
-                <span class="icon">&#9632;</span>
+                <span class="icon" data-lucide="shield-check"></span>
                 <span>CNSS / Damancom</span>
             </a>
         </li>
         <li>
             <a href="/paie-me/ir" class="<?= str_contains($_SERVER['REQUEST_URI'], '/ir') ? 'active' : '' ?>">
-                <span class="icon">&#9632;</span>
+                <span class="icon" data-lucide="calculator"></span>
                 <span>IR / SIMPL</span>
             </a>
         </li>
     </ul>
     <div class="sidebar-footer">
         <a href="/paie-me/logout">
-            <span class="icon">&#9632;</span>
+            <span class="icon" data-lucide="log-out"></span>
             <span>Déconnexion</span>
         </a>
     </div>
@@ -94,5 +95,6 @@
     <?= $content ?? '' ?>
 </main>
 
+<script>lucide.createIcons();</script>
 </body>
 </html>

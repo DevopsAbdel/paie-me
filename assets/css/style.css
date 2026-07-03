@@ -95,7 +95,17 @@ a:hover {
 
 .sidebar-nav li a .icon {
     width: 20px;
-    text-align: center;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sidebar-nav li a .icon svg {
+    width: 20px;
+    height: 20px;
+    stroke: currentColor;
+    stroke-width: 1.5;
 }
 
 .sidebar-footer {
