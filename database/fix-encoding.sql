@@ -1,0 +1,11 @@
+USE paie_me;
+UPDATE salaries SET poste='Développeur Full Stack' WHERE id=1;
+UPDATE salaries SET poste='Chef de Projet' WHERE id=2;
+UPDATE salaries SET poste='Ingénieur Agronome' WHERE id=3;
+UPDATE salaries SET poste='Designer UX/UI' WHERE id=4;
+UPDATE salaries SET poste='Directeur Logistique' WHERE id=5;
+UPDATE societes SET raison_sociale='TechMaroc Solutions' WHERE id=1;
+UPDATE societes SET raison_sociale='MegaBuild Construction' WHERE id=2;
+UPDATE societes SET raison_sociale='GreenAgri SARL' WHERE id=3;
+UPDATE societes SET raison_sociale='DigitalServices Africa' WHERE id=4;
+UPDATE societes SET raison_sociale='TransLogistique Group' WHERE id=5;

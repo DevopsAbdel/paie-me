@@ -18,6 +18,9 @@ spl_autoload_register(function (string $class) {
     }
 });
 
+header('Content-Type: text/html; charset=utf-8');
+mb_internal_encoding('UTF-8');
+
 use Core\Session;
 use Core\Router;
 

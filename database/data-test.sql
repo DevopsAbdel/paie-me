@@ -1,6 +1,5 @@
 USE paie_me;
 
--- 5 sociétés
 INSERT INTO societes (user_id, raison_sociale, forme_juridique, ice, if_fiscal, rc, tp, cnss, adresse, ville, telephone, email) VALUES
 (1, 'TechMaroc Solutions', 'SARL', 'ICE001234567', 'IF123456', 'RC78901', 'TP34567', 'CNSS1001', '12 Rue des Innovateurs', 'Casablanca', '0522123456', 'contact@techmaroc.ma'),
 (1, 'MegaBuild Construction', 'SA', 'ICE002345678', 'IF234567', 'RC89012', 'TP45678', 'CNSS1002', '45 Avenue Mohammed V', 'Rabat', '0537123456', 'info@megabuild.ma'),
@@ -8,7 +7,6 @@ INSERT INTO societes (user_id, raison_sociale, forme_juridique, ice, if_fiscal, 
 (1, 'DigitalServices Africa', 'SAS', 'ICE004567890', 'IF456789', 'RC01234', 'TP67890', 'CNSS1004', '33 Boulevard Al Massira', 'Agadir', '0528123456', 'hello@digitalservices.ma'),
 (1, 'TransLogistique Group', 'SNC', 'ICE005678901', 'IF567890', 'RC12345', 'TP78901', 'CNSS1005', '7 Rue du Commerce', 'Tanger', '0539123456', 'contact@translogistique.ma');
 
--- 5 salariés (1 par société)
 INSERT INTO salaries (societe_id, matricule, nom_famille, prenom, adresse, date_naissance, date_embauche, cin, cnss, situation_familiale, nb_enfants, poste, type_contrat, salaire_base, indemnite_transport, indemnite_panier, indemnite_representation) VALUES
 (1, 'TMS001', 'Benali', 'Karim', '15 Rue Atlas, Casablanca', '1990-03-15', '2022-01-10', 'AB123456', 'CNSS2001', 'marie', 2, 'Développeur Full Stack', 'CDI', 15000.00, 500.00, 780.00, 1500.00),
 (2, 'MBC001', 'Alaoui', 'Fatima', '22 Avenue Hassan II, Rabat', '1985-07-22', '2020-06-01', 'CD234567', 'CNSS2002', 'marie', 3, 'Chef de Projet', 'CDI', 22000.00, 500.00, 780.00, 2200.00),
