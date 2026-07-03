@@ -79,7 +79,7 @@ class SocieteController extends Controller
         $salaries = $this->db->query("SELECT * FROM salaries WHERE societe_id = $id AND actif = 1 ORDER BY nom_famille, prenom")->fetchAll();
         $periodes = $this->db->query("SELECT p.*, (SELECT COUNT(*) FROM paies WHERE periode_id = p.id) as nb_paies FROM periodes p WHERE p.societe_id = $id ORDER BY p.annee DESC, p.mois DESC")->fetchAll();
         $bulletins = $this->db->query("
-            SELECT b.*, pa.salaire_brut, pa.net_a_payer, s.nom_famille, s.prenom, p.mois, p.annee
+            SELECT b.*, pa.salaire_brut, pa.net_a_payer, pa.ir, s.nom_famille, s.prenom, p.mois, p.annee
             FROM bulletins b
             JOIN paies pa ON b.paie_id = pa.id
             JOIN salaries s ON pa.salarie_id = s.id

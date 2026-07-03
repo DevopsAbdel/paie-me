@@ -54,8 +54,8 @@ $baseUrl = '/paie-me/societes/' . $societe['id'];
         <div><strong>Email :</strong> <?= htmlspecialchars($societe['email'] ?? '') ?></div>
         <div><strong>Banque :</strong> <?= htmlspecialchars($societe['banque'] ?? '') ?></div>
         <div><strong>RIB :</strong> <?= htmlspecialchars($societe['rib'] ?? '') ?></div>
-        <div><strong>Damancom :</strong> <?= htmlspecialchars($societe['compte_damancom'] ?? '') ?></div>
-        <div><strong>SIMPL :</strong> <?= htmlspecialchars($societe['compte_simpl'] ?? '') ?></div>
+        <div><strong>Damancom :</strong> <?= htmlspecialchars($societe['damancom_login'] ?? 'Non configuré') ?></div>
+        <div><strong>SIMPL :</strong> <?= htmlspecialchars($societe['simpl_login'] ?? 'Non configuré') ?></div>
     </div>
 </div>
 
@@ -199,9 +199,9 @@ $baseUrl = '/paie-me/societes/' . $societe['id'];
         </div>
 
         <div style="margin-top:1.5rem; background:var(--bg-secondary); border-radius:8px; padding:1rem;">
-            <h4 style="color:var(--accent); margin-bottom:0.5rem;">Compte Damancom</h4>
+            <h4 style="color:var(--accent); margin-bottom:0.5rem;">Damancom (CNSS)</h4>
             <p style="font-size:0.875rem; color:var(--text-muted);">
-                Numéro de compte : <strong><?= htmlspecialchars($societe['compte_damancom'] ?: 'Non configuré') ?></strong><br>
+                Login : <strong><?= htmlspecialchars($societe['damancom_login'] ?: 'Non configuré') ?></strong><br>
                 CNSS : <strong><?= htmlspecialchars($societe['cnss']) ?></strong>
             </p>
             <p style="font-size:0.8125rem; color:var(--text-muted);">
@@ -256,9 +256,9 @@ $baseUrl = '/paie-me/societes/' . $societe['id'];
         </div>
 
         <div style="margin-top:1.5rem; background:var(--bg-secondary); border-radius:8px; padding:1rem;">
-            <h4 style="color:var(--accent); margin-bottom:0.5rem;">Compte SIMPL</h4>
+            <h4 style="color:var(--accent); margin-bottom:0.5rem;">SIMPL (Impôts)</h4>
             <p style="font-size:0.875rem; color:var(--text-muted);">
-                Compte SIMPL : <strong><?= htmlspecialchars($societe['compte_simpl'] ?: 'Non configuré') ?></strong><br>
+                Login : <strong><?= htmlspecialchars($societe['simpl_login'] ?: 'Non configuré') ?></strong><br>
                 IF : <strong><?= htmlspecialchars($societe['if_fiscal']) ?></strong>
             </p>
             <p style="font-size:0.8125rem; color:var(--text-muted);">
