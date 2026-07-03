@@ -82,14 +82,10 @@
             </div>
         </div>
         <hr style="border-color: var(--border); margin: 1rem 0;">
-        <h4 style="margin-bottom:1rem;">Comptes téléservices</h4>
+        <h4 style="margin-bottom:1rem;">Accès téléservices</h4>
         <div class="form-row">
             <div class="form-group">
-                <label>Compte Damancom (CNSS)</label>
-                <input type="text" name="compte_damancom" class="form-control" value="<?= $societe['compte_damancom'] ?? '' ?>">
-            </div>
-            <div class="form-group">
-                <label>Login Damancom</label>
+                <label>Login Damancom (CNSS)</label>
                 <input type="text" name="damancom_login" class="form-control" value="<?= $societe['damancom_login'] ?? '' ?>">
             </div>
             <div class="form-group">
@@ -99,11 +95,7 @@
         </div>
         <div class="form-row">
             <div class="form-group">
-                <label>Compte SIMPL (DGI)</label>
-                <input type="text" name="compte_simpl" class="form-control" value="<?= $societe['compte_simpl'] ?? '' ?>">
-            </div>
-            <div class="form-group">
-                <label>Login SIMPL</label>
+                <label>Login SIMPL (Impôts)</label>
                 <input type="text" name="simpl_login" class="form-control" value="<?= $societe['simpl_login'] ?? '' ?>">
             </div>
             <div class="form-group">
@@ -113,11 +105,7 @@
         </div>
         <div class="form-row">
             <div class="form-group">
-                <label>Compte CIMR</label>
-                <input type="text" name="compte_cimr" class="form-control" value="<?= $societe['compte_cimr'] ?? '' ?>">
-            </div>
-            <div class="form-group">
-                <label>Login CIMR</label>
+                <label>Login CIMR (Retraite)</label>
                 <input type="text" name="cimr_login" class="form-control" value="<?= $societe['cimr_login'] ?? '' ?>">
             </div>
             <div class="form-group">
