@@ -25,6 +25,7 @@ Router::get('/societes/{id}',          [SocieteController::class, 'show']);
 Router::get('/societes/{id}/edit',     [SocieteController::class, 'edit']);
 Router::post('/societes/{id}/edit',    [SocieteController::class, 'edit']);
 Router::get('/societes/{id}/delete',   [SocieteController::class, 'delete']);
+Router::post('/societes/{id}/parameters', [SocieteController::class, 'parameters']);
 
 Router::get('/salaries',               [SalarieController::class, 'index']);
 Router::get('/salaries/create',        [SalarieController::class, 'create']);

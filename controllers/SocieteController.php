@@ -149,6 +149,38 @@ class SocieteController extends Controller
         $this->redirect('/paie-me/societes');
     }
 
+    public function parameters(int $id): void
+    {
+        $userId = Session::get('user_id');
+        $societe = $this->db->query("SELECT * FROM societes WHERE id = $id AND user_id = $userId")->fetch();
+
+        if (!$societe) {
+            Session::setFlash('error', 'Société introuvable.');
+            $this->redirect('/paie-me/societes');
+        }
+
+        if ($this->isPost()) {
+            $stmt = $this->db->prepare("
+                UPDATE societes SET banque=?, agence=?, rib=?, compte_damancom=?, compte_simpl=?, compte_cimr=?
+                WHERE id = ?
+            ");
+            $stmt->execute([
+                $_POST['banque'] ?? '',
+                $_POST['agence'] ?? '',
+                $_POST['rib'] ?? '',
+                $_POST['compte_damancom'] ?? '',
+                $_POST['compte_simpl'] ?? '',
+                $_POST['compte_cimr'] ?? '',
+                $id,
+            ]);
+
+            Session::setFlash('success', 'Paramètres mis à jour.');
+            $this->redirect('/paie-me/societes/' . $id . '?tab=parametres');
+        }
+
+        $this->redirect('/paie-me/societes/' . $id . '?tab=parametres');
+    }
+
     private function getPostData(): array
     {
         return [

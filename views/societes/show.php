@@ -275,48 +275,71 @@ $baseUrl = '/paie-me/societes/' . $societe['id'];
 <?php elseif ($tab === 'parametres'): ?>
 <div class="card">
     <div class="card-header"><h3>Paramètres — <?= htmlspecialchars($societe['raison_sociale']) ?></h3></div>
-    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(250px,1fr)); gap:1rem;">
+    <form method="post" action="/paie-me/societes/<?= $societe['id'] ?>/parameters">
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(300px,1fr)); gap:1.5rem;">
 
         <div class="card" style="margin:0;">
-            <h4 style="color:var(--accent); margin-bottom:0.75rem;">Barèmes</h4>
-            <p style="color:var(--text-muted); font-size:0.875rem;">IR, CNSS, AMO</p>
-            <p style="font-size:0.8125rem; color:var(--text-muted);">Barème IR 2025 chargé automatiquement. Mise à jour annuelle requise.</p>
+            <h4 style="color:var(--accent); margin-bottom:1rem;">Banque</h4>
+            <div class="form-group">
+                <label>Banque</label>
+                <input type="text" name="banque" value="<?= htmlspecialchars($societe['banque'] ?? '') ?>" class="form-control" placeholder="Nom de la banque">
+            </div>
+            <div class="form-group">
+                <label>Agence</label>
+                <input type="text" name="agence" value="<?= htmlspecialchars($societe['agence'] ?? '') ?>" class="form-control" placeholder="Agence bancaire">
+            </div>
+            <div class="form-group">
+                <label>RIB</label>
+                <input type="text" name="rib" value="<?= htmlspecialchars($societe['rib'] ?? '') ?>" class="form-control" placeholder="RIB">
+            </div>
         </div>
 
         <div class="card" style="margin:0;">
-            <h4 style="color:var(--accent); margin-bottom:0.75rem;">Services</h4>
-            <p style="color:var(--text-muted); font-size:0.875rem;">Organisation interne</p>
-            <p style="font-size:0.8125rem; color:var(--text-muted);">Définir les services (RH, Compta, Production…) et affecter les salariés.</p>
+            <h4 style="color:var(--accent); margin-bottom:1rem;">Comptes téléservices</h4>
+            <div class="form-group">
+                <label>Damancom (CNSS)</label>
+                <input type="text" name="compte_damancom" value="<?= htmlspecialchars($societe['compte_damancom'] ?? '') ?>" class="form-control" placeholder="Compte Damancom">
+                <small style="color:var(--text-muted); font-size:0.75rem;">Compte utilisateur pour la déclaration CNSS en ligne</small>
+            </div>
+            <div class="form-group">
+                <label>SIMPL (Impôts)</label>
+                <input type="text" name="compte_simpl" value="<?= htmlspecialchars($societe['compte_simpl'] ?? '') ?>" class="form-control" placeholder="Compte SIMPL">
+                <small style="color:var(--text-muted); font-size:0.75rem;">Compte pour la déclaration IR via SIMPL</small>
+            </div>
+            <div class="form-group">
+                <label>CIMR (Retraite)</label>
+                <input type="text" name="compte_cimr" value="<?= htmlspecialchars($societe['compte_cimr'] ?? '') ?>" class="form-control" placeholder="Compte CIMR">
+                <small style="color:var(--text-muted); font-size:0.75rem;">Caisse Interprofessionnelle Marocaine de Retraite</small>
+            </div>
         </div>
 
         <div class="card" style="margin:0;">
-            <h4 style="color:var(--accent); margin-bottom:0.75rem;">Gains</h4>
-            <p style="color:var(--text-muted); font-size:0.875rem;">Éléments de rémunération</p>
-            <p style="font-size:0.8125rem; color:var(--text-muted);">Salaire de base, indemnités transport/panier, primes.</p>
-        </div>
-
-        <div class="card" style="margin:0;">
-            <h4 style="color:var(--accent); margin-bottom:0.75rem;">Retenues</h4>
-            <p style="color:var(--text-muted); font-size:0.875rem;">Déductions salariales</p>
-            <p style="font-size:0.8125rem; color:var(--text-muted);">CNSS, AMO, IR, avances sur salaire, mutuelle.</p>
-        </div>
-
-        <div class="card" style="margin:0;">
-            <h4 style="color:var(--accent); margin-bottom:0.75rem;">Comptes téléservices</h4>
-            <p style="color:var(--text-muted); font-size:0.875rem;">Damancom, SIMPL, CIMR</p>
+            <h4 style="color:var(--accent); margin-bottom:1rem;">Barème IR</h4>
+            <p style="color:var(--text-muted); font-size:0.875rem;">Barème progressif 2025</p>
             <p style="font-size:0.8125rem; color:var(--text-muted);">
-                Damancom: <?= htmlspecialchars($societe['compte_damancom'] ?: 'Non configuré') ?><br>
-                SIMPL: <?= htmlspecialchars($societe['compte_simpl'] ?: 'Non configuré') ?><br>
-                CIMR: <?= htmlspecialchars($societe['compte_cimr'] ?: 'Non configuré') ?>
+                Tranches et taux chargés automatiquement depuis la base de données.<br>
+                Mise à jour annuelle requise en janvier.
             </p>
         </div>
 
         <div class="card" style="margin:0;">
-            <h4 style="color:var(--accent); margin-bottom:0.75rem;">Codification</h4>
-            <p style="color:var(--text-muted); font-size:0.875rem;">Numérotation automatique</p>
-            <p style="font-size:0.8125rem; color:var(--text-muted);">Codes rubriques paie, références internes salariés et documents.</p>
+            <h4 style="color:var(--accent); margin-bottom:1rem;">Codification</h4>
+            <div class="form-group">
+                <label>Préfixe matricule</label>
+                <input type="text" value="EMP-" class="form-control" disabled>
+                <small style="color:var(--text-muted); font-size:0.75rem;">Préfixe automatique pour les matricules salariés</small>
+            </div>
+            <div class="form-group">
+                <label>Préfixe bulletin</label>
+                <input type="text" value="BUL-" class="form-control" disabled>
+                <small style="color:var(--text-muted); font-size:0.75rem;">Préfixe des numéros de bulletin</small>
+            </div>
         </div>
 
     </div>
+    <div style="margin-top:1rem; padding:1rem 0; border-top:1px solid var(--border);">
+        <button type="submit" class="btn btn-primary">Enregistrer les paramètres</button>
+    </div>
+    </form>
 </div>
 <?php endif; ?>
