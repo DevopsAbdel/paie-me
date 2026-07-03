@@ -6,7 +6,7 @@
         <div class="form-row">
             <div class="form-group">
                 <label>Société *</label>
-                <select name="societe_id" class="form-control" required onchange="document.getElementById('service_group').style.display=this.value ? 'flex' : 'none'">
+                <select name="societe_id" class="form-control" required onchange="var s=document.getElementById('service_group'),f=document.getElementById('fonction_group');s.style.display=this.value?'block':'none';f.style.display=this.value?'block':'none'">
                     <option value="">— Sélectionner —</option>
                     <?php foreach ($societes as $so): ?>
                     <option value="<?= $so['id'] ?>" <?= ($fromSociete ?? $salarie['societe_id'] ?? '') == $so['id'] ? 'selected' : '' ?>><?= htmlspecialchars($so['raison_sociale']) ?></option>
@@ -15,10 +15,19 @@
             </div>
             <div class="form-group" id="service_group" style="display:<?= ($salarie['societe_id'] ?? $fromSociete) ? 'block' : 'none' ?>">
                 <label>Service</label>
-                <select name="service_id" class="form-control">
+                <select name="service_id" class="form-control" onchange="filterFonctions(this.value)">
                     <option value="">— Aucun —</option>
                     <?php foreach ($services as $sv): ?>
                     <option value="<?= $sv['id'] ?>" <?= ($salarie['service_id'] ?? '') == $sv['id'] ? 'selected' : '' ?>><?= htmlspecialchars($sv['nom']) ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="form-group" id="fonction_group" style="display:<?= ($salarie['societe_id'] ?? $fromSociete) ? 'block' : 'none' ?>">
+                <label>Fonction</label>
+                <select name="fonction_id" class="form-control">
+                    <option value="">— Aucune —</option>
+                    <?php foreach ($fonctions as $fn): ?>
+                    <option value="<?= $fn['id'] ?>" data-service-id="<?= $fn['service_id'] ?: '' ?>" <?= ($salarie['fonction_id'] ?? '') == $fn['id'] ? 'selected' : '' ?>><?= htmlspecialchars($fn['nom']) ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
@@ -153,3 +162,27 @@
         </div>
     </form>
 </div>
+<script>
+function filterFonctions(serviceId) {
+    const selects = document.querySelectorAll('select[name="fonction_id"] option');
+    let selected = document.querySelector('select[name="fonction_id"]').value;
+    let hasVisible = false;
+    selects.forEach(function(opt) {
+        if (opt.value === '') return;
+        var sid = opt.getAttribute('data-service-id');
+        if (!serviceId || sid === serviceId || !sid) {
+            opt.style.display = '';
+            hasVisible = true;
+        } else {
+            opt.style.display = 'none';
+        }
+    });
+    var sel = document.querySelector('select[name="fonction_id"]');
+    if (sel.value && sel.querySelector('option[value="' + sel.value + '"]')?.style.display === 'none') {
+        sel.value = '';
+    }
+}
+document.addEventListener('DOMContentLoaded', function() {
+    filterFonctions(document.querySelector('select[name="service_id"]')?.value || '');
+});
+</script>

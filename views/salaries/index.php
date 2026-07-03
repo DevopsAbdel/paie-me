@@ -33,7 +33,7 @@
                         <td><?= htmlspecialchars($s['prenom']) ?></td>
                         <td><?= htmlspecialchars($s['cin']) ?></td>
                         <td><?= htmlspecialchars($s['cnss']) ?></td>
-                        <td><?= htmlspecialchars($s['poste']) ?></td>
+                        <td><?= htmlspecialchars($s['fonction_nom'] ?? $s['poste']) ?></td>
                         <td><?= htmlspecialchars($s['raison_sociale']) ?></td>
                         <td><?= number_format($s['salaire_base'], 2, ',', ' ') ?></td>
                         <td class="table-actions">

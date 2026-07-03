@@ -76,7 +76,7 @@ class SocieteController extends Controller
             'cnss'           => $societe['cnss'],
         ]);
 
-        $salaries = $this->db->query("SELECT * FROM salaries WHERE societe_id = $id AND actif = 1 ORDER BY nom_famille, prenom")->fetchAll();
+        $salaries = $this->db->query("SELECT s.*, f.nom as fonction_nom FROM salaries s LEFT JOIN fonctions f ON s.fonction_id = f.id WHERE s.societe_id = $id AND s.actif = 1 ORDER BY s.nom_famille, s.prenom")->fetchAll();
         $periodes = $this->db->query("SELECT p.*, (SELECT COUNT(*) FROM paies WHERE periode_id = p.id) as nb_paies FROM periodes p WHERE p.societe_id = $id ORDER BY p.annee DESC, p.mois DESC")->fetchAll();
         $bulletins = $this->db->query("
             SELECT b.*, pa.salaire_brut, pa.net_a_payer, pa.ir, s.nom_famille, s.prenom, p.mois, p.annee
@@ -173,6 +173,7 @@ class SocieteController extends Controller
         // Delete actions via GET
         $deleteActions = [
             'delete_service'    => ['table' => 'services',             'tab' => 'services'],
+            'delete_fonction'   => ['table' => 'fonctions',           'tab' => 'services'],
             'delete_gain'       => ['table' => 'rubriques_gains',      'tab' => 'gains'],
             'delete_retenue'    => ['table' => 'rubriques_retenues',   'tab' => 'retenues'],
             'delete_organisme'  => ['table' => 'organismes',           'tab' => 'organismes'],
@@ -223,6 +224,11 @@ class SocieteController extends Controller
                     $stmt = $this->db->prepare("INSERT INTO services (societe_id, nom, description) VALUES (?, ?, ?)");
                     $stmt->execute([$id, $_POST['service_nom'], $_POST['service_description'] ?? '']);
                     Session::setFlash('success', 'Service ajouté.');
+                }
+                if (!empty($_POST['fonction_nom'])) {
+                    $stmt = $this->db->prepare("INSERT INTO fonctions (societe_id, service_id, nom, description) VALUES (?, ?, ?, ?)");
+                    $stmt->execute([$id, $_POST['fonction_service_id'] ? (int)$_POST['fonction_service_id'] : null, $_POST['fonction_nom'], $_POST['fonction_description'] ?? '']);
+                    Session::setFlash('success', 'Fonction ajoutée.');
                 }
             } elseif ($sousTab === 'gains') {
                 if (!empty($_POST['code'])) {
@@ -276,6 +282,7 @@ class SocieteController extends Controller
         $cnssParams = $this->db->query("SELECT * FROM parametres_cnss_amo WHERE societe_id = $id")->fetch();
         if (!$cnssParams) $cnssParams = ['plafond_cnss'=>6000,'taux_cnss_salarial'=>4.48,'taux_cnss_patronal'=>8.98,'taux_amo_salarial'=>2.26,'taux_amo_patronal'=>4.11,'taux_allocations_familiales'=>6.40,'taux_prestations_sociales'=>13.46,'taxe_formation'=>1.60,'participation_amo'=>1.85];
         $services = $this->db->query("SELECT * FROM services WHERE societe_id = $id ORDER BY nom")->fetchAll();
+        $fonctions = $this->db->query("SELECT f.*, s.nom as service_nom FROM fonctions f LEFT JOIN services s ON f.service_id = s.id WHERE f.societe_id = $id ORDER BY s.nom, f.nom")->fetchAll();
         $gains = $this->db->query("SELECT * FROM rubriques_gains WHERE societe_id = $id ORDER BY code")->fetchAll();
         $retenues = $this->db->query("SELECT * FROM rubriques_retenues WHERE societe_id = $id ORDER BY code")->fetchAll();
         $organismes = $this->db->query("SELECT * FROM organismes WHERE societe_id = $id ORDER BY nom")->fetchAll();
@@ -309,6 +316,7 @@ class SocieteController extends Controller
             'baremeAnnuel'  => $baremeAnnuel,
             'cnssParams'    => $cnssParams,
             'services'      => $services,
+            'fonctions'     => $fonctions,
             'gains'         => $gains,
             'retenues'      => $retenues,
             'organismes'    => $organismes,

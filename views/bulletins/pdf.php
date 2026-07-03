@@ -45,7 +45,7 @@
                 <strong>Matricule:</strong> <?= htmlspecialchars($b['matricule']) ?><br>
                 <strong>CIN:</strong> <?= htmlspecialchars($b['cin']) ?><br>
                 <strong>CNSS:</strong> <?= htmlspecialchars($b['cnss_num']) ?><br>
-                <strong>Poste:</strong> <?= htmlspecialchars($b['poste']) ?><br>
+                <strong>Poste:</strong> <?= htmlspecialchars($b['fonction_nom'] ?? $b['poste']) ?><br>
                 <strong>Date d'embauche:</strong> <?= $b['date_embauche'] ?>
             </td>
             <td class="infos-right">
@@ -98,6 +98,8 @@
             <?php if ($b['email']): ?> | <?= htmlspecialchars($b['email']) ?><?php endif; ?>
             <br>
             ICE: <?= htmlspecialchars($b['ice']) ?> | IF: <?= htmlspecialchars($b['if_fiscal']) ?> | CNSS: <?= htmlspecialchars($b['cnss_societe']) ?>
+            <?php if ($b['banque']): ?> | <?= htmlspecialchars($b['banque']) ?> <?php endif; ?>
+            <?php if ($b['rib']): ?>| RIB: <?= htmlspecialchars($b['rib']) ?><?php endif; ?>
         </div>
     </div>
 </body>

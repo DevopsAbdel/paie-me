@@ -69,3 +69,17 @@ SNI  = salaire - (CNSS + AMO)
 IR   = (SNI × taux) - déduction (barème progressif 2025)
 Net  = salaire - (CNSS + AMO + IR)
 ```
+
+## Encodage UTF-8 — RÈGLE CRITIQUE
+- **Tous les fichiers PHP, SQL, CSS, JS** doivent être **sauvés en UTF-8 sans BOM**.
+- **Toute donnée contenant des accents français** (`é`, `è`, `ê`, `ë`, `à`, `â`, `ù`, `û`, `ô`, `î`, `ç`, `É`, `È`, etc.) doit être **validée** avant insertion.
+- **Import SQL** : utiliser impérativement `--default-character-set=utf8mb4` :
+  ```
+  mysql -u root --default-character-set=utf8mb4 paie_me < schema.sql
+  ```
+  Ne JAMAIS utiliser `Set-Content` de PowerShell pour écrire du SQL contenant des accents → utiliser `Out-File -Encoding utf8NoBOM` ou l'éditeur de code.
+- **PDO** : le DSN doit toujours contenir `charset=utf8mb4` (déjà fait dans `config/database.php`).
+- **HTML** : `<meta charset="UTF-8">` + header PHP `Content-Type: text/html; charset=utf-8` (déjà fait).
+- **Corruption connue** : `0xC3 0x9A` au lieu de `0xC3 0xA9` (caractère `é`). Vérifier avec `SELECT id, HEX(nom) FROM services WHERE HEX(nom) LIKE '%C39A%'`.
+- **Fix** si données corrompues : `UPDATE table SET col = REPLACE(col, _utf8mb4 0xC39A, _utf8mb4 0xC3A9) WHERE HEX(col) LIKE '%C39A%';`
+- Les fichiers PHP et SQL ne doivent **jamais** être ouverts/sauvés avec un éditeur qui utilise l'encodage système Windows (cp850/Windows-1252) par défaut.

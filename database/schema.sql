@@ -1,3 +1,6 @@
+SET NAMES utf8mb4;
+SET CHARACTER SET utf8mb4;
+
 CREATE DATABASE IF NOT EXISTS paie_me
     CHARACTER SET utf8mb4
     COLLATE utf8mb4_unicode_ci;
@@ -272,13 +275,30 @@ CREATE TABLE IF NOT EXISTS modeles_attestation (
 ) ENGINE=InnoDB;
 
 -- -----------------------------------------------------------
+-- Fonctions (postes par service)
+-- -----------------------------------------------------------
+CREATE TABLE IF NOT EXISTS fonctions (
+    id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    societe_id      INT UNSIGNED        NOT NULL,
+    service_id      INT UNSIGNED        DEFAULT NULL,
+    nom             VARCHAR(100)        NOT NULL,
+    description     TEXT,
+    actif           TINYINT(1)          NOT NULL DEFAULT 1,
+    created_at      DATETIME            NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (societe_id) REFERENCES societes(id) ON DELETE CASCADE,
+    FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+-- -----------------------------------------------------------
 -- Colonnes ajoutées aux salariés
 -- -----------------------------------------------------------
 ALTER TABLE salaries
     ADD COLUMN service_id        INT UNSIGNED    DEFAULT NULL AFTER societe_id,
+    ADD COLUMN fonction_id       INT UNSIGNED    DEFAULT NULL AFTER service_id,
     ADD COLUMN avances_salaire   DECIMAL(10,2)   NOT NULL DEFAULT 0.00 AFTER avantage_logement,
     ADD COLUMN mutuelle          DECIMAL(10,2)   NOT NULL DEFAULT 0.00 AFTER avances_salaire,
-    ADD FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE SET NULL;
+    ADD FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE SET NULL,
+    ADD FOREIGN KEY (fonction_id) REFERENCES fonctions(id) ON DELETE SET NULL;
 
 -- -----------------------------------------------------------
 -- Index utilisateur par défaut (password: admin123)

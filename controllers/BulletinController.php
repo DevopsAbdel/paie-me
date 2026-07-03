@@ -72,7 +72,8 @@ class BulletinController extends Controller
     {
         $userId = Session::get('user_id');
         $stmt = $this->db->prepare("
-            SELECT b.*, pa.*, s.nom_famille, s.prenom, s.matricule, s.cin, s.cnss as cnss_num, s.poste,
+            SELECT b.*, pa.*, s.nom_famille, s.prenom, s.matricule, s.cin, s.cnss as cnss_num, s.poste, s.fonction_id,
+                   f.nom as fonction_nom,
                    s.date_embauche, s.situation_familiale, s.nb_enfants, s.indemnite_transport,
                    s.indemnite_panier, s.indemnite_representation, s.avantage_logement, s.salaire_base,
                    so.raison_sociale, so.ice, so.if_fiscal, so.cnss as cnss_societe, so.rc, so.ville,
@@ -81,6 +82,7 @@ class BulletinController extends Controller
             FROM bulletins b
             JOIN paies pa ON b.paie_id = pa.id
             JOIN salaries s ON pa.salarie_id = s.id
+            LEFT JOIN fonctions f ON s.fonction_id = f.id
             JOIN periodes p ON pa.periode_id = p.id
             JOIN societes so ON pa.societe_id = so.id
             WHERE b.id = ? AND so.user_id = ?
