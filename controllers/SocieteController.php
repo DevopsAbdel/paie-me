@@ -37,14 +37,16 @@ class SocieteController extends Controller
             $data = $this->getPostData();
 
             $stmt = $this->db->prepare("
-                INSERT INTO societes (user_id, raison_sociale, forme_juridique, ice, if_fiscal, rc, tp, cnss, adresse, ville, telephone, email, site_web, banque, agence, rib, compte_damancom, compte_simpl, compte_cimr)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO societes (user_id, raison_sociale, forme_juridique, ice, if_fiscal, rc, tp, cnss, adresse, ville, telephone, email, site_web, banque, agence, rib, compte_damancom, damancom_login, damancom_password, compte_simpl, simpl_login, simpl_password, compte_cimr, cimr_login, cimr_password)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ");
             $stmt->execute([
                 $userId, $data['raison_sociale'], $data['forme_juridique'], $data['ice'], $data['if_fiscal'],
                 $data['rc'], $data['tp'], $data['cnss'], $data['adresse'], $data['ville'], $data['telephone'],
                 $data['email'], $data['site_web'], $data['banque'], $data['agence'], $data['rib'],
-                $data['compte_damancom'], $data['compte_simpl'], $data['compte_cimr'],
+                $data['compte_damancom'], $data['damancom_login'], $data['damancom_password'],
+                $data['compte_simpl'], $data['simpl_login'], $data['simpl_password'],
+                $data['compte_cimr'], $data['cimr_login'], $data['cimr_password'],
             ]);
 
             Session::setFlash('success', 'Société créée avec succès.');
@@ -110,14 +112,16 @@ class SocieteController extends Controller
             $data = $this->getPostData();
 
             $stmt = $this->db->prepare("
-                UPDATE societes SET raison_sociale=?, forme_juridique=?, ice=?, if_fiscal=?, rc=?, tp=?, cnss=?, adresse=?, ville=?, telephone=?, email=?, site_web=?, banque=?, agence=?, rib=?, compte_damancom=?, compte_simpl=?, compte_cimr=?
+                UPDATE societes SET raison_sociale=?, forme_juridique=?, ice=?, if_fiscal=?, rc=?, tp=?, cnss=?, adresse=?, ville=?, telephone=?, email=?, site_web=?, banque=?, agence=?, rib=?, compte_damancom=?, damancom_login=?, damancom_password=?, compte_simpl=?, simpl_login=?, simpl_password=?, compte_cimr=?, cimr_login=?, cimr_password=?
                 WHERE id = ?
             ");
             $stmt->execute([
                 $data['raison_sociale'], $data['forme_juridique'], $data['ice'], $data['if_fiscal'],
                 $data['rc'], $data['tp'], $data['cnss'], $data['adresse'], $data['ville'], $data['telephone'],
                 $data['email'], $data['site_web'], $data['banque'], $data['agence'], $data['rib'],
-                $data['compte_damancom'], $data['compte_simpl'], $data['compte_cimr'], $id,
+                $data['compte_damancom'], $data['damancom_login'], $data['damancom_password'],
+                $data['compte_simpl'], $data['simpl_login'], $data['simpl_password'],
+                $data['compte_cimr'], $data['cimr_login'], $data['cimr_password'], $id,
             ]);
 
             Session::setFlash('success', 'Société mise à jour.');
@@ -168,7 +172,7 @@ class SocieteController extends Controller
 
         if ($this->isPost()) {
             $stmt = $this->db->prepare("
-                UPDATE societes SET banque=?, agence=?, rib=?, compte_damancom=?, compte_simpl=?, compte_cimr=?
+                UPDATE societes SET banque=?, agence=?, rib=?, compte_damancom=?, damancom_login=?, damancom_password=?, compte_simpl=?, simpl_login=?, simpl_password=?, compte_cimr=?, cimr_login=?, cimr_password=?
                 WHERE id = ?
             ");
             $stmt->execute([
@@ -176,8 +180,14 @@ class SocieteController extends Controller
                 $_POST['agence'] ?? '',
                 $_POST['rib'] ?? '',
                 $_POST['compte_damancom'] ?? '',
+                $_POST['damancom_login'] ?? '',
+                $_POST['damancom_password'] ?? '',
                 $_POST['compte_simpl'] ?? '',
+                $_POST['simpl_login'] ?? '',
+                $_POST['simpl_password'] ?? '',
                 $_POST['compte_cimr'] ?? '',
+                $_POST['cimr_login'] ?? '',
+                $_POST['cimr_password'] ?? '',
                 $id,
             ]);
 
@@ -197,24 +207,30 @@ class SocieteController extends Controller
     private function getPostData(): array
     {
         return [
-            'raison_sociale'  => $_POST['raison_sociale'] ?? '',
-            'forme_juridique' => $_POST['forme_juridique'] ?? 'SARL',
-            'ice'             => $_POST['ice'] ?? '',
-            'if_fiscal'       => $_POST['if_fiscal'] ?? '',
-            'rc'              => $_POST['rc'] ?? '',
-            'tp'              => $_POST['tp'] ?? '',
-            'cnss'            => $_POST['cnss'] ?? '',
-            'adresse'         => $_POST['adresse'] ?? '',
-            'ville'           => $_POST['ville'] ?? '',
-            'telephone'       => $_POST['telephone'] ?? '',
-            'email'           => $_POST['email'] ?? '',
-            'site_web'        => $_POST['site_web'] ?? '',
-            'banque'          => $_POST['banque'] ?? '',
-            'agence'          => $_POST['agence'] ?? '',
-            'rib'             => $_POST['rib'] ?? '',
-            'compte_damancom' => $_POST['compte_damancom'] ?? '',
-            'compte_simpl'    => $_POST['compte_simpl'] ?? '',
-            'compte_cimr'     => $_POST['compte_cimr'] ?? '',
+            'raison_sociale'    => $_POST['raison_sociale'] ?? '',
+            'forme_juridique'   => $_POST['forme_juridique'] ?? 'SARL',
+            'ice'               => $_POST['ice'] ?? '',
+            'if_fiscal'         => $_POST['if_fiscal'] ?? '',
+            'rc'                => $_POST['rc'] ?? '',
+            'tp'                => $_POST['tp'] ?? '',
+            'cnss'              => $_POST['cnss'] ?? '',
+            'adresse'           => $_POST['adresse'] ?? '',
+            'ville'             => $_POST['ville'] ?? '',
+            'telephone'         => $_POST['telephone'] ?? '',
+            'email'             => $_POST['email'] ?? '',
+            'site_web'          => $_POST['site_web'] ?? '',
+            'banque'            => $_POST['banque'] ?? '',
+            'agence'            => $_POST['agence'] ?? '',
+            'rib'               => $_POST['rib'] ?? '',
+            'compte_damancom'   => $_POST['compte_damancom'] ?? '',
+            'damancom_login'    => $_POST['damancom_login'] ?? '',
+            'damancom_password' => $_POST['damancom_password'] ?? '',
+            'compte_simpl'      => $_POST['compte_simpl'] ?? '',
+            'simpl_login'       => $_POST['simpl_login'] ?? '',
+            'simpl_password'    => $_POST['simpl_password'] ?? '',
+            'compte_cimr'       => $_POST['compte_cimr'] ?? '',
+            'cimr_login'        => $_POST['cimr_login'] ?? '',
+            'cimr_password'     => $_POST['cimr_password'] ?? '',
         ];
     }
 

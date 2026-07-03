@@ -89,12 +89,40 @@
                 <input type="text" name="compte_damancom" class="form-control" value="<?= $societe['compte_damancom'] ?? '' ?>">
             </div>
             <div class="form-group">
+                <label>Login Damancom</label>
+                <input type="text" name="damancom_login" class="form-control" value="<?= $societe['damancom_login'] ?? '' ?>">
+            </div>
+            <div class="form-group">
+                <label>Mot de passe Damancom</label>
+                <input type="password" name="damancom_password" class="form-control" value="<?= $societe['damancom_password'] ?? '' ?>">
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
                 <label>Compte SIMPL (DGI)</label>
                 <input type="text" name="compte_simpl" class="form-control" value="<?= $societe['compte_simpl'] ?? '' ?>">
             </div>
             <div class="form-group">
+                <label>Login SIMPL</label>
+                <input type="text" name="simpl_login" class="form-control" value="<?= $societe['simpl_login'] ?? '' ?>">
+            </div>
+            <div class="form-group">
+                <label>Mot de passe SIMPL</label>
+                <input type="password" name="simpl_password" class="form-control" value="<?= $societe['simpl_password'] ?? '' ?>">
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
                 <label>Compte CIMR</label>
                 <input type="text" name="compte_cimr" class="form-control" value="<?= $societe['compte_cimr'] ?? '' ?>">
+            </div>
+            <div class="form-group">
+                <label>Login CIMR</label>
+                <input type="text" name="cimr_login" class="form-control" value="<?= $societe['cimr_login'] ?? '' ?>">
+            </div>
+            <div class="form-group">
+                <label>Mot de passe CIMR</label>
+                <input type="password" name="cimr_password" class="form-control" value="<?= $societe['cimr_password'] ?? '' ?>">
             </div>
         </div>
         <div style="display:flex; gap:0.75rem; margin-top:1rem;">
