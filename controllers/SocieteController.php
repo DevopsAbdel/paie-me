@@ -201,9 +201,9 @@ class SocieteController extends Controller
                 Session::setFlash('success', 'Barème IR mis à jour.');
             } elseif ($sousTab === 'cnss_amo') {
                 $stmt = $this->db->prepare("
-                    INSERT INTO parametres_cnss_amo (societe_id, plafond_cnss, taux_cnss_salarial, taux_cnss_patronal, taux_amo_salarial, taux_amo_patronal)
-                    VALUES (?, ?, ?, ?, ?, ?)
-                    ON DUPLICATE KEY UPDATE plafond_cnss=VALUES(plafond_cnss), taux_cnss_salarial=VALUES(taux_cnss_salarial), taux_cnss_patronal=VALUES(taux_cnss_patronal), taux_amo_salarial=VALUES(taux_amo_salarial), taux_amo_patronal=VALUES(taux_amo_patronal)
+                    INSERT INTO parametres_cnss_amo (societe_id, plafond_cnss, taux_cnss_salarial, taux_cnss_patronal, taux_amo_salarial, taux_amo_patronal, taux_allocations_familiales, taux_prestations_sociales, taxe_formation, participation_amo)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ON DUPLICATE KEY UPDATE plafond_cnss=VALUES(plafond_cnss), taux_cnss_salarial=VALUES(taux_cnss_salarial), taux_cnss_patronal=VALUES(taux_cnss_patronal), taux_amo_salarial=VALUES(taux_amo_salarial), taux_amo_patronal=VALUES(taux_amo_patronal), taux_allocations_familiales=VALUES(taux_allocations_familiales), taux_prestations_sociales=VALUES(taux_prestations_sociales), taxe_formation=VALUES(taxe_formation), participation_amo=VALUES(participation_amo)
                 ");
                 $stmt->execute([
                     $id,
@@ -212,6 +212,10 @@ class SocieteController extends Controller
                     $_POST['taux_cnss_patronal'] ?? 8.98,
                     $_POST['taux_amo_salarial'] ?? 2.26,
                     $_POST['taux_amo_patronal'] ?? 4.11,
+                    $_POST['taux_allocations_familiales'] ?? 6.40,
+                    $_POST['taux_prestations_sociales'] ?? 13.46,
+                    $_POST['taxe_formation'] ?? 1.60,
+                    $_POST['participation_amo'] ?? 1.85,
                 ]);
                 Session::setFlash('success', 'Taux CNSS/AMO mis à jour.');
             } elseif ($sousTab === 'services') {
@@ -270,7 +274,7 @@ class SocieteController extends Controller
         $baremeMensuel = $this->db->query("SELECT * FROM bareme_ir WHERE type='mensuel' ORDER BY `min`")->fetchAll();
         $baremeAnnuel  = $this->db->query("SELECT * FROM bareme_ir WHERE type='annuel' ORDER BY `min`")->fetchAll();
         $cnssParams = $this->db->query("SELECT * FROM parametres_cnss_amo WHERE societe_id = $id")->fetch();
-        if (!$cnssParams) $cnssParams = ['plafond_cnss'=>6000,'taux_cnss_salarial'=>4.48,'taux_cnss_patronal'=>8.98,'taux_amo_salarial'=>2.26,'taux_amo_patronal'=>4.11];
+        if (!$cnssParams) $cnssParams = ['plafond_cnss'=>6000,'taux_cnss_salarial'=>4.48,'taux_cnss_patronal'=>8.98,'taux_amo_salarial'=>2.26,'taux_amo_patronal'=>4.11,'taux_allocations_familiales'=>6.40,'taux_prestations_sociales'=>13.46,'taxe_formation'=>1.60,'participation_amo'=>1.85];
         $services = $this->db->query("SELECT * FROM services WHERE societe_id = $id ORDER BY nom")->fetchAll();
         $gains = $this->db->query("SELECT * FROM rubriques_gains WHERE societe_id = $id ORDER BY code")->fetchAll();
         $retenues = $this->db->query("SELECT * FROM rubriques_retenues WHERE societe_id = $id ORDER BY code")->fetchAll();

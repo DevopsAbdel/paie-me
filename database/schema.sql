@@ -201,9 +201,13 @@ CREATE TABLE IF NOT EXISTS parametres_cnss_amo (
     taux_cnss_patronal  DECIMAL(5,2)    NOT NULL DEFAULT 8.98,
     taux_amo_salarial   DECIMAL(5,2)    NOT NULL DEFAULT 2.26,
     taux_amo_patronal   DECIMAL(5,2)    NOT NULL DEFAULT 4.11,
-    taux_ams_salarial   DECIMAL(5,2)    NOT NULL DEFAULT 0.00,
-    taux_ams_patronal   DECIMAL(5,2)    NOT NULL DEFAULT 0.00,
-    created_at          DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    taux_ams_salarial           DECIMAL(5,2) NOT NULL DEFAULT 0.00,
+    taux_ams_patronal           DECIMAL(5,2) NOT NULL DEFAULT 0.00,
+    taux_allocations_familiales DECIMAL(5,2) NOT NULL DEFAULT 6.40,
+    taux_prestations_sociales   DECIMAL(5,2) NOT NULL DEFAULT 13.46,
+    taxe_formation              DECIMAL(5,2) NOT NULL DEFAULT 1.60,
+    participation_amo           DECIMAL(5,2) NOT NULL DEFAULT 1.85,
+    created_at                  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at          DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (societe_id) REFERENCES societes(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
