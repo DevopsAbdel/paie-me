@@ -153,7 +153,7 @@ class SocieteController extends Controller
         $this->redirect('/paie-me/societes');
     }
 
-    public function parametres(int $id): void
+    public function parametres(int $id, string $sous_tab = 'banque'): void
     {
         $userId = Session::get('user_id');
         $societe = $this->db->query("SELECT * FROM societes WHERE id = $id AND user_id = $userId")->fetch();
@@ -172,17 +172,17 @@ class SocieteController extends Controller
 
         // Delete actions via GET
         $deleteActions = [
-            'delete_service'    => 'services',
-            'delete_gain'       => 'rubriques_gains',
-            'delete_retenue'    => 'rubriques_retenues',
-            'delete_organisme'  => 'organismes',
-            'delete_attestation' => 'modeles_attestation',
+            'delete_service'    => ['table' => 'services',             'tab' => 'services'],
+            'delete_gain'       => ['table' => 'rubriques_gains',      'tab' => 'gains'],
+            'delete_retenue'    => ['table' => 'rubriques_retenues',   'tab' => 'retenues'],
+            'delete_organisme'  => ['table' => 'organismes',           'tab' => 'organismes'],
+            'delete_attestation' => ['table' => 'modeles_attestation', 'tab' => 'attestations'],
         ];
-        foreach ($deleteActions as $param => $table) {
+        foreach ($deleteActions as $param => $cfg) {
             if (isset($_GET[$param])) {
-                $this->db->exec("DELETE FROM $table WHERE id = " . (int)$_GET[$param] . " AND societe_id = $id");
+                $this->db->exec("DELETE FROM {$cfg['table']} WHERE id = " . (int)$_GET[$param] . " AND societe_id = $id");
                 Session::setFlash('success', 'Supprimé avec succès.');
-                $this->redirect('/paie-me/societes/' . $id . '/parametres?tab=' . str_replace('delete_', '', $param));
+                $this->redirect('/paie-me/societes/' . $id . '/parametres/' . $cfg['tab']);
             }
         }
 
@@ -264,7 +264,7 @@ class SocieteController extends Controller
                 Session::setFlash('success', 'Paramètres mis à jour.');
             }
 
-            $this->redirect('/paie-me/societes/' . $id . '/parametres?tab=' . $sousTab);
+            $this->redirect('/paie-me/societes/' . $id . '/parametres/' . $sousTab);
         }
 
         $baremeMensuel = $this->db->query("SELECT * FROM bareme_ir WHERE type='mensuel' ORDER BY `min`")->fetchAll();
@@ -277,9 +277,29 @@ class SocieteController extends Controller
         $organismes = $this->db->query("SELECT * FROM organismes WHERE societe_id = $id ORDER BY nom")->fetchAll();
         $attestations = $this->db->query("SELECT * FROM modeles_attestation WHERE societe_id = $id ORDER BY titre")->fetchAll();
 
-        $this->render('societes/parametres.php', [
-            'title'         => 'Paramètres — ' . $societe['raison_sociale'],
+        $titles = [
+            'general'      => 'Informations générales',
+            'banque'       => 'Coordonnées bancaires',
+            'teleservices' => 'Accès téléservices',
+            'bareme'       => 'Barème IR 2025',
+            'codification' => 'Codification & numérotation',
+            'cnss_amo'     => 'Taux CNSS & AMO',
+            'services'     => 'Services',
+            'gains'        => 'Rubriques de gains',
+            'retenues'     => 'Rubriques de retenues',
+            'organismes'   => 'Organismes',
+            'attestations' => 'Modèles d\'attestation',
+        ];
+        $subView = 'banque';
+        if (in_array($sous_tab, array_keys($titles))) {
+            $subView = $sous_tab;
+        }
+        $baseUrl = '/paie-me/societes/' . $id . '/parametres';
+
+        $this->render('societes/parametres/' . $subView . '.php', [
+            'title'         => $titles[$subView] . ' — ' . $societe['raison_sociale'],
             'societe'       => $societe,
+            'baseUrl'       => $baseUrl,
             'bareme'        => $baremeMensuel,
             'baremeAnnuel'  => $baremeAnnuel,
             'cnssParams'    => $cnssParams,

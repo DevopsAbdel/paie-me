@@ -35,6 +35,22 @@ Application web de gestion de paie marocaine (PHP 8+ / MySQL / Dark UI).
 /database/            → schema.sql
 ```
 
+## Règles pour les sous-pages (paramètres et autres)
+- **PAS de tabs/conditions** dans une vue PHP. Chaque sous-page = fichier dédié.
+- **PAS de barre d'onglets**. Chaque sous-page s'affiche seule, sans navigation horizontale.
+- Les sous-pages vont dans un dossier nommé comme la vue principale : `views/societes/parametres/banque.php`, `views/societes/parametres/services.php`, etc.
+- Le controller rend la sous-page **directement** (`render('societes/parametres/' . $sous_tab . '.php')`) — pas de fichier `parametres.php` intermédiaire avec des `if/elseif`.
+- Le controller passe `$baseUrl` dans les données de la vue pour les liens et formulaires.
+- Le titre de la page est défini dynamiquement dans le controller (ex: `"Coordonnées bancaires — " . $societe['raison_sociale']`).
+- La navigation entre sous-pages se fait **uniquement** par le menu latéral (sidebar).
+- **Cette règle s'applique à toutes les sous-pages existantes et futures.**
+- Pour ajouter une nouvelle sous-page :
+  1. Créer le fichier `views/societes/parametres/nouvelle.php` avec son contenu complet (pas de tabs)
+  2. Ajouter le titre dans le tableau `$titles` dans `SocieteController::parametres()`
+  3. Ajouter la route dans `routes.php`
+  4. Ajouter le traitement POST dans `SocieteController::parametres()` (si formulaire)
+  5. Ajouter le lien dans le sous-menu latéral dans `views/layout.php`
+
 ## Modules (ordre de priorité)
 1. Authentification (login/logout/sessions)
 2. Sociétés (CRUD + infos fiscales)
