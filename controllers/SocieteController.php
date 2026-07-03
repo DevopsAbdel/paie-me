@@ -67,14 +67,31 @@ class SocieteController extends Controller
             $this->redirect('/paie-me/societes');
         }
 
+        Session::set('societe_context', [
+            'id'             => $societe['id'],
+            'raison_sociale' => $societe['raison_sociale'],
+            'ice'            => $societe['ice'],
+            'cnss'           => $societe['cnss'],
+        ]);
+
         $salaries = $this->db->query("SELECT * FROM salaries WHERE societe_id = $id AND actif = 1 ORDER BY nom_famille, prenom")->fetchAll();
         $periodes = $this->db->query("SELECT p.*, (SELECT COUNT(*) FROM paies WHERE periode_id = p.id) as nb_paies FROM periodes p WHERE p.societe_id = $id ORDER BY p.annee DESC, p.mois DESC")->fetchAll();
+        $bulletins = $this->db->query("
+            SELECT b.*, pa.salaire_brut, pa.net_a_payer, s.nom_famille, s.prenom, p.mois, p.annee
+            FROM bulletins b
+            JOIN paies pa ON b.paie_id = pa.id
+            JOIN salaries s ON pa.salarie_id = s.id
+            JOIN periodes p ON pa.periode_id = p.id
+            WHERE pa.societe_id = $id
+            ORDER BY p.annee DESC, p.mois DESC, s.nom_famille
+        ")->fetchAll();
 
         $this->render('societes/show.php', [
             'title'     => $societe['raison_sociale'],
             'societe'   => $societe,
             'salaries'  => $salaries,
             'periodes'  => $periodes,
+            'bulletins' => $bulletins,
             'societeId' => $id,
         ]);
     }
@@ -111,6 +128,17 @@ class SocieteController extends Controller
             'title'   => 'Modifier société',
             'societe' => $societe,
         ]);
+    }
+
+    public function clearContext(): void
+    {
+        Session::remove('societe_context');
+        $this->redirect('/paie-me/societes');
+    }
+
+    public function switchContext(int $id): void
+    {
+        $this->redirect('/paie-me/societes/' . $id);
     }
 
     public function delete(int $id): void

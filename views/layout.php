@@ -9,57 +9,82 @@
 </head>
 <body>
 
-<?php if (isset($_SESSION['user_id'])): ?>
+<?php if (isset($_SESSION['user_id'])): 
+    $ctx = $_SESSION['societe_context'] ?? null;
+?>
 <aside class="sidebar">
     <div class="sidebar-brand">
-        <h2>Paie Me</h2>
-        <small>Gestion de paie</small>
+        <?php if ($ctx): ?>
+            <div style="width:40px;height:40px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;margin-bottom:4px;">
+                <?= strtoupper(mb_substr($ctx['raison_sociale'], 0, 2)) ?>
+            </div>
+            <h2 style="font-size:1rem;margin:0;"><?= htmlspecialchars($ctx['raison_sociale']) ?></h2>
+            <small style="font-size:0.7rem;">ICE: <?= htmlspecialchars($ctx['ice']) ?></small>
+        <?php else: ?>
+            <h2>Paie Me</h2>
+            <small>Gestion de paie</small>
+        <?php endif; ?>
     </div>
     <ul class="sidebar-nav">
+        <?php if ($ctx): ?>
+        <li>
+            <a href="/paie-me/societes/<?= $ctx['id'] ?>?tab=infos" class="<?= str_contains($_SERVER['REQUEST_URI'], '/societes/'.$ctx['id']) && !str_contains($_SERVER['REQUEST_URI'], 'tab=') ? 'active' : '' ?>">
+                <span class="icon" data-lucide="info"></span>
+                <span>Infos société</span>
+            </a>
+        </li>
+        <li>
+            <a href="/paie-me/societes/<?= $ctx['id'] ?>?tab=salaries">
+                <span class="icon" data-lucide="users"></span>
+                <span>Salariés</span>
+            </a>
+        </li>
+        <li>
+            <a href="/paie-me/societes/<?= $ctx['id'] ?>?tab=paies">
+                <span class="icon" data-lucide="wallet"></span>
+                <span>Paies</span>
+            </a>
+        </li>
+        <li>
+            <a href="/paie-me/societes/<?= $ctx['id'] ?>?tab=bulletins">
+                <span class="icon" data-lucide="file-text"></span>
+                <span>Bulletins</span>
+            </a>
+        </li>
+        <li>
+            <a href="/paie-me/societes/<?= $ctx['id'] ?>?tab=cnss">
+                <span class="icon" data-lucide="shield-check"></span>
+                <span>CNSS / Damancom</span>
+            </a>
+        </li>
+        <li>
+            <a href="/paie-me/societes/<?= $ctx['id'] ?>?tab=ir">
+                <span class="icon" data-lucide="calculator"></span>
+                <span>IR / SIMPL</span>
+            </a>
+        </li>
+        <?php else: ?>
         <li>
             <a href="/paie-me/dashboard" class="<?= str_contains($_SERVER['REQUEST_URI'], '/dashboard') ? 'active' : '' ?>">
                 <span class="icon" data-lucide="layout-dashboard"></span>
                 <span>Dashboard</span>
             </a>
         </li>
+        <?php endif; ?>
         <li>
-            <a href="/paie-me/societes" class="<?= str_contains($_SERVER['REQUEST_URI'], '/societes') ? 'active' : '' ?>">
+            <a href="/paie-me/societes" class="<?= str_contains($_SERVER['REQUEST_URI'], '/societes') && !$ctx ? 'active' : '' ?>">
                 <span class="icon" data-lucide="building-2"></span>
-                <span>Sociétés</span>
-            </a>
-        </li>
-        <li>
-            <a href="/paie-me/salaries" class="<?= str_contains($_SERVER['REQUEST_URI'], '/salaries') ? 'active' : '' ?>">
-                <span class="icon" data-lucide="users"></span>
-                <span>Salariés</span>
-            </a>
-        </li>
-        <li>
-            <a href="/paie-me/paies" class="<?= str_contains($_SERVER['REQUEST_URI'], '/paies') ? 'active' : '' ?>">
-                <span class="icon" data-lucide="wallet"></span>
-                <span>Paies</span>
-            </a>
-        </li>
-        <li>
-            <a href="/paie-me/bulletins" class="<?= str_contains($_SERVER['REQUEST_URI'], '/bulletins') ? 'active' : '' ?>">
-                <span class="icon" data-lucide="file-text"></span>
-                <span>Bulletins</span>
-            </a>
-        </li>
-        <li>
-            <a href="/paie-me/damancom" class="<?= str_contains($_SERVER['REQUEST_URI'], '/damancom') ? 'active' : '' ?>">
-                <span class="icon" data-lucide="shield-check"></span>
-                <span>CNSS / Damancom</span>
-            </a>
-        </li>
-        <li>
-            <a href="/paie-me/ir" class="<?= str_contains($_SERVER['REQUEST_URI'], '/ir') ? 'active' : '' ?>">
-                <span class="icon" data-lucide="calculator"></span>
-                <span>IR / SIMPL</span>
+                <span><?= $ctx ? 'Changer de société' : 'Sociétés' ?></span>
             </a>
         </li>
     </ul>
     <div class="sidebar-footer">
+        <?php if ($ctx): ?>
+        <a href="/paie-me/societes/clear-context">
+            <span class="icon" data-lucide="arrow-left-square"></span>
+            <span>Quitter la société</span>
+        </a>
+        <?php endif; ?>
         <a href="/paie-me/logout">
             <span class="icon" data-lucide="log-out"></span>
             <span>Déconnexion</span>

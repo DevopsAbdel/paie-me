@@ -18,6 +18,7 @@ Router::get('/logout',                [AuthController::class, 'logout']);
 Router::get('/dashboard',              [DashboardController::class, 'index']);
 
 Router::get('/societes',               [SocieteController::class, 'index']);
+Router::get('/societes/clear-context', [SocieteController::class, 'clearContext']);
 Router::get('/societes/create',        [SocieteController::class, 'create']);
 Router::post('/societes/create',       [SocieteController::class, 'create']);
 Router::get('/societes/{id}',          [SocieteController::class, 'show']);
@@ -43,6 +44,8 @@ Router::get('/bulletins/{id}/pdf',     [BulletinController::class, 'pdf']);
 
 Router::get('/damancom',               [DamancomController::class, 'index']);
 Router::post('/damancom/generate',     [DamancomController::class, 'generate']);
+Router::get('/damancom/generate',      [DamancomController::class, 'generate']);
 
 Router::get('/ir',                     [IrController::class, 'index']);
 Router::post('/ir/export',             [IrController::class, 'export']);
+Router::get('/ir/export',              [IrController::class, 'export']);

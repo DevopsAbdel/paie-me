@@ -22,13 +22,18 @@ class DamancomController extends Controller
     public function index(): void
     {
         $userId = Session::get('user_id');
-        $periodes = $this->db->query("
+        $ctx = Session::get('societe_context');
+        $sql = "
             SELECT p.*, so.raison_sociale
             FROM periodes p
             JOIN societes so ON p.societe_id = so.id
             WHERE so.user_id = $userId AND p.cloturee = 1
-            ORDER BY p.annee DESC, p.mois DESC
-        ")->fetchAll();
+        ";
+        if ($ctx) {
+            $sql .= " AND p.societe_id = " . (int)$ctx['id'];
+        }
+        $sql .= " ORDER BY p.annee DESC, p.mois DESC";
+        $periodes = $this->db->query($sql)->fetchAll();
 
         $this->render('damancom/index.php', [
             'title'    => 'CNSS / Damancom',
@@ -38,11 +43,15 @@ class DamancomController extends Controller
 
     public function generate(): void
     {
-        if (!$this->isPost()) {
+        $periodeId = (int) ($_POST['periode_id'] ?? $_GET['periode_id'] ?? 0);
+        if (!$periodeId) {
+            Session::setFlash('error', 'Période non spécifiée.');
+            $ctx = Session::get('societe_context');
+            if ($ctx) {
+                $this->redirect('/paie-me/societes/' . $ctx['id'] . '?tab=cnss');
+            }
             $this->redirect('/paie-me/damancom');
         }
-
-        $periodeId = (int) ($_POST['periode_id'] ?? 0);
         $userId = Session::get('user_id');
 
         $periode = $this->db->query("
