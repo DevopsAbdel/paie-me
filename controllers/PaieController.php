@@ -86,8 +86,8 @@ class PaieController extends Controller
             $periodeId = $this->db->lastInsertId();
 
             $cnssParams = $this->db->query("SELECT * FROM parametres_cnss_amo WHERE societe_id = $societeId")->fetch() ?: [];
-            $gains = $this->db->query("SELECT * FROM rubriques_gains WHERE societe_id = $societeId AND actif = 1")->fetchAll();
-            $retenues = $this->db->query("SELECT * FROM rubriques_retenues WHERE societe_id = $societeId AND actif = 1")->fetchAll();
+            $gains = $this->mergeRubriques('rubriques_gains', $societeId);
+            $retenues = $this->mergeRubriques('rubriques_retenues', $societeId);
 
             $salaries = $this->db->query("SELECT id, salaire_base, date_embauche, date_sortie, situation_familiale, indemnite_transport, indemnite_panier, indemnite_representation, avantage_logement, nb_enfants, avances_salaire, mutuelle FROM salaries WHERE societe_id = $societeId AND actif = 1")->fetchAll();
 
@@ -159,8 +159,8 @@ class PaieController extends Controller
         $dateDebut = $periode['date_debut'];
         $dateFin = $periode['date_fin'];
         $cnssParams = $this->db->query("SELECT * FROM parametres_cnss_amo WHERE societe_id = $societeId")->fetch() ?: [];
-        $gains = $this->db->query("SELECT * FROM rubriques_gains WHERE societe_id = $societeId AND actif = 1")->fetchAll();
-        $retenues = $this->db->query("SELECT * FROM rubriques_retenues WHERE societe_id = $societeId AND actif = 1")->fetchAll();
+        $gains = $this->mergeRubriques('rubriques_gains', $societeId);
+        $retenues = $this->mergeRubriques('rubriques_retenues', $societeId);
 
         $salaries = $this->db->query("SELECT id, salaire_base, date_embauche, date_sortie, situation_familiale, indemnite_transport, indemnite_panier, indemnite_representation, avantage_logement, nb_enfants, avances_salaire, mutuelle FROM salaries WHERE societe_id = $societeId AND actif = 1")->fetchAll();
 
@@ -345,5 +345,15 @@ class PaieController extends Controller
         require __DIR__ . '/../views/' . $view;
         $content = ob_get_clean();
         require __DIR__ . '/../views/layout.php';
+    }
+
+    private function mergeRubriques(string $table, int $societeId): array
+    {
+        $all = $this->db->query("SELECT * FROM $table WHERE (societe_id IS NULL OR societe_id = $societeId) AND actif = 1 ORDER BY is_global, code")->fetchAll();
+        $merged = [];
+        foreach ($all as $r) {
+            $merged[$r['code']] = $r;
+        }
+        return array_values($merged);
     }
 }

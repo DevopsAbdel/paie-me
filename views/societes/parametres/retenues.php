@@ -17,11 +17,11 @@
     <div style="overflow-x:auto;">
         <table>
             <thead>
-                <tr><th>Code</th><th>Libellé</th><th>Type</th><th>Valeur défaut</th><th>Actif</th><th>Actions</th></tr>
+                <tr><th>Code</th><th>Libellé</th><th>Type</th><th>Valeur défaut</th><th>Actif</th><th>Source</th><th>Actions</th></tr>
             </thead>
             <tbody>
                 <?php if (empty($retenues)): ?>
-                <tr><td colspan="6" style="text-align:center; color:var(--text-muted);">Aucune retenue</td></tr>
+                <tr><td colspan="7" style="text-align:center; color:var(--text-muted);">Aucune retenue</td></tr>
                 <?php else: ?>
                 <?php foreach ($retenues as $r): ?>
                 <tr>
@@ -30,8 +30,13 @@
                     <td><?= htmlspecialchars($r['type_montant']) ?></td>
                     <td><?= htmlspecialchars($r['valeur_defaut'] ?? '') ?></td>
                     <td><span class="badge badge-<?= $r['actif'] ? 'success' : 'secondary' ?>"><?= $r['actif'] ? 'Oui' : 'Non' ?></span></td>
+                    <td><span class="badge badge-info"><?= !empty($r['is_global']) ? 'Globale' : 'Société' ?></span></td>
                     <td>
+                        <?php if (empty($r['is_global'])): ?>
                         <a href="<?= $baseUrl ?>/retenues?delete_retenue=<?= $r['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Supprimer cette retenue ?')">Supprimer</a>
+                        <?php else: ?>
+                        <span style="color:var(--text-muted); font-size:0.85rem;">Par défaut</span>
+                        <?php endif; ?>
                     </td>
                 </tr>
                 <?php endforeach; ?>

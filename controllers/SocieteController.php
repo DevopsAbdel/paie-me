@@ -325,8 +325,8 @@ class SocieteController extends Controller
         if (!$cnssParams) $cnssParams = ['plafond_cnss'=>6000,'taux_cnss_salarial'=>4.48,'taux_cnss_patronal'=>8.98,'taux_amo_salarial'=>2.26,'taux_amo_patronal'=>4.11,'taux_allocations_familiales'=>6.40,'taux_prestations_sociales'=>13.46,'taxe_formation'=>1.60,'participation_amo'=>1.85];
         $services = $this->db->query("SELECT * FROM services WHERE societe_id = $id ORDER BY nom")->fetchAll();
         $fonctions = $this->db->query("SELECT f.*, s.nom as service_nom FROM fonctions f LEFT JOIN services s ON f.service_id = s.id WHERE f.societe_id = $id ORDER BY s.nom, f.nom")->fetchAll();
-        $gains = $this->db->query("SELECT * FROM rubriques_gains WHERE societe_id = $id ORDER BY code")->fetchAll();
-        $retenues = $this->db->query("SELECT * FROM rubriques_retenues WHERE societe_id = $id ORDER BY code")->fetchAll();
+        $gains = $this->db->query("SELECT * FROM rubriques_gains WHERE (societe_id IS NULL OR societe_id = $id) ORDER BY is_global DESC, code")->fetchAll();
+        $retenues = $this->db->query("SELECT * FROM rubriques_retenues WHERE (societe_id IS NULL OR societe_id = $id) ORDER BY is_global DESC, code")->fetchAll();
         $organismes = $this->db->query("SELECT * FROM organismes WHERE societe_id = $id ORDER BY nom")->fetchAll();
         $attestations = $this->db->query("SELECT * FROM modeles_attestation WHERE societe_id = $id ORDER BY titre")->fetchAll();
 

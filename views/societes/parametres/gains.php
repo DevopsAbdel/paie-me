@@ -17,11 +17,11 @@
     <div style="overflow-x:auto;">
         <table>
             <thead>
-                <tr><th>Code</th><th>Libellé</th><th>Type</th><th>Valeur défaut</th><th>Imposable</th><th>Actif</th><th>Actions</th></tr>
+                <tr><th>Code</th><th>Libellé</th><th>Type</th><th>Valeur défaut</th><th>Imposable</th><th>Actif</th><th>Source</th><th>Actions</th></tr>
             </thead>
             <tbody>
                 <?php if (empty($gains)): ?>
-                <tr><td colspan="7" style="text-align:center; color:var(--text-muted);">Aucun gain</td></tr>
+                <tr><td colspan="8" style="text-align:center; color:var(--text-muted);">Aucun gain</td></tr>
                 <?php else: ?>
                 <?php foreach ($gains as $g): ?>
                 <tr>
@@ -31,8 +31,13 @@
                     <td><?= htmlspecialchars($g['valeur_defaut'] ?? '') ?></td>
                     <td><span class="badge badge-<?= $g['imposable'] ? 'warning' : 'secondary' ?>"><?= $g['imposable'] ? 'Oui' : 'Non' ?></span></td>
                     <td><span class="badge badge-<?= $g['actif'] ? 'success' : 'secondary' ?>"><?= $g['actif'] ? 'Oui' : 'Non' ?></span></td>
+                    <td><span class="badge badge-info"><?= !empty($g['is_global']) ? 'Globale' : 'Société' ?></span></td>
                     <td>
+                        <?php if (empty($g['is_global'])): ?>
                         <a href="<?= $baseUrl ?>/gains?delete_gain=<?= $g['id'] ?>" class="btn btn-danger btn-sm" onclick="return confirm('Supprimer ce gain ?')">Supprimer</a>
+                        <?php else: ?>
+                        <span style="color:var(--text-muted); font-size:0.85rem;">Par défaut</span>
+                        <?php endif; ?>
                     </td>
                 </tr>
                 <?php endforeach; ?>

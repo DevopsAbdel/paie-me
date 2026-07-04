@@ -167,12 +167,12 @@ CREATE TABLE IF NOT EXISTS bareme_ir (
 ) ENGINE=InnoDB;
 
 INSERT INTO bareme_ir (min, max, taux, deduction, type) VALUES
-    (0.00,    3333.00,    0.00,   0.00,    'mensuel'),
-    (3334.00, 5000.00,   10.00, 250.00,   'mensuel'),
-    (5001.00, 6666.67,   20.00, 666.67,   'mensuel'),
-    (6667.00, 8333.00,   30.00, 1166.67,  'mensuel'),
-    (8334.00, 15000.00,  34.00, 1433.33,  'mensuel'),
-    (15000.01, 999999.99, 37.00, 2033.33, 'mensuel'),
+    (0.00,    3333.33,   0.00,   0.00,    'mensuel'),
+    (3333.34, 5000.00,  10.00, 333.33,   'mensuel'),
+    (5000.01, 6666.67,  20.00, 833.33,   'mensuel'),
+    (6666.68, 8333.33,  30.00, 1500.00,  'mensuel'),
+    (8333.34, 15000.00, 34.00, 1833.33,  'mensuel'),
+    (15000.01, 999999.99, 37.00, 2283.33, 'mensuel'),
     (0.00,    40000.00,   0.00,   0.00,    'annuel'),
     (40001.00, 60000.00,  10.00, 4000.00,  'annuel'),
     (60001.00, 80000.00,  20.00, 10000.00, 'annuel'),
@@ -220,7 +220,8 @@ CREATE TABLE IF NOT EXISTS parametres_cnss_amo (
 -- -----------------------------------------------------------
 CREATE TABLE IF NOT EXISTS rubriques_gains (
     id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    societe_id      INT UNSIGNED        NOT NULL,
+    societe_id      INT UNSIGNED        DEFAULT NULL,
+    is_global       TINYINT(1)          NOT NULL DEFAULT 0,
     code            VARCHAR(20)         NOT NULL,
     libelle         VARCHAR(100)        NOT NULL,
     type_montant    ENUM('fixe','proportionnel') NOT NULL DEFAULT 'fixe',
@@ -236,7 +237,8 @@ CREATE TABLE IF NOT EXISTS rubriques_gains (
 -- -----------------------------------------------------------
 CREATE TABLE IF NOT EXISTS rubriques_retenues (
     id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    societe_id      INT UNSIGNED        NOT NULL,
+    societe_id      INT UNSIGNED        DEFAULT NULL,
+    is_global       TINYINT(1)          NOT NULL DEFAULT 0,
     code            VARCHAR(20)         NOT NULL,
     libelle         VARCHAR(100)        NOT NULL,
     type_montant    ENUM('fixe','proportionnel') NOT NULL DEFAULT 'fixe',
@@ -331,3 +333,69 @@ INSERT INTO users (nom, email, password, role)
 VALUES ('Administrateur', 'admin@paie-me.ma',
         '$2y$10$DRPsKOgLy.Ib4oKPT8oX/.2gRRWXSCgQz3UdUMLbbiyYvVOnX6fhq',
         'admin');
+
+-- -----------------------------------------------------------
+-- Rubriques gains globales (applicables à toutes les sociétés)
+-- -----------------------------------------------------------
+INSERT INTO rubriques_gains (societe_id, is_global, code, libelle, type_montant, valeur_defaut, imposable) VALUES
+    -- Gains standard (imposables)
+    (NULL, 1, 'PRIME_REND',     'Prime de rendement',        'proportionnel', 10.00,  1),
+    (NULL, 1, 'PRIME_OBJECTIF',  'Prime d''objectifs',        'proportionnel', 5.00,   1),
+    (NULL, 1, 'PRIME_ASSIDUITE', 'Prime d''assiduité',        'fixe',          300.00, 1),
+    (NULL, 1, 'PRIME_NUIT',     'Prime de nuit',              'fixe',          250.00, 1),
+    (NULL, 1, 'PRIME_13EME',    '13ème mois (prorata)',       'proportionnel', 8.33,   1),
+    -- I. Transport & Déplacement (exonérés)
+    (NULL, 1, '330', 'Indemnité de transport urbain',                     'fixe',           500, 0),
+    (NULL, 1, '331', 'Indemnité de représentation',                      'proportionnel',   10, 0),
+    (NULL, 1, '334', 'Indemnité kilométrique',                           'fixe',             0, 0),
+    (NULL, 1, '337', 'Indemnité de tournée',                             'fixe',          1500, 0),
+    (NULL, 1, '339', 'Indemnité de déplacement justifiée',               'fixe',             0, 0),
+    (NULL, 1, '340', 'Indemnité de déplacement forfaitaire ponctuelle',  'fixe',             0, 0),
+    (NULL, 1, '341', 'Indemnité de déplacement forfaitaire régulière',   'fixe',          5000, 0),
+    (NULL, 1, '342', 'Indemnité de transport hors urbain',               'fixe',           750, 0),
+    (NULL, 1, '343', 'Prime d''outillage',                              'fixe',           100, 0),
+    (NULL, 1, '344', 'Prime de salissure',                              'fixe',           210, 0),
+    (NULL, 1, '345', 'Prime d''usure de vêtements / Tenue',             'fixe',             0, 0),
+    (NULL, 1, '346', 'Indemnité de panier / Panier de nuit',            'fixe',             0, 0),
+    (NULL, 1, '347', 'Indemnité de pénibilité',                          'fixe',             0, 0),
+    (NULL, 1, '348', 'Indemnité de risque / Danger',                     'fixe',             0, 0),
+    (NULL, 1, '349', 'Indemnité d''astreinte',                          'fixe',             0, 0),
+    (NULL, 1, '350', 'Indemnité de garde',                               'fixe',             0, 0),
+    (NULL, 1, '351', 'Voiture de fonction ou de service',                'fixe',             0, 0),
+    (NULL, 1, '352', 'Indemnité de voyage à l''étranger',               'fixe',             0, 0),
+    (NULL, 1, '353', 'Indemnité de déménagement / mutation',             'fixe',             0, 0),
+    (NULL, 1, '354', 'Allocations familiales additionnelles',            'fixe',             0, 0),
+    (NULL, 1, '355', 'Allocation de naissance',                          'fixe',             0, 0),
+    (NULL, 1, '356', 'Allocation de mariage',                            'fixe',             0, 0),
+    (NULL, 1, '357', 'Allocation de décès / Obsèques',                   'fixe',             0, 0),
+    (NULL, 1, '358', 'Prime de scolarité / Rentrée scolaire',            'fixe',           400, 0),
+    (NULL, 1, '359', 'Bons d''achat / Cadeaux de fin d''année',         'fixe',             0, 0),
+    (NULL, 1, '360', 'Indemnité de caisse (responsabilité pécuniaire)', 'fixe',           190, 0),
+    (NULL, 1, '361', 'Subvention de cantine / Titres repas',            'fixe',             0, 0),
+    (NULL, 1, '362', 'Prise en charge des frais médicaux',              'fixe',             0, 0),
+    (NULL, 1, '363', 'Aide aux vacances / Estivage',                    'fixe',             0, 0),
+    (NULL, 1, '364', 'Secours exceptionnel / Social',                   'fixe',             0, 0),
+    (NULL, 1, '365', 'Bourses d''études pour les enfants',              'fixe',             0, 0),
+    (NULL, 1, '366', 'Indemnité légale de licenciement',                'fixe',             0, 0),
+    (NULL, 1, '367', 'Indemnité de licenciement abusive',               'fixe',             0, 0),
+    (NULL, 1, '368', 'Indemnité de départ volontaire / Retraite',       'fixe',             0, 0),
+    (NULL, 1, '369', 'Indemnité de préavis (dispensé)',                 'fixe',             0, 0),
+    (NULL, 1, '370', 'Prime de fin de carrière',                        'fixe',             0, 0),
+    (NULL, 1, '371', 'Indemnité compensatrice de logement',             'fixe',             0, 0),
+    (NULL, 1, '372', 'Indemnité de non-concurrence',                    'fixe',             0, 0),
+    (NULL, 1, '373', 'Indemnité de clientèle (VRP)',                    'fixe',             0, 0),
+    (NULL, 1, '374', 'Indemnité de reconversion professionnelle',       'fixe',             0, 0),
+    (NULL, 1, '375', 'Indemnité de chômage technique / Partiel',        'fixe',             0, 0),
+    (NULL, 1, '376', 'Indemnité transactionnelle globale',              'fixe',             0, 0),
+    (NULL, 1, '377', 'Prime de tutorat / Fin de projet',                'fixe',             0, 0);
+
+-- -----------------------------------------------------------
+-- Rubriques retenues globales (applicables à toutes les sociétés)
+-- -----------------------------------------------------------
+INSERT INTO rubriques_retenues (societe_id, is_global, code, libelle, type_montant, valeur_defaut) VALUES
+    (NULL, 1, 'AVANCE',          'Avance sur salaire',   'fixe', 0),
+    (NULL, 1, 'PRET',            'Prêt personnel',       'fixe', 0),
+    (NULL, 1, 'PRET_LOGEMENT',   'Prêt logement',        'fixe', 0),
+    (NULL, 1, 'COTIS_SYNDICALE', 'Cotisation syndicale', 'fixe', 0),
+    (NULL, 1, 'PENSION_ALIMENT', 'Pension alimentaire',  'fixe', 0),
+    (NULL, 1, 'SAISIE_ARRET',    'Saisie-arrêt',         'fixe', 0);
