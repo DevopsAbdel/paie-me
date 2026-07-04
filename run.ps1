@@ -6,6 +6,7 @@ param(
 $ErrorActionPreference = "Stop"
 $ProjectUrl = "http://localhost/paie-me"
 $XamppPath = "C:\xampp"
+$PhpExe = "$XamppPath\php\php.exe"
 
 function Write-Info($msg)  { Write-Host "[INFO] $msg" -ForegroundColor Cyan }
 function Write-Ok($msg)   { Write-Host "[OK]   $msg" -ForegroundColor Green }
@@ -39,6 +40,16 @@ if (-not $mysql) {
     Write-Ok "MySQL déjà en marche"
 }
 
+# ── Synchronisation Git ──
+try {
+    Write-Info "Synchronisation avec le dépôt distant..."
+    & git fetch --prune 2>&1 | Out-Null
+    & git pull --rebase --autostash 2>&1 | Out-Null
+    Write-Ok "Code synchronisé"
+} catch {
+    Write-Error "Échec git pull — vérifie que tu es sur main et que tu n'as pas de conflits"
+}
+
 # ── Base de données ──
 $mysqlExe = "$XamppPath\mysql\bin\mysql.exe"
 if (Test-Path $mysqlExe) {
@@ -49,10 +60,15 @@ if (Test-Path $mysqlExe) {
             & $mysqlExe -u root -e "DROP DATABASE IF EXISTS paie_me"
         }
         Write-Info "Import du schéma SQL..."
-        Get-Content "$PSScriptRoot\database\schema.sql" | & $mysqlExe -u root
+        Get-Content "$PSScriptRoot\database\schema.sql" | & $mysqlExe -u root --default-character-set=utf8mb4
         Write-Ok "Base 'paie_me' créée"
     } else {
         Write-Ok "Base 'paie_me' déjà existante"
+        # Appliquer les migrations si la base existe déjà
+        if (Test-Path $PhpExe) {
+            Write-Info "Application des migrations..."
+            & $PhpExe "$PSScriptRoot\database\migrate.php"
+        }
     }
 } else {
     Write-Error "mysql.exe introuvable. Vérifie le chemin XAMPP."
