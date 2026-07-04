@@ -5,6 +5,8 @@ namespace Controllers;
 use Core\Controller;
 use Core\Model;
 use Core\Session;
+use Core\Audit;
+use Core\Crypto;
 use PDO;
 
 class SalarieController extends Controller
@@ -46,6 +48,8 @@ class SalarieController extends Controller
         if ($this->isPost()) {
             $this->checkCsrf();
             $data = $this->getPostData();
+            $data['rib'] = Crypto::encrypt($data['rib']);
+            $data['cin'] = Crypto::encrypt($data['cin']);
             $services = $this->db->query("SELECT * FROM services WHERE societe_id = " . (int)$data['societe_id'] . " ORDER BY nom")->fetchAll();
             $stmt = $this->db->prepare("
                 INSERT INTO salaries (societe_id, service_id, fonction_id, matricule, nom_famille, prenom, adresse, date_naissance, date_embauche, cin, cnss, situation_familiale, nb_enfants, poste, type_contrat, salaire_base, type_salaire, frequence_paiement, mode_paiement, rib, indemnite_transport, indemnite_panier, indemnite_representation, avantage_logement, avances_salaire, mutuelle)
@@ -61,6 +65,8 @@ class SalarieController extends Controller
                 $data['indemnite_representation'], $data['avantage_logement'],
                 $data['avances_salaire'], $data['mutuelle'],
             ]);
+
+            Audit::log($this->db, 'create', 'salarie', (int) $this->db->lastInsertId(), 'Création salarié: ' . $data['nom_famille'] . ' ' . $data['prenom']);
 
             Session::setFlash('success', 'Salarié ajouté avec succès.');
             $this->redirect($fromSociete ? '/paie-me/societes/' . $fromSociete . '?tab=salaries' : '/paie-me/salaries');
@@ -97,6 +103,8 @@ class SalarieController extends Controller
         if ($this->isPost()) {
             $this->checkCsrf();
             $data = $this->getPostData();
+            $data['rib'] = Crypto::encrypt($data['rib']);
+            $data['cin'] = Crypto::encrypt($data['cin']);
             $stmt = $this->db->prepare("
                 UPDATE salaries SET societe_id=?, service_id=?, fonction_id=?, matricule=?, nom_famille=?, prenom=?, adresse=?, date_naissance=?, date_embauche=?, cin=?, cnss=?, situation_familiale=?, nb_enfants=?, poste=?, type_contrat=?, salaire_base=?, type_salaire=?, frequence_paiement=?, mode_paiement=?, rib=?, indemnite_transport=?, indemnite_panier=?, indemnite_representation=?, avantage_logement=?, avances_salaire=?, mutuelle=?
                 WHERE id = ?
@@ -112,6 +120,8 @@ class SalarieController extends Controller
                 $data['avances_salaire'], $data['mutuelle'], $id,
             ]);
 
+            Audit::log($this->db, 'update', 'salarie', $id, 'Modification salarié: ' . $salarie['nom_famille'] . ' ' . $salarie['prenom']);
+
             Session::setFlash('success', 'Salarié mis à jour.');
             $societeId = $data['societe_id'] ?? $salarie['societe_id'];
             $this->redirect('/paie-me/societes/' . $societeId . '?tab=salaries');
@@ -121,6 +131,9 @@ class SalarieController extends Controller
         $societeId = $salarie['societe_id'];
         $services = $this->db->query("SELECT * FROM services WHERE societe_id = $societeId ORDER BY nom")->fetchAll();
         $fonctions = $this->db->query("SELECT * FROM fonctions WHERE societe_id = $societeId ORDER BY nom")->fetchAll();
+
+        $salarie['rib'] = Crypto::decrypt($salarie['rib']);
+        $salarie['cin'] = Crypto::decrypt($salarie['cin']);
 
         $this->render('salaries/form.php', [
             'title'       => 'Modifier salarié',
@@ -137,6 +150,8 @@ class SalarieController extends Controller
         $this->checkCsrf();
         $this->requireRole('admin');
         $userId = Session::get('user_id');
+        $salarie = $this->db->query("SELECT nom_famille, prenom FROM salaries WHERE id = $id")->fetch();
+        Audit::log($this->db, 'delete', 'salarie', $id, 'Suppression salarié: ' . ($salarie['nom_famille'] ?? '') . ' ' . ($salarie['prenom'] ?? ''));
         $this->db->exec("
             DELETE s FROM salaries s
             JOIN societes so ON s.societe_id = so.id
@@ -170,6 +185,9 @@ class SalarieController extends Controller
             LIMIT 1
         ")->fetch();
 
+        $salarie['rib'] = Crypto::decrypt($salarie['rib']);
+        $salarie['cin'] = Crypto::decrypt($salarie['cin']);
+
         $this->render('salaries/stc.php', [
             'title'       => 'Solde de Tout Compte — ' . $salarie['nom_famille'] . ' ' . $salarie['prenom'],
             's'           => $salarie,
@@ -200,6 +218,9 @@ class SalarieController extends Controller
             ORDER BY p.annee DESC, p.mois DESC
             LIMIT 1
         ")->fetch();
+
+        $salarie['rib'] = Crypto::decrypt($salarie['rib']);
+        $salarie['cin'] = Crypto::decrypt($salarie['cin']);
 
         ob_start();
         require __DIR__ . '/../views/salaries/stc_pdf.php';

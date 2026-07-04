@@ -6,4 +6,5 @@ return [
     'debug'     => true,
     'url'       => 'http://localhost/paie-me',
     'timezone'  => 'Africa/Casablanca',
+    'encryption_key' => 'CHANGEZ-MOI-PAR-UNE-CLE-32BYTES!',
 ];

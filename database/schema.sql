@@ -308,6 +308,23 @@ ALTER TABLE paies
     ADD COLUMN total_gains       DECIMAL(10,2)   NOT NULL DEFAULT 0.00 AFTER montant_heures_sup;
 
 -- -----------------------------------------------------------
+-- Audit log
+-- -----------------------------------------------------------
+CREATE TABLE IF NOT EXISTS audit_log (
+    id          INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id     INT UNSIGNED        NOT NULL,
+    action      VARCHAR(50)         NOT NULL,
+    entity_type VARCHAR(50)         NOT NULL,
+    entity_id   INT UNSIGNED        DEFAULT NULL,
+    description VARCHAR(500)        DEFAULT NULL,
+    ip_address  VARCHAR(45)         DEFAULT NULL,
+    created_at  DATETIME            NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_entity (entity_type, entity_id),
+    INDEX idx_user (user_id),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- -----------------------------------------------------------
 -- Index utilisateur par défaut (password: admin123)
 -- -----------------------------------------------------------
 INSERT INTO users (nom, email, password, role)

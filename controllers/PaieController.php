@@ -7,6 +7,7 @@ use Core\Model;
 use Core\PaieCalculator;
 use Core\Session;
 use Core\Validator;
+use Core\Audit;
 use PDO;
 
 class PaieController extends Controller
@@ -112,6 +113,8 @@ class PaieController extends Controller
 
             $nbBulletins = BulletinController::genererPourPeriode((int) $periodeId, $this->db);
 
+            Audit::log($this->db, 'create', 'periode', (int) $periodeId, 'Création période: ' . $mois . '/' . $annee);
+
             Session::setFlash('success', 'Période créée et paies calculées pour ' . count($salaries) . ' salariés. ' . $nbBulletins . ' bulletins générés.');
             $this->redirect('/paie-me/paies');
         }
@@ -183,6 +186,8 @@ class PaieController extends Controller
 
         $nbBulletins = BulletinController::genererPourPeriode($id, $this->db);
 
+        Audit::log($this->db, 'calculate', 'periode', $id, 'Recalcul paies période');
+
         Session::setFlash('success', 'Paies recalculées pour ' . count($salaries) . ' salariés. ' . $nbBulletins . ' bulletins générés.');
         $this->redirect('/paie-me/paies');
     }
@@ -213,6 +218,7 @@ class PaieController extends Controller
         }
 
         $this->db->exec("UPDATE periodes SET cloturee = 1 WHERE id = $id");
+        Audit::log($this->db, 'cloture', 'periode', $id, 'Clôture période');
         Session::setFlash('success', 'Période clôturée avec succès.');
         $this->redirect('/paie-me/paies');
     }

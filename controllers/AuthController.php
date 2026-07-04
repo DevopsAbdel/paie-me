@@ -5,6 +5,7 @@ namespace Controllers;
 use Core\Controller;
 use Core\Model;
 use Core\Session;
+use Core\Audit;
 use PDO;
 
 class AuthController extends Controller
@@ -43,6 +44,7 @@ class AuthController extends Controller
                 Session::set('user_nom', $user['nom']);
                 Session::set('user_email', $user['email']);
                 Session::set('user_role', $user['role']);
+                Audit::log($this->db, 'login', 'user', $user['id'], 'Connexion utilisateur');
                 $this->redirect('/paie-me/dashboard');
             }
 
@@ -55,6 +57,7 @@ class AuthController extends Controller
 
     public function logout(): void
     {
+        Audit::log($this->db, 'logout', 'user', Session::get('user_id'), 'Déconnexion utilisateur');
         Session::destroy();
         $this->redirect('/paie-me/login');
     }

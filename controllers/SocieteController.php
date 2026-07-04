@@ -6,6 +6,8 @@ use Core\Controller;
 use Core\Model;
 use Core\Session;
 use Core\Validator;
+use Core\Audit;
+use Core\Crypto;
 use PDO;
 
 class SocieteController extends Controller
@@ -50,6 +52,7 @@ class SocieteController extends Controller
 
             $userId = Session::get('user_id');
             $data = $this->getPostData();
+            $data['rib'] = Crypto::encrypt($data['rib']);
 
             $stmt = $this->db->prepare("
                 INSERT INTO societes (user_id, raison_sociale, forme_juridique, ice, if_fiscal, rc, tp, cnss, adresse, ville, telephone, email, site_web, banque, agence, rib, damancom_login, damancom_password, simpl_login, simpl_password, cimr_login, cimr_password)
@@ -63,6 +66,9 @@ class SocieteController extends Controller
                 $data['simpl_login'], $data['simpl_password'],
                 $data['cimr_login'], $data['cimr_password'],
             ]);
+
+            $societeId = $this->db->lastInsertId();
+            Audit::log($this->db, 'create', 'societe', (int) $societeId, 'Création société: ' . $data['raison_sociale']);
 
             Session::setFlash('success', 'Société créée avec succès.');
             $this->redirect('/paie-me/societes');
@@ -103,6 +109,8 @@ class SocieteController extends Controller
             ORDER BY p.annee DESC, p.mois DESC, s.nom_famille
         ")->fetchAll();
 
+        $societe['rib'] = Crypto::decrypt($societe['rib']);
+
         $this->render('societes/show.php', [
             'title'     => $societe['raison_sociale'],
             'societe'   => $societe,
@@ -134,6 +142,7 @@ class SocieteController extends Controller
                 $this->redirect('/paie-me/societes/' . $id . '/edit');
             }
             $data = $this->getPostData();
+            $data['rib'] = Crypto::encrypt($data['rib']);
 
             $stmt = $this->db->prepare("
                 UPDATE societes SET raison_sociale=?, forme_juridique=?, ice=?, if_fiscal=?, rc=?, tp=?, cnss=?, adresse=?, ville=?, telephone=?, email=?, site_web=?, banque=?, agence=?, rib=?, damancom_login=?, damancom_password=?, simpl_login=?, simpl_password=?, cimr_login=?, cimr_password=?
@@ -148,9 +157,13 @@ class SocieteController extends Controller
                 $data['cimr_login'], $data['cimr_password'], $id,
             ]);
 
+            Audit::log($this->db, 'update', 'societe', $id, 'Modification société: ' . $societe['raison_sociale']);
+
             Session::setFlash('success', 'Société mise à jour.');
             $this->redirect('/paie-me/societes');
         }
+
+        $societe['rib'] = Crypto::decrypt($societe['rib']);
 
         $this->render('societes/form.php', [
             'title'   => 'Modifier société',
@@ -174,6 +187,8 @@ class SocieteController extends Controller
         $this->checkCsrf();
         $this->requireRole('admin');
         $userId = Session::get('user_id');
+        $societe = $this->db->query("SELECT raison_sociale FROM societes WHERE id = $id")->fetch();
+        Audit::log($this->db, 'delete', 'societe', $id, 'Suppression société: ' . ($societe['raison_sociale'] ?? ''));
         $this->db->exec("DELETE FROM societes WHERE id = $id AND user_id = $userId");
         Session::setFlash('success', 'Société supprimée.');
         $this->redirect('/paie-me/societes');
@@ -289,7 +304,7 @@ class SocieteController extends Controller
                 $stmt->execute([
                     $_POST['banque'] ?? '',
                     $_POST['agence'] ?? '',
-                    $_POST['rib'] ?? '',
+                    Crypto::encrypt($_POST['rib'] ?? ''),
                     $_POST['damancom_login'] ?? '',
                     $_POST['damancom_password'] ?? '',
                     $_POST['simpl_login'] ?? '',
@@ -314,6 +329,8 @@ class SocieteController extends Controller
         $retenues = $this->db->query("SELECT * FROM rubriques_retenues WHERE societe_id = $id ORDER BY code")->fetchAll();
         $organismes = $this->db->query("SELECT * FROM organismes WHERE societe_id = $id ORDER BY nom")->fetchAll();
         $attestations = $this->db->query("SELECT * FROM modeles_attestation WHERE societe_id = $id ORDER BY titre")->fetchAll();
+
+        $societe['rib'] = Crypto::decrypt($societe['rib']);
 
         $titles = [
             'general'      => 'Informations générales',
