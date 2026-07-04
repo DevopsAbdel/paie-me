@@ -2,152 +2,182 @@
 /**
  * Migration script — exécuter après chaque pull pour mettre à jour la base
  * Usage : php database/migrate.php
- *
- * Vérifie les colonnes manquantes et applique les ALTER nécessaires.
  */
 
 $p = new PDO("mysql:host=127.0.0.1;dbname=paie_me;charset=utf8mb4", "root", "", [
     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
 ]);
 
-$migrations = [
-    // is_global + societe_id nullable sur rubriques_gains
-    "rubriques_gains_is_global" => "
-        ALTER TABLE rubriques_gains
-        ADD COLUMN is_global TINYINT(1) NOT NULL DEFAULT 0
-        AFTER societe_id
-    ",
-    "rubriques_gains_societe_id_nullable" => "
-        ALTER TABLE rubriques_gains
-        MODIFY COLUMN societe_id INT UNSIGNED DEFAULT NULL
-    ",
-    // is_global + societe_id nullable sur rubriques_retenues
-    "rubriques_retenues_is_global" => "
-        ALTER TABLE rubriques_retenues
-        ADD COLUMN is_global TINYINT(1) NOT NULL DEFAULT 0
-        AFTER societe_id
-    ",
-    "rubriques_retenues_societe_id_nullable" => "
-        ALTER TABLE rubriques_retenues
-        MODIFY COLUMN societe_id INT UNSIGNED DEFAULT NULL
-    ",
-    // Barème IR — on remplace les anciennes valeurs
-    "bareme_ir_2025" => "
-        REPLACE INTO bareme_ir (min, max, taux, deduction, type) VALUES
-            (0.00, 3333.33, 0, 0, 'mensuel'),
-            (3333.34, 5000.00, 10, 333.33, 'mensuel'),
-            (5000.01, 6666.67, 20, 833.33, 'mensuel'),
-            (6666.68, 8333.33, 30, 1500.00, 'mensuel'),
-            (8333.34, 15000.00, 34, 1833.33, 'mensuel'),
-            (15000.01, 999999.99, 37, 2283.33, 'mensuel')
-    ",
-    // Rubriques gains globales
-    "rubriques_gains_globales" => "
-        INSERT IGNORE INTO rubriques_gains (societe_id, is_global, code, libelle, type_montant, valeur_defaut, imposable) VALUES
-            (NULL, 1, 'PRIME_REND', 'Prime de rendement', 'proportionnel', 10.00, 1),
-            (NULL, 1, 'PRIME_OBJECTIF', 'Prime d''objectifs', 'proportionnel', 5.00, 1),
-            (NULL, 1, 'PRIME_ASSIDUITE', 'Prime d''assiduité', 'fixe', 300.00, 1),
-            (NULL, 1, 'PRIME_NUIT', 'Prime de nuit', 'fixe', 250.00, 1),
-            (NULL, 1, 'PRIME_13EME', '13ème mois (prorata)', 'proportionnel', 8.33, 1),
-            (NULL, 1, '330', 'Indemnité de transport urbain', 'fixe', 500, 0),
-            (NULL, 1, '331', 'Indemnité de représentation', 'proportionnel', 10, 0),
-            (NULL, 1, '334', 'Indemnité kilométrique', 'fixe', 0, 0),
-            (NULL, 1, '337', 'Indemnité de tournée', 'fixe', 1500, 0),
-            (NULL, 1, '339', 'Indemnité de déplacement justifiée', 'fixe', 0, 0),
-            (NULL, 1, '340', 'Indemnité de déplacement forfaitaire ponctuelle', 'fixe', 0, 0),
-            (NULL, 1, '341', 'Indemnité de déplacement forfaitaire régulière', 'fixe', 5000, 0),
-            (NULL, 1, '342', 'Indemnité de transport hors urbain', 'fixe', 750, 0),
-            (NULL, 1, '343', 'Prime d''outillage', 'fixe', 100, 0),
-            (NULL, 1, '344', 'Prime de salissure', 'fixe', 210, 0),
-            (NULL, 1, '345', 'Prime d''usure de vêtements / Tenue', 'fixe', 0, 0),
-            (NULL, 1, '346', 'Indemnité de panier / Panier de nuit', 'fixe', 0, 0),
-            (NULL, 1, '347', 'Indemnité de pénibilité', 'fixe', 0, 0),
-            (NULL, 1, '348', 'Indemnité de risque / Danger', 'fixe', 0, 0),
-            (NULL, 1, '349', 'Indemnité d''astreinte', 'fixe', 0, 0),
-            (NULL, 1, '350', 'Indemnité de garde', 'fixe', 0, 0),
-            (NULL, 1, '351', 'Voiture de fonction ou de service', 'fixe', 0, 0),
-            (NULL, 1, '352', 'Indemnité de voyage à l''étranger', 'fixe', 0, 0),
-            (NULL, 1, '353', 'Indemnité de déménagement / mutation', 'fixe', 0, 0),
-            (NULL, 1, '354', 'Allocations familiales additionnelles', 'fixe', 0, 0),
-            (NULL, 1, '355', 'Allocation de naissance', 'fixe', 0, 0),
-            (NULL, 1, '356', 'Allocation de mariage', 'fixe', 0, 0),
-            (NULL, 1, '357', 'Allocation de décès / Obsèques', 'fixe', 0, 0),
-            (NULL, 1, '358', 'Prime de scolarité / Rentrée scolaire', 'fixe', 400, 0),
-            (NULL, 1, '359', 'Bons d''achat / Cadeaux de fin d''année', 'fixe', 0, 0),
-            (NULL, 1, '360', 'Indemnité de caisse (responsabilité pécuniaire)', 'fixe', 190, 0),
-            (NULL, 1, '361', 'Subvention de cantine / Titres repas', 'fixe', 0, 0),
-            (NULL, 1, '362', 'Prise en charge des frais médicaux', 'fixe', 0, 0),
-            (NULL, 1, '363', 'Aide aux vacances / Estivage', 'fixe', 0, 0),
-            (NULL, 1, '364', 'Secours exceptionnel / Social', 'fixe', 0, 0),
-            (NULL, 1, '365', 'Bourses d''études pour les enfants', 'fixe', 0, 0),
-            (NULL, 1, '366', 'Indemnité légale de licenciement', 'fixe', 0, 0),
-            (NULL, 1, '367', 'Indemnité de licenciement abusive', 'fixe', 0, 0),
-            (NULL, 1, '368', 'Indemnité de départ volontaire / Retraite', 'fixe', 0, 0),
-            (NULL, 1, '369', 'Indemnité de préavis (dispensé)', 'fixe', 0, 0),
-            (NULL, 1, '370', 'Prime de fin de carrière', 'fixe', 0, 0),
-            (NULL, 1, '371', 'Indemnité compensatrice de logement', 'fixe', 0, 0),
-            (NULL, 1, '372', 'Indemnité de non-concurrence', 'fixe', 0, 0),
-            (NULL, 1, '373', 'Indemnité de clientèle (VRP)', 'fixe', 0, 0),
-            (NULL, 1, '374', 'Indemnité de reconversion professionnelle', 'fixe', 0, 0),
-            (NULL, 1, '375', 'Indemnité de chômage technique / Partiel', 'fixe', 0, 0),
-            (NULL, 1, '376', 'Indemnité transactionnelle globale', 'fixe', 0, 0),
-            (NULL, 1, '377', 'Prime de tutorat / Fin de projet', 'fixe', 0, 0)
-    ",
-    // Rubriques retenues globales
-    "rubriques_retenues_globales" => "
-        INSERT IGNORE INTO rubriques_retenues (societe_id, is_global, code, libelle, type_montant, valeur_defaut) VALUES
-            (NULL, 1, 'AVANCE', 'Avance sur salaire', 'fixe', 0),
-            (NULL, 1, 'PRET', 'Prêt personnel', 'fixe', 0),
-            (NULL, 1, 'PRET_LOGEMENT', 'Prêt logement', 'fixe', 0),
-            (NULL, 1, 'COTIS_SYNDICALE', 'Cotisation syndicale', 'fixe', 0),
-            (NULL, 1, 'PENSION_ALIMENT', 'Pension alimentaire', 'fixe', 0),
-            (NULL, 1, 'SAISIE_ARRET', 'Saisie-arrêt', 'fixe', 0)
-    ",
-];
+function colExists(PDO $p, string $table, string $col): bool {
+    return (bool) $p->query("SHOW COLUMNS FROM `$table` LIKE '$col'")->fetch();
+}
 
-$count = 0;
-foreach ($migrations as $name => $sql) {
-    try {
-        // Vérifier si la colonne existe déjà
-        if (str_contains($name, 'is_global')) {
-            $table = str_starts_with($name, 'rubriques_gains') ? 'rubriques_gains' : 'rubriques_retenues';
-            $check = $p->query("SHOW COLUMNS FROM $table LIKE 'is_global'")->fetch();
-            if ($check) {
-                echo "   déjà fait : $name\n";
-                continue;
-            }
-        }
-        if (str_contains($name, 'societe_id_nullable')) {
-            $table = str_starts_with($name, 'rubriques_gains') ? 'rubriques_gains' : 'rubriques_retenues';
-            $check = $p->query("SHOW COLUMNS FROM $table LIKE 'societe_id'")->fetch();
-            if ($check && $check['Null'] === 'YES') {
-                echo "   déjà fait : $name\n";
-                continue;
-            }
-        }
-        // Pour les INSERT IGNORE, vérifier si une rubrique existe déjà
-        if (str_contains($name, 'globales')) {
-            $table = str_contains($name, 'gains') ? 'rubriques_gains' : 'rubriques_retenues';
-            $existing = $p->query("SELECT COUNT(*) FROM $table WHERE is_global = 1")->fetchColumn();
-            if ($existing > 0) {
-                echo "   déjà fait : $name ($existing rubriques)\n";
-                continue;
-            }
-        }
-        if (str_contains($name, 'bareme')) {
-            $check = $p->query("SELECT COUNT(*) FROM bareme_ir WHERE deduction = 333.33")->fetchColumn();
-            if ($check > 0) {
-                echo "   déjà fait : $name\n";
-                continue;
-            }
-        }
-
-        $p->exec($sql);
-        echo "   OK : $name\n";
-        $count++;
-    } catch (\PDOException $e) {
-        echo "   ERREUR : $name — " . $e->getMessage() . "\n";
+function addCol(PDO $p, string $table, string $def): void {
+    $col = explode(" ", $def)[0];
+    if (!colExists($p, $table, $col)) {
+        $p->exec("ALTER TABLE `$table` ADD COLUMN $def");
+        echo "   + colonne $col ($table)\n";
     }
 }
 
-echo "\n$count migrations appliquées.\n";
+$count = 0;
+
+// === rubriques_gains : colonnes ===
+addCol($p, 'rubriques_gains', 'is_global TINYINT(1) NOT NULL DEFAULT 0 AFTER societe_id');
+addCol($p, 'rubriques_gains', 'categorie VARCHAR(50) DEFAULT NULL AFTER valeur_defaut');
+addCol($p, 'rubriques_gains', 'affectation VARCHAR(20) DEFAULT NULL AFTER imposable');
+addCol($p, 'rubriques_gains', 'plafond_dgi VARCHAR(200) DEFAULT NULL AFTER affectation');
+addCol($p, 'rubriques_gains', 'plafond_cnss VARCHAR(200) DEFAULT NULL AFTER plafond_dgi');
+addCol($p, 'rubriques_gains', 'justificatifs VARCHAR(500) DEFAULT NULL AFTER plafond_cnss');
+
+if (!colExists($p, 'rubriques_gains', 'societe_id') || $p->query("SHOW COLUMNS FROM rubriques_gains LIKE 'societe_id'")->fetch()['Null'] !== 'YES') {
+    $p->exec("ALTER TABLE rubriques_gains MODIFY COLUMN societe_id INT UNSIGNED DEFAULT NULL");
+    echo "   + societe_id nullable (rubriques_gains)\n";
+}
+
+// === rubriques_retenues : colonnes ===
+addCol($p, 'rubriques_retenues', 'is_global TINYINT(1) NOT NULL DEFAULT 0 AFTER societe_id');
+
+if (!colExists($p, 'rubriques_retenues', 'societe_id') || $p->query("SHOW COLUMNS FROM rubriques_retenues LIKE 'societe_id'")->fetch()['Null'] !== 'YES') {
+    $p->exec("ALTER TABLE rubriques_retenues MODIFY COLUMN societe_id INT UNSIGNED DEFAULT NULL");
+    echo "   + societe_id nullable (rubriques_retenues)\n";
+}
+
+// === Barème IR 2025 ===
+$check = $p->query("SELECT COUNT(*) FROM bareme_ir WHERE deduction = 333.33")->fetchColumn();
+if (!$check) {
+    $p->exec("TRUNCATE TABLE bareme_ir");
+    $p->exec("INSERT INTO bareme_ir (min, max, taux, deduction, type) VALUES
+        (0.00, 3333.33, 0, 0, 'mensuel'),
+        (3333.34, 5000.00, 10, 333.33, 'mensuel'),
+        (5000.01, 6666.67, 20, 833.33, 'mensuel'),
+        (6666.68, 8333.33, 30, 1500.00, 'mensuel'),
+        (8333.34, 15000.00, 34, 1833.33, 'mensuel'),
+        (15000.01, 999999.99, 37, 2283.33, 'mensuel'),
+        (0.00, 40000.00, 0, 0, 'annuel'),
+        (40001.00, 60000.00, 10, 4000.00, 'annuel'),
+        (60001.00, 80000.00, 20, 10000.00, 'annuel'),
+        (80001.00, 100000.00, 30, 18000.00, 'annuel'),
+        (100001.00, 180000.00, 34, 22000.00, 'annuel'),
+        (180000.01, 9999999.99, 37, 27400.00, 'annuel')");
+    echo "   + barème IR 2025 mis à jour\n";
+}
+
+// === Rubriques gains globales ===
+$existing = $p->query("SELECT COUNT(*) FROM rubriques_gains WHERE is_global = 1 AND code = 'PRIME_REND'")->fetchColumn();
+if (!$existing) {
+    $p->exec("INSERT IGNORE INTO rubriques_gains (societe_id, is_global, code, libelle, type_montant, valeur_defaut, categorie, imposable, affectation, plafond_dgi, plafond_cnss, justificatifs) VALUES
+        (NULL,1,'PRIME_REND','Prime de rendement','proportionnel',10.00,'Gain standard',1,NULL,NULL,NULL,NULL),
+        (NULL,1,'PRIME_OBJECTIF','Prime d''objectifs','proportionnel',5.00,'Gain standard',1,NULL,NULL,NULL,NULL),
+        (NULL,1,'PRIME_ASSIDUITE','Prime d''assiduité','fixe',300.00,'Gain standard',1,NULL,NULL,NULL,NULL),
+        (NULL,1,'PRIME_NUIT','Prime de nuit','fixe',250.00,'Gain standard',1,NULL,NULL,NULL,NULL),
+        (NULL,1,'PRIME_13EME','13ème mois (prorata)','proportionnel',8.33,'Gain standard',1,NULL,NULL,NULL,NULL),
+        (NULL,1,'330','Indemnité de transport urbain','fixe',500,'Transport & Déplacement',0,'61713','500.00 DH / mois','500.00 DH / mois','Lieu de travail situé au milieu urbain de la ville'),
+        (NULL,1,'331','Indemnité de représentation','proportionnel',10,'Spécifiques à certains emplois',0,'61713','10% du salaire de base','10% du salaire de base','Poste de direction, d''encadrement supérieur ou équivalent'),
+        (NULL,1,'334','Indemnité kilométrique','fixe',0,'Transport & Déplacement',0,'61713','3 DH / KM','3 DH / KM','Carnet de bord, carte grise au nom du salarié, trajet < 50 KM'),
+        (NULL,1,'337','Indemnité de tournée','fixe',1500,'Transport & Déplacement',0,'61713','1 500.00 DH / mois','1 500.00 DH / mois','Périmètre de déplacement limité à 50 KM, planning de tournée'),
+        (NULL,1,'339','Indemnité de déplacement justifiée','fixe',0,'Transport & Déplacement',0,'61713','Nourriture (10x SMIG hor.), Hébergement (30x SMIG hor.)','Totalement exonéré si justifié','Pièces justificatives (factures, tickets, ordre de mission)'),
+        (NULL,1,'340','Indemnité de déplacement forfaitaire ponctuelle','fixe',0,'Transport & Déplacement',0,'61713','Nourriture (10x SMIG hor.), Hébergement (30x SMIG hor.)','Repas: 171 DH/j, Hébergement: 513 DH/nuit','Ordre de mission stipulant la nature ponctuelle'),
+        (NULL,1,'341','Indemnité de déplacement forfaitaire régulière','fixe',5000,'Transport & Déplacement',0,'61713','<= 5000 DH et <= Salaire de base','Exonération dans la limite de 100% du S.B. (max 5000 DH/mois)','Déplacements professionnels hors périmètre urbain (> 50 km)'),
+        (NULL,1,'342','Indemnité de transport hors urbain','fixe',750,'Transport & Déplacement',0,'61713','750.00 DH / mois','750.00 DH / mois','Lieu de travail situé en dehors du milieu urbain'),
+        (NULL,1,'343','Prime d''outillage','fixe',100,'Spécifiques à certains emplois',0,'61713','100 DH / mois','119.70 DH / 26 jours de travail','Le salarié doit être propriétaire de ses propres équipements'),
+        (NULL,1,'344','Prime de salissure','fixe',210,'Spécifiques à certains emplois',0,'61713','210 DH / mois','239.40 DH / 26 jours de travail','Travaux salissants / insalubres (bleu de travail requis)'),
+        (NULL,1,'345','Prime d''usure de vêtements / Tenue','fixe',0,'Spécifiques à certains emplois',0,'61713','Frais réels ou barème interne','Exonéré si port obligatoire pour le service','Obligation contractuelle ou règlement intérieur'),
+        (NULL,1,'346','Indemnité de panier / Panier de nuit','fixe',0,'Spécifiques à certains emplois',0,'61713','2x SMIG horaire par jour','Exonération selon plafond légal en vigueur','Horaires de nuit ou travail continu sans coupure'),
+        (NULL,1,'347','Indemnité de pénibilité','fixe',0,'Spécifiques à certains emplois',0,'61713','Selon convention collective','Exonéré sous réserve d''un cadre réglementé','Attestation de conditions de travail pénibles'),
+        (NULL,1,'348','Indemnité de risque / Danger','fixe',0,'Spécifiques à certains emplois',0,'61713','Selon barème sectoriel','Exonéré si le risque est inhérent à la fonction','Fiche de poste, rapport d''évaluation des risques'),
+        (NULL,1,'349','Indemnité d''astreinte','fixe',0,'Spécifiques à certains emplois',0,'61713','Selon convention collective','Exonéré si liée à des interventions urgentes hors horaires','Planning d''astreinte et rapports d''intervention'),
+        (NULL,1,'350','Indemnité de garde','fixe',0,'Spécifiques à certains emplois',0,'61713','Barème interne conventionné','Exonéré dans le cadre médical ou de sécurité','Registre des gardes effectuées'),
+        (NULL,1,'351','Voiture de fonction ou de service','fixe',0,'Transport & Déplacement',0,'61713','Charges supportées par l''entreprise','Totalement exonéré','Usage strictement professionnel ou convention d''affectation'),
+        (NULL,1,'352','Indemnité de voyage à l''étranger','fixe',0,'Transport & Déplacement',0,'61713','Frais réels justifiés','Frais réels sur justificatifs ou barème officiel','Ordre de mission international, billets, factures hôtel'),
+        (NULL,1,'353','Indemnité de déménagement / mutation','fixe',0,'Transport & Déplacement',0,'61713','Frais réels sur factures','Exonéré si requis par l''employeur','Décision de mutation, factures du déménageur'),
+        (NULL,1,'354','Allocations familiales additionnelles','fixe',0,'Caractère Social & Familial',0,'61712','Plafond légal CNSS','Totalement exonéré','Livret de famille, attestation de non-paiement par ailleurs'),
+        (NULL,1,'355','Allocation de naissance','fixe',0,'Caractère Social & Familial',0,'61712','Plafond interne raisonnable','Exonéré si ponctuel','Extrait d''acte de naissance du nouveau-né'),
+        (NULL,1,'356','Allocation de mariage','fixe',0,'Caractère Social & Familial',0,'61712','Barème social de l''entreprise','Exonéré si ponctuel','Acte de mariage adoulé ou officiel'),
+        (NULL,1,'357','Allocation de décès / Obsèques','fixe',0,'Caractère Social & Familial',0,'61712','Frais réels ou forfait social','Totalement exonéré','Certificat de décès du conjoint ou d''un ascendant/descendant direct'),
+        (NULL,1,'358','Prime de scolarité / Rentrée scolaire','fixe',400,'Caractère Social & Familial',0,'61712','Plafond par enfant/an','Exonéré si attribué aux enfants à charge','Certificat de scolarité annuel'),
+        (NULL,1,'359','Bons d''achat / Cadeaux de fin d''année','fixe',0,'Caractère Social & Familial',0,'61712','Plafond annuel (ex: 10% SMIG)','Exonéré dans la limite du plafond social','Distribution générale à l''occasion de fêtes (Aïd, Achoura, etc.)'),
+        (NULL,1,'360','Indemnité de caisse (responsabilité pécuniaire)','fixe',190,'Spécifiques à certains emplois',0,'61713','190 DH / mois','239.40 DH / 26 jours de travail','Poste de caissier ou manipulation effective de fonds'),
+        (NULL,1,'361','Subvention de cantine / Titres repas','fixe',0,'Caractère Social & Familial',0,'61712','Plafond par ticket / jour','Exonéré selon la quote-part patronale réglementaire','Factures du prestataire de restauration ou émetteur de titres'),
+        (NULL,1,'362','Prise en charge des frais médicaux','fixe',0,'Caractère Social & Familial',0,'61712','Sur dossier médical','Exonéré si géré par le fonds social / mutuelle','Décompte AMO/Mutuelle et ordonnances restées à charge'),
+        (NULL,1,'363','Aide aux vacances / Estivage','fixe',0,'Caractère Social & Familial',0,'61712','Plafond annuel fixe','Exonéré si géré via les œuvres sociales (COS)','Factures d''organismes de vacances ou convention COS'),
+        (NULL,1,'364','Secours exceptionnel / Social','fixe',0,'Caractère Social & Familial',0,'61712','Forfait ponctuel motivé','Exonéré si situation de précarité avérée','Dossier d''assistante sociale ou justificatifs de force majeure'),
+        (NULL,1,'365','Bourses d''études pour les enfants','fixe',0,'Caractère Social & Familial',0,'61712','Selon mérite et critères sociaux','Exonéré si versé directement à l''établissement','Facture de l''école/université, attestation de réussite'),
+        (NULL,1,'366','Indemnité légale de licenciement','fixe',0,'Rupture & Fin de Contrat',0,'61715','Barème du Code du Travail','Totalement exonérée de CNSS et DGI','Lettre de licenciement, PV de l''inspecteur du travail / tribunal'),
+        (NULL,1,'367','Indemnité de licenciement abusive','fixe',0,'Rupture & Fin de Contrat',0,'61715','Fixée par tribunal ou conciliation','Exonérée selon la limite légale ou judiciaire','Jugement définitif ou PV de conciliation légalisé'),
+        (NULL,1,'368','Indemnité de départ volontaire / Retraite','fixe',0,'Rupture & Fin de Contrat',0,'61715','Plafonds selon barème légal','Exonérée sous conditions de l''accord DGI/CNSS','Convention de départ volontaire signée et légalisée'),
+        (NULL,1,'369','Indemnité de préavis (dispensé)','fixe',0,'Rupture & Fin de Contrat',0,'61715','Montant correspondant aux salaires','Assujettie sauf cas spécifiques d''exonération globale','Lettre de dispense de préavis'),
+        (NULL,1,'370','Prime de fin de carrière','fixe',0,'Rupture & Fin de Contrat',0,'61715','Selon convention collective','Exonérée si assimilée à l''indemnité de départ','Notification de mise à la retraite'),
+        (NULL,1,'371','Indemnité compensatrice de logement','fixe',0,'Rupture & Fin de Contrat',0,'61715','Frais réels ou barème','Exonérée si intégrée aux dommages et intérêts','Protocole d''accord transactionnel'),
+        (NULL,1,'372','Indemnité de non-concurrence','fixe',0,'Rupture & Fin de Contrat',0,'61715','Fixée par contrat','Exonérée si qualifiée de dommages et intérêts','Clause contractuelle et reçu pour solde de tout compte'),
+        (NULL,1,'373','Indemnité de clientèle (VRP)','fixe',0,'Rupture & Fin de Contrat',0,'61715','Selon préjudice commercial','Exonérée selon le Code du Travail','Calcul de la perte de clientèle validé par expert/tribunal'),
+        (NULL,1,'374','Indemnité de reconversion professionnelle','fixe',0,'Rupture & Fin de Contrat',0,'61715','Prise en charge de la formation','Exonérée si versée au centre de formation','Facture du centre de formation, plan de sauvegarde de l''emploi'),
+        (NULL,1,'375','Indemnité de chômage technique / Partiel','fixe',0,'Rupture & Fin de Contrat',0,'61715','Selon autorisations réglementaires','Exonérée en période de crise majeure','Autorisation du gouverneur ou décision ministérielle'),
+        (NULL,1,'376','Indemnité transactionnelle globale','fixe',0,'Rupture & Fin de Contrat',0,'61715','Limite des dommages légaux','Exonérée à hauteur des plafonds légaux','Protocole de transaction enregistré auprès des autorités'),
+        (NULL,1,'377','Prime de tutorat / Fin de projet','fixe',0,'Rupture & Fin de Contrat',0,'61713','Forfait contractuel','Exonéré si lié à un transfert d''outils de fin de contrat','Rapport de fin de mission validé par l''entreprise')");
+    echo "   + rubriques gains globales insérées\n";
+} else {
+    // Mettre à jour les métadonnées si colonnes existent mais données vides
+    $needUpdate = $p->query("SELECT COUNT(*) FROM rubriques_gains WHERE is_global = 1 AND code BETWEEN '330' AND '377' AND categorie IS NULL AND societe_id IS NULL")->fetchColumn();
+    if ($needUpdate > 0) {
+        $p->exec("UPDATE rubriques_gains SET categorie='Transport & Déplacement', affectation='61713', plafond_dgi='500.00 DH / mois', plafond_cnss='500.00 DH / mois', justificatifs='Lieu de travail situé au milieu urbain de la ville' WHERE code='330' AND societe_id IS NULL");
+        $p->exec("UPDATE rubriques_gains SET categorie='Spécifiques à certains emplois', affectation='61713', plafond_dgi='10% du salaire de base', plafond_cnss='10% du salaire de base', justificatifs='Poste de direction, d''encadrement supérieur ou équivalent' WHERE code='331' AND societe_id IS NULL");
+        $p->exec("UPDATE rubriques_gains SET categorie='Transport & Déplacement', affectation='61713', plafond_dgi='3 DH / KM', plafond_cnss='3 DH / KM', justificatifs='Carnet de bord, carte grise au nom du salarié, trajet < 50 KM' WHERE code='334' AND societe_id IS NULL");
+        $p->exec("UPDATE rubriques_gains SET categorie='Transport & Déplacement', affectation='61713', plafond_dgi='1 500.00 DH / mois', plafond_cnss='1 500.00 DH / mois', justificatifs='Périmètre de déplacement limité à 50 KM, planning de tournée' WHERE code='337' AND societe_id IS NULL");
+        $p->exec("UPDATE rubriques_gains SET categorie='Transport & Déplacement', affectation='61713', plafond_dgi='Nourriture (10x SMIG hor.), Hébergement (30x SMIG hor.)', plafond_cnss='Totalement exonéré si justifié', justificatifs='Pièces justificatives (factures, tickets, ordre de mission)' WHERE code='339' AND societe_id IS NULL");
+        $p->exec("UPDATE rubriques_gains SET categorie='Transport & Déplacement', affectation='61713', plafond_dgi='Nourriture (10x SMIG hor.), Hébergement (30x SMIG hor.)', plafond_cnss='Repas: 171 DH/j, Hébergement: 513 DH/nuit', justificatifs='Ordre de mission stipulant la nature ponctuelle' WHERE code='340' AND societe_id IS NULL");
+        $p->exec("UPDATE rubriques_gains SET categorie='Transport & Déplacement', affectation='61713', plafond_dgi='<= 5000 DH et <= Salaire de base', plafond_cnss='Exonération dans la limite de 100% du S.B. (max 5000 DH/mois)', justificatifs='Déplacements professionnels hors périmètre urbain (> 50 km)' WHERE code='341' AND societe_id IS NULL");
+        $p->exec("UPDATE rubriques_gains SET categorie='Transport & Déplacement', affectation='61713', plafond_dgi='750.00 DH / mois', plafond_cnss='750.00 DH / mois', justificatifs='Lieu de travail situé en dehors du milieu urbain' WHERE code='342' AND societe_id IS NULL");
+        $p->exec("UPDATE rubriques_gains SET categorie='Spécifiques à certains emplois', affectation='61713', plafond_dgi='100 DH / mois', plafond_cnss='119.70 DH / 26 jours de travail', justificatifs='Le salarié doit être propriétaire de ses propres équipements' WHERE code='343' AND societe_id IS NULL");
+        $p->exec("UPDATE rubriques_gains SET categorie='Spécifiques à certains emplois', affectation='61713', plafond_dgi='210 DH / mois', plafond_cnss='239.40 DH / 26 jours de travail', justificatifs='Travaux salissants / insalubres (bleu de travail requis)' WHERE code='344' AND societe_id IS NULL");
+        $p->exec("UPDATE rubriques_gains SET categorie='Spécifiques à certains emplois', affectation='61713', plafond_dgi='Frais réels ou barème interne', plafond_cnss='Exonéré si port obligatoire pour le service', justificatifs='Obligation contractuelle ou règlement intérieur' WHERE code='345' AND societe_id IS NULL");
+        $p->exec("UPDATE rubriques_gains SET categorie='Spécifiques à certains emplois', affectation='61713', plafond_dgi='2x SMIG horaire par jour', plafond_cnss='Exonération selon plafond légal en vigueur', justificatifs='Horaires de nuit ou travail continu sans coupure' WHERE code='346' AND societe_id IS NULL");
+        $p->exec("UPDATE rubriques_gains SET categorie='Spécifiques à certains emplois', affectation='61713', plafond_dgi='Selon convention collective', plafond_cnss='Exonéré sous réserve d''un cadre réglementé', justificatifs='Attestation de conditions de travail pénibles' WHERE code='347' AND societe_id IS NULL");
+        $p->exec("UPDATE rubriques_gains SET categorie='Spécifiques à certains emplois', affectation='61713', plafond_dgi='Selon barème sectoriel', plafond_cnss='Exonéré si le risque est inhérent à la fonction', justificatifs='Fiche de poste, rapport d''évaluation des risques' WHERE code='348' AND societe_id IS NULL");
+        $p->exec("UPDATE rubriques_gains SET categorie='Spécifiques à certains emplois', affectation='61713', plafond_dgi='Selon convention collective', plafond_cnss='Exonéré si liée à des interventions urgentes hors horaires', justificatifs='Planning d''astreinte et rapports d''intervention' WHERE code='349' AND societe_id IS NULL");
+        $p->exec("UPDATE rubriques_gains SET categorie='Spécifiques à certains emplois', affectation='61713', plafond_dgi='Barème interne conventionné', plafond_cnss='Exonéré dans le cadre médical ou de sécurité', justificatifs='Registre des gardes effectuées' WHERE code='350' AND societe_id IS NULL");
+        $p->exec("UPDATE rubriques_gains SET categorie='Transport & Déplacement', affectation='61713', plafond_dgi='Charges supportées par l''entreprise', plafond_cnss='Totalement exonéré', justificatifs='Usage strictement professionnel ou convention d''affectation' WHERE code='351' AND societe_id IS NULL");
+        $p->exec("UPDATE rubriques_gains SET categorie='Transport & Déplacement', affectation='61713', plafond_dgi='Frais réels justifiés', plafond_cnss='Frais réels sur justificatifs ou barème officiel', justificatifs='Ordre de mission international, billets, factures hôtel' WHERE code='352' AND societe_id IS NULL");
+        $p->exec("UPDATE rubriques_gains SET categorie='Transport & Déplacement', affectation='61713', plafond_dgi='Frais réels sur factures', plafond_cnss='Exonéré si requis par l''employeur', justificatifs='Décision de mutation, factures du déménageur' WHERE code='353' AND societe_id IS NULL");
+        $p->exec("UPDATE rubriques_gains SET categorie='Caractère Social & Familial', affectation='61712', plafond_dgi='Plafond légal CNSS', plafond_cnss='Totalement exonéré', justificatifs='Livret de famille, attestation de non-paiement par ailleurs' WHERE code='354' AND societe_id IS NULL");
+        $p->exec("UPDATE rubriques_gains SET categorie='Caractère Social & Familial', affectation='61712', plafond_dgi='Plafond interne raisonnable', plafond_cnss='Exonéré si ponctuel', justificatifs='Extrait d''acte de naissance du nouveau-né' WHERE code='355' AND societe_id IS NULL");
+        $p->exec("UPDATE rubriques_gains SET categorie='Caractère Social & Familial', affectation='61712', plafond_dgi='Barème social de l''entreprise', plafond_cnss='Exonéré si ponctuel', justificatifs='Acte de mariage adoulé ou officiel' WHERE code='356' AND societe_id IS NULL");
+        $p->exec("UPDATE rubriques_gains SET categorie='Caractère Social & Familial', affectation='61712', plafond_dgi='Frais réels ou forfait social', plafond_cnss='Totalement exonéré', justificatifs='Certificat de décès du conjoint ou d''un ascendant/descendant direct' WHERE code='357' AND societe_id IS NULL");
+        $p->exec("UPDATE rubriques_gains SET categorie='Caractère Social & Familial', affectation='61712', plafond_dgi='Plafond par enfant/an', plafond_cnss='Exonéré si attribué aux enfants à charge', justificatifs='Certificat de scolarité annuel' WHERE code='358' AND societe_id IS NULL");
+        $p->exec("UPDATE rubriques_gains SET categorie='Caractère Social & Familial', affectation='61712', plafond_dgi='Plafond annuel (ex: 10% SMIG)', plafond_cnss='Exonéré dans la limite du plafond social', justificatifs='Distribution générale à l''occasion de fêtes (Aïd, Achoura, etc.)' WHERE code='359' AND societe_id IS NULL");
+        $p->exec("UPDATE rubriques_gains SET categorie='Spécifiques à certains emplois', affectation='61713', plafond_dgi='190 DH / mois', plafond_cnss='239.40 DH / 26 jours de travail', justificatifs='Poste de caissier ou manipulation effective de fonds' WHERE code='360' AND societe_id IS NULL");
+        $p->exec("UPDATE rubriques_gains SET categorie='Caractère Social & Familial', affectation='61712', plafond_dgi='Plafond par ticket / jour', plafond_cnss='Exonéré selon la quote-part patronale réglementaire', justificatifs='Factures du prestataire de restauration ou émetteur de titres' WHERE code='361' AND societe_id IS NULL");
+        $p->exec("UPDATE rubriques_gains SET categorie='Caractère Social & Familial', affectation='61712', plafond_dgi='Sur dossier médical', plafond_cnss='Exonéré si géré par le fonds social / mutuelle', justificatifs='Décompte AMO/Mutuelle et ordonnances restées à charge' WHERE code='362' AND societe_id IS NULL");
+        $p->exec("UPDATE rubriques_gains SET categorie='Caractère Social & Familial', affectation='61712', plafond_dgi='Plafond annuel fixe', plafond_cnss='Exonéré si géré via les œuvres sociales (COS)', justificatifs='Factures d''organismes de vacances ou convention COS' WHERE code='363' AND societe_id IS NULL");
+        $p->exec("UPDATE rubriques_gains SET categorie='Caractère Social & Familial', affectation='61712', plafond_dgi='Forfait ponctuel motivé', plafond_cnss='Exonéré si situation de précarité avérée', justificatifs='Dossier d''assistante sociale ou justificatifs de force majeure' WHERE code='364' AND societe_id IS NULL");
+        $p->exec("UPDATE rubriques_gains SET categorie='Caractère Social & Familial', affectation='61712', plafond_dgi='Selon mérite et critères sociaux', plafond_cnss='Exonéré si versé directement à l''établissement', justificatifs='Facture de l''école/université, attestation de réussite' WHERE code='365' AND societe_id IS NULL");
+        $p->exec("UPDATE rubriques_gains SET categorie='Rupture & Fin de Contrat', affectation='61715', plafond_dgi='Barème du Code du Travail', plafond_cnss='Totalement exonérée de CNSS et DGI', justificatifs='Lettre de licenciement, PV de l''inspecteur du travail / tribunal' WHERE code='366' AND societe_id IS NULL");
+        $p->exec("UPDATE rubriques_gains SET categorie='Rupture & Fin de Contrat', affectation='61715', plafond_dgi='Fixée par tribunal ou conciliation', plafond_cnss='Exonérée selon la limite légale ou judiciaire', justificatifs='Jugement définitif ou PV de conciliation légalisé' WHERE code='367' AND societe_id IS NULL");
+        $p->exec("UPDATE rubriques_gains SET categorie='Rupture & Fin de Contrat', affectation='61715', plafond_dgi='Plafonds selon barème légal', plafond_cnss='Exonérée sous conditions de l''accord DGI/CNSS', justificatifs='Convention de départ volontaire signée et légalisée' WHERE code='368' AND societe_id IS NULL");
+        $p->exec("UPDATE rubriques_gains SET categorie='Rupture & Fin de Contrat', affectation='61715', plafond_dgi='Montant correspondant aux salaires', plafond_cnss='Assujettie sauf cas spécifiques d''exonération globale', justificatifs='Lettre de dispense de préavis' WHERE code='369' AND societe_id IS NULL");
+        $p->exec("UPDATE rubriques_gains SET categorie='Rupture & Fin de Contrat', affectation='61715', plafond_dgi='Selon convention collective', plafond_cnss='Exonérée si assimilée à l''indemnité de départ', justificatifs='Notification de mise à la retraite' WHERE code='370' AND societe_id IS NULL");
+        $p->exec("UPDATE rubriques_gains SET categorie='Rupture & Fin de Contrat', affectation='61715', plafond_dgi='Frais réels ou barème', plafond_cnss='Exonérée si intégrée aux dommages et intérêts', justificatifs='Protocole d''accord transactionnel' WHERE code='371' AND societe_id IS NULL");
+        $p->exec("UPDATE rubriques_gains SET categorie='Rupture & Fin de Contrat', affectation='61715', plafond_dgi='Fixée par contrat', plafond_cnss='Exonérée si qualifiée de dommages et intérêts', justificatifs='Clause contractuelle et reçu pour solde de tout compte' WHERE code='372' AND societe_id IS NULL");
+        $p->exec("UPDATE rubriques_gains SET categorie='Rupture & Fin de Contrat', affectation='61715', plafond_dgi='Selon préjudice commercial', plafond_cnss='Exonérée selon le Code du Travail', justificatifs='Calcul de la perte de clientèle validé par expert/tribunal' WHERE code='373' AND societe_id IS NULL");
+        $p->exec("UPDATE rubriques_gains SET categorie='Rupture & Fin de Contrat', affectation='61715', plafond_dgi='Prise en charge de la formation', plafond_cnss='Exonérée si versée au centre de formation', justificatifs='Facture du centre de formation, plan de sauvegarde de l''emploi' WHERE code='374' AND societe_id IS NULL");
+        $p->exec("UPDATE rubriques_gains SET categorie='Rupture & Fin de Contrat', affectation='61715', plafond_dgi='Selon autorisations réglementaires', plafond_cnss='Exonérée en période de crise majeure', justificatifs='Autorisation du gouverneur ou décision ministérielle' WHERE code='375' AND societe_id IS NULL");
+        $p->exec("UPDATE rubriques_gains SET categorie='Rupture & Fin de Contrat', affectation='61715', plafond_dgi='Limite des dommages légaux', plafond_cnss='Exonérée à hauteur des plafonds légaux', justificatifs='Protocole de transaction enregistré auprès des autorités' WHERE code='376' AND societe_id IS NULL");
+        $p->exec("UPDATE rubriques_gains SET categorie='Rupture & Fin de Contrat', affectation='61713', plafond_dgi='Forfait contractuel', plafond_cnss='Exonéré si lié à un transfert d''outils de fin de contrat', justificatifs='Rapport de fin de mission validé par l''entreprise' WHERE code='377' AND societe_id IS NULL");
+        echo "   + métadonnées mises à jour pour $needUpdate rubriques gains\n";
+    }
+}
+
+// === Rubriques retenues globales ===
+$existing = $p->query("SELECT COUNT(*) FROM rubriques_retenues WHERE is_global = 1")->fetchColumn();
+if (!$existing) {
+    $p->exec("INSERT IGNORE INTO rubriques_retenues (societe_id, is_global, code, libelle, type_montant, valeur_defaut) VALUES
+        (NULL, 1, 'AVANCE', 'Avance sur salaire', 'fixe', 0),
+        (NULL, 1, 'PRET', 'Prêt personnel', 'fixe', 0),
+        (NULL, 1, 'PRET_LOGEMENT', 'Prêt logement', 'fixe', 0),
+        (NULL, 1, 'COTIS_SYNDICALE', 'Cotisation syndicale', 'fixe', 0),
+        (NULL, 1, 'PENSION_ALIMENT', 'Pension alimentaire', 'fixe', 0),
+        (NULL, 1, 'SAISIE_ARRET', 'Saisie-arrêt', 'fixe', 0)");
+    echo "   + rubriques retenues globales insérées\n";
+}
+
+echo "\nMigrations terminées.\n";
