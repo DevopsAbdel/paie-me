@@ -1,4 +1,5 @@
 <form method="post" action="<?= $baseUrl ?>/cnss_amo">
+<?= \Core\Session::csrfField() ?>
 <input type="hidden" name="sous_tab" value="cnss_amo">
 
 <div class="card">

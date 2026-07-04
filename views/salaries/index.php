@@ -38,7 +38,11 @@
                         <td><?= number_format($s['salaire_base'], 2, ',', ' ') ?></td>
                         <td class="table-actions">
                             <a href="/paie-me/salaries/<?= $s['id'] ?>/edit" class="btn btn-secondary btn-sm">Modifier</a>
-                            <a href="/paie-me/salaries/<?= $s['id'] ?>/delete" class="btn btn-danger btn-sm" onclick="return confirm('Supprimer ce salarié ?')">Supprimer</a>
+                            <a href="/paie-me/salaries/<?= $s['id'] ?>/stc" class="btn btn-secondary btn-sm">STC</a>
+                            <form method="POST" action="/paie-me/salaries/<?= $s['id'] ?>/delete" class="inline-form">
+                                <?= \Core\Session::csrfField() ?>
+                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Supprimer ce salarié ?')">Supprimer</button>
+                            </form>
                         </td>
                     </tr>
                     <?php endforeach; ?>

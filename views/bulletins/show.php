@@ -62,6 +62,18 @@
                     <td>Salaire de base</td>
                     <td style="text-align:right;"><?= number_format($b['salaire_base'], 2, ',', ' ') ?></td>
                 </tr>
+                <?php if ((float)$b['prime_anciennete'] > 0): ?>
+                <tr>
+                    <td>Prime d'ancienneté</td>
+                    <td style="text-align:right;"><?= number_format($b['prime_anciennete'], 2, ',', ' ') ?></td>
+                </tr>
+                <?php endif; ?>
+                <?php if ((float)$b['montant_heures_sup'] > 0): ?>
+                <tr>
+                    <td>Heures supplémentaires (<?= (float)$b['heures_supplementaires'] ?>h)</td>
+                    <td style="text-align:right;"><?= number_format($b['montant_heures_sup'], 2, ',', ' ') ?></td>
+                </tr>
+                <?php endif; ?>
                 <tr>
                     <td>Indemnité de transport</td>
                     <td style="text-align:right;"><?= number_format($b['indemnite_transport'], 2, ',', ' ') ?></td>
@@ -83,9 +95,15 @@
                 </tr>
                 <?php endif; ?>
                 <tr style="font-weight:bold; border-top:2px solid var(--accent);">
-                    <td>Salaire brut</td>
+                    <td>Salaire brut global (SBG)</td>
                     <td style="text-align:right;"><?= number_format($b['salaire_brut'], 2, ',', ' ') ?></td>
                 </tr>
+                <?php if ((float)$b['sbi'] > 0): ?>
+                <tr>
+                    <td>Salaire brut imposable (SBI)</td>
+                    <td style="text-align:right;"><?= number_format($b['sbi'], 2, ',', ' ') ?></td>
+                </tr>
+                <?php endif; ?>
             </tbody>
         </table>
     </div>
@@ -108,18 +126,24 @@
                     <td>AMO (part salariale)</td>
                     <td style="text-align:right;">- <?= number_format($b['amo_salariale'], 2, ',', ' ') ?></td>
                 </tr>
+                <?php if ((float)$b['frais_professionnels'] > 0): ?>
+                <tr>
+                    <td>Frais professionnels</td>
+                    <td style="text-align:right;">- <?= number_format($b['frais_professionnels'], 2, ',', ' ') ?></td>
+                </tr>
+                <?php endif; ?>
                 <tr>
                     <td>Salaire net imposable (SNI)</td>
                     <td style="text-align:right;"><?= number_format($b['sni'], 2, ',', ' ') ?></td>
                 </tr>
                 <tr>
-                    <td>Impôt sur le revenu (IR)</td>
+                    <td>Impôt sur le revenu (IR brut)</td>
                     <td style="text-align:right;">- <?= number_format($b['ir'], 2, ',', ' ') ?></td>
                 </tr>
                 <?php if ((float)$b['deductions_familiales'] > 0): ?>
                 <tr>
-                    <td>Déductions familiales (<?= (int)$b['nb_enfants'] ?> enfants)</td>
-                    <td style="text-align:right;">- <?= number_format($b['deductions_familiales'], 2, ',', ' ') ?></td>
+                    <td>Déductions pour charges de famille</td>
+                    <td style="text-align:right; color:var(--success);">+ <?= number_format($b['deductions_familiales'], 2, ',', ' ') ?></td>
                 </tr>
                 <?php endif; ?>
             </tbody>

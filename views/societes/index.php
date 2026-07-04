@@ -37,7 +37,10 @@
                         <td class="table-actions">
                             <a href="/paie-me/societes/<?= $s['id'] ?>" class="btn btn-primary btn-sm">Ouvrir</a>
                             <a href="/paie-me/societes/<?= $s['id'] ?>/edit" class="btn btn-secondary btn-sm">Modifier</a>
-                            <a href="/paie-me/societes/<?= $s['id'] ?>/delete" class="btn btn-danger btn-sm" onclick="return confirm('Supprimer cette société ?')">Supprimer</a>
+                            <form method="POST" action="/paie-me/societes/<?= $s['id'] ?>/delete" class="inline-form">
+                                <?= \Core\Session::csrfField() ?>
+                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Supprimer cette société ?')">Supprimer</button>
+                            </form>
                         </td>
                     </tr>
                     <?php endforeach; ?>

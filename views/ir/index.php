@@ -10,6 +10,7 @@
         </div>
     <?php else: ?>
         <form method="POST" action="/paie-me/ir/export">
+            <?= \Core\Session::csrfField() ?>
             <div class="form-group">
                 <label>Période clôturée *</label>
                 <select name="periode_id" class="form-control" required>

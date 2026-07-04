@@ -2,6 +2,7 @@
     <div class="card-header" style="display:flex; justify-content:space-between; align-items:center; gap:1rem;">
         <h3 style="margin:0;">Organismes</h3>
         <form method="post" action="<?= $baseUrl ?>/organismes" style="display:flex; gap:0.5rem; align-items:center;">
+            <?= \Core\Session::csrfField() ?>
             <input type="hidden" name="sous_tab" value="organismes">
             <input type="text" name="nom" class="form-control" placeholder="Nom" style="width:150px;" required>
             <select name="type" class="form-control" style="width:110px;">

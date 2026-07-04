@@ -3,6 +3,7 @@
         <h3><?= $societe ? 'Modifier' : 'Nouvelle' ?> société</h3>
     </div>
     <form method="POST">
+        <?= \Core\Session::csrfField() ?>
         <div class="form-row">
             <div class="form-group">
                 <label>Raison sociale *</label>

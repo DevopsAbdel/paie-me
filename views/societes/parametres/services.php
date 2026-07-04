@@ -2,6 +2,7 @@
     <div class="card-header" style="display:flex; justify-content:space-between; align-items:center; gap:1rem;">
         <h3 style="margin:0;">Services</h3>
         <form method="post" action="<?= $baseUrl ?>/services" style="display:flex; gap:0.5rem; align-items:center;">
+            <?= \Core\Session::csrfField() ?>
             <input type="hidden" name="sous_tab" value="services">
             <input type="text" name="service_nom" class="form-control" placeholder="Nom du service" style="width:180px;" required>
             <input type="text" name="service_description" class="form-control" placeholder="Description" style="width:240px;">
@@ -37,6 +38,7 @@
     <div class="card-header" style="display:flex; justify-content:space-between; align-items:center; gap:1rem;">
         <h3 style="margin:0;">Fonctions (postes)</h3>
         <form method="post" action="<?= $baseUrl ?>/services" style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;">
+            <?= \Core\Session::csrfField() ?>
             <input type="hidden" name="sous_tab" value="services">
             <select name="fonction_service_id" class="form-control" style="width:160px;">
                 <option value="">— Tous services —</option>

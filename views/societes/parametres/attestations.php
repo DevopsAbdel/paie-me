@@ -2,6 +2,7 @@
     <div class="card-header" style="display:flex; justify-content:space-between; align-items:center; gap:1rem;">
         <h3 style="margin:0;">Attestations</h3>
         <form method="post" action="<?= $baseUrl ?>/attestations" style="display:flex; gap:0.5rem; align-items:center;">
+            <?= \Core\Session::csrfField() ?>
             <input type="hidden" name="sous_tab" value="attestations">
             <input type="text" name="titre" class="form-control" placeholder="Titre" style="width:180px;" required>
             <textarea name="contenu" class="form-control" placeholder="Contenu du modèle" style="width:240px; height:32px; resize:vertical;" required></textarea>

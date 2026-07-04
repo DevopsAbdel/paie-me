@@ -44,6 +44,7 @@ class SalarieController extends Controller
         $fromSociete = isset($_GET['from_societe']) ? (int) $_GET['from_societe'] : null;
 
         if ($this->isPost()) {
+            $this->checkCsrf();
             $data = $this->getPostData();
             $services = $this->db->query("SELECT * FROM services WHERE societe_id = " . (int)$data['societe_id'] . " ORDER BY nom")->fetchAll();
             $stmt = $this->db->prepare("
@@ -94,6 +95,7 @@ class SalarieController extends Controller
         $societes = $this->db->query("SELECT id, raison_sociale FROM societes WHERE user_id = $userId ORDER BY raison_sociale")->fetchAll();
 
         if ($this->isPost()) {
+            $this->checkCsrf();
             $data = $this->getPostData();
             $stmt = $this->db->prepare("
                 UPDATE salaries SET societe_id=?, service_id=?, fonction_id=?, matricule=?, nom_famille=?, prenom=?, adresse=?, date_naissance=?, date_embauche=?, cin=?, cnss=?, situation_familiale=?, nb_enfants=?, poste=?, type_contrat=?, salaire_base=?, type_salaire=?, frequence_paiement=?, mode_paiement=?, rib=?, indemnite_transport=?, indemnite_panier=?, indemnite_representation=?, avantage_logement=?, avances_salaire=?, mutuelle=?
@@ -132,6 +134,8 @@ class SalarieController extends Controller
 
     public function delete(int $id): void
     {
+        $this->checkCsrf();
+        $this->requireRole('admin');
         $userId = Session::get('user_id');
         $this->db->exec("
             DELETE s FROM salaries s
@@ -140,6 +144,74 @@ class SalarieController extends Controller
         ");
         Session::setFlash('success', 'Salarié supprimé.');
         $this->redirect('/paie-me/salaries');
+    }
+
+    public function stc(int $id): void
+    {
+        $userId = Session::get('user_id');
+        $salarie = $this->db->query("
+            SELECT s.*, so.raison_sociale, so.ice, so.if_fiscal, so.cnss as cnss_societe,
+                   so.rc, so.ville, so.adresse, so.telephone, so.email, so.logo
+            FROM salaries s
+            JOIN societes so ON s.societe_id = so.id
+            WHERE s.id = $id AND so.user_id = $userId
+        ")->fetch();
+
+        if (!$salarie) {
+            Session::setFlash('error', 'Salarié introuvable.');
+            $this->redirect('/paie-me/salaries');
+        }
+
+        $dernierePaie = $this->db->query("
+            SELECT pa.*, p.mois, p.annee FROM paies pa
+            JOIN periodes p ON pa.periode_id = p.id
+            WHERE pa.salarie_id = $id
+            ORDER BY p.annee DESC, p.mois DESC
+            LIMIT 1
+        ")->fetch();
+
+        $this->render('salaries/stc.php', [
+            'title'       => 'Solde de Tout Compte — ' . $salarie['nom_famille'] . ' ' . $salarie['prenom'],
+            's'           => $salarie,
+            'dernierePaie' => $dernierePaie,
+        ]);
+    }
+
+    public function stcPdf(int $id): void
+    {
+        $userId = Session::get('user_id');
+        $salarie = $this->db->query("
+            SELECT s.*, so.raison_sociale, so.ice, so.if_fiscal, so.cnss as cnss_societe,
+                   so.rc, so.ville, so.adresse, so.telephone, so.email, so.logo
+            FROM salaries s
+            JOIN societes so ON s.societe_id = so.id
+            WHERE s.id = $id AND so.user_id = $userId
+        ")->fetch();
+
+        if (!$salarie) {
+            Session::setFlash('error', 'Salarié introuvable.');
+            $this->redirect('/paie-me/salaries');
+        }
+
+        $dernierePaie = $this->db->query("
+            SELECT pa.*, p.mois, p.annee FROM paies pa
+            JOIN periodes p ON pa.periode_id = p.id
+            WHERE pa.salarie_id = $id
+            ORDER BY p.annee DESC, p.mois DESC
+            LIMIT 1
+        ")->fetch();
+
+        ob_start();
+        require __DIR__ . '/../views/salaries/stc_pdf.php';
+        $html = ob_get_clean();
+
+        $dompdf = new \Dompdf\Dompdf(['defaultFont' => 'DejaVu Sans']);
+        $dompdf->loadHtml($html, 'UTF-8');
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+
+        $dompdf->stream('stc_' . $salarie['matricule'] . '.pdf', ['Attachment' => false]);
+        exit;
     }
 
     private function getPostData(): array

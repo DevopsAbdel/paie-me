@@ -1,4 +1,5 @@
 <form method="post" action="<?= $baseUrl ?>/bareme">
+<?= \Core\Session::csrfField() ?>
 <input type="hidden" name="sous_tab" value="bareme">
 <?php $types = [['key'=>'mensuel','label'=>'Mensuel','data'=>$bareme], ['key'=>'annuel','label'=>'Annuel','data'=>$baremeAnnuel]]; ?>
 <?php foreach ($types as $t): ?>

@@ -5,6 +5,7 @@ namespace Controllers;
 use Core\Controller;
 use Core\Model;
 use Core\Session;
+use Dompdf\Dompdf;
 use PDO;
 
 class BulletinController extends Controller
@@ -62,10 +63,38 @@ class BulletinController extends Controller
             $this->redirect('/paie-me/bulletins');
         }
 
-        $this->render('bulletins/pdf.php', [
-            'title' => 'Bulletin de paie',
-            'b'     => $bulletin,
-        ]);
+        ob_start();
+        require __DIR__ . '/../views/bulletins/pdf.php';
+        $html = ob_get_clean();
+
+        $dompdf = new Dompdf(['defaultFont' => 'DejaVu Sans']);
+        $dompdf->loadHtml($html, 'UTF-8');
+        $dompdf->setPaper('A4', 'portrait');
+        $dompdf->render();
+
+        $nomFichier = 'bulletin_' . $bulletin['matricule'] . '_' . str_pad($bulletin['mois'], 2, '0', STR_PAD_LEFT) . '_' . $bulletin['annee'] . '.pdf';
+
+        $dompdf->stream($nomFichier, ['Attachment' => false]);
+        exit;
+    }
+
+    public static function genererPourPeriode(int $periodeId, PDO $db): int
+    {
+        $paies = $db->query("SELECT id, societe_id FROM paies WHERE periode_id = $periodeId")->fetchAll();
+        $count = 0;
+        foreach ($paies as $pa) {
+            $existing = $db->query("SELECT id FROM bulletins WHERE paie_id = {$pa['id']}")->fetch();
+            if ($existing) continue;
+
+            $societe = $db->query("SELECT raison_sociale FROM societes WHERE id = {$pa['societe_id']}")->fetch();
+            $prefix = strtoupper(mb_substr($societe['raison_sociale'], 0, 3));
+            $numero = $prefix . '-' . str_pad((string) $pa['id'], 5, '0', STR_PAD_LEFT);
+
+            $stmt = $db->prepare("INSERT INTO bulletins (paie_id, numero, date_emission) VALUES (?, ?, CURDATE())");
+            $stmt->execute([$pa['id'], $numero]);
+            $count++;
+        }
+        return $count;
     }
 
     private function getBulletin(int $id): ?array

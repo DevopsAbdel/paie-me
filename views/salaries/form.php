@@ -3,6 +3,7 @@
         <h3><?= $salarie ? 'Modifier' : 'Nouveau' ?> salarié</h3>
     </div>
     <form method="POST">
+        <?= \Core\Session::csrfField() ?>
         <div class="form-row">
             <div class="form-group">
                 <label>Société *</label>

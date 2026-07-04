@@ -33,6 +33,7 @@ class SocieteController extends Controller
     public function create(): void
     {
         if ($this->isPost()) {
+            $this->checkCsrf();
             $userId = Session::get('user_id');
             $data = $this->getPostData();
 
@@ -109,6 +110,7 @@ class SocieteController extends Controller
         }
 
         if ($this->isPost()) {
+            $this->checkCsrf();
             $data = $this->getPostData();
 
             $stmt = $this->db->prepare("
@@ -147,6 +149,8 @@ class SocieteController extends Controller
 
     public function delete(int $id): void
     {
+        $this->checkCsrf();
+        $this->requireRole('admin');
         $userId = Session::get('user_id');
         $this->db->exec("DELETE FROM societes WHERE id = $id AND user_id = $userId");
         Session::setFlash('success', 'Société supprimée.');
@@ -188,6 +192,7 @@ class SocieteController extends Controller
         }
 
         if ($this->isPost()) {
+            $this->checkCsrf();
             $sousTab = $_POST['sous_tab'] ?? 'banque';
 
             if ($sousTab === 'bareme') {

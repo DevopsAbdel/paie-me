@@ -2,6 +2,7 @@
     <div class="card-header" style="display:flex; justify-content:space-between; align-items:center; gap:1rem;">
         <h3 style="margin:0;">Retenues</h3>
         <form method="post" action="<?= $baseUrl ?>/retenues" style="display:flex; gap:0.5rem; align-items:center;">
+            <?= \Core\Session::csrfField() ?>
             <input type="hidden" name="sous_tab" value="retenues">
             <input type="text" name="code" class="form-control" placeholder="Code" style="width:100px;" required>
             <input type="text" name="libelle" class="form-control" placeholder="Libellé" style="width:180px;" required>

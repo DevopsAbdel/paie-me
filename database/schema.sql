@@ -290,15 +290,22 @@ CREATE TABLE IF NOT EXISTS fonctions (
 ) ENGINE=InnoDB;
 
 -- -----------------------------------------------------------
--- Colonnes ajoutées aux salariés
+-- Colonnes ajoutées
 -- -----------------------------------------------------------
 ALTER TABLE salaries
     ADD COLUMN service_id        INT UNSIGNED    DEFAULT NULL AFTER societe_id,
     ADD COLUMN fonction_id       INT UNSIGNED    DEFAULT NULL AFTER service_id,
     ADD COLUMN avances_salaire   DECIMAL(10,2)   NOT NULL DEFAULT 0.00 AFTER avantage_logement,
     ADD COLUMN mutuelle          DECIMAL(10,2)   NOT NULL DEFAULT 0.00 AFTER avances_salaire,
+    ADD COLUMN date_sortie       DATE            DEFAULT NULL AFTER date_embauche,
     ADD FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE SET NULL,
     ADD FOREIGN KEY (fonction_id) REFERENCES fonctions(id) ON DELETE SET NULL;
+
+ALTER TABLE paies
+    ADD COLUMN prime_anciennete  DECIMAL(10,2)   NOT NULL DEFAULT 0.00 AFTER salaire_brut,
+    ADD COLUMN sbi               DECIMAL(10,2)   NOT NULL DEFAULT 0.00 AFTER salaire_brut,
+    ADD COLUMN frais_professionnels DECIMAL(10,2) NOT NULL DEFAULT 0.00 AFTER sbi,
+    ADD COLUMN total_gains       DECIMAL(10,2)   NOT NULL DEFAULT 0.00 AFTER montant_heures_sup;
 
 -- -----------------------------------------------------------
 -- Index utilisateur par défaut (password: admin123)

@@ -506,3 +506,13 @@ body:has(.login-wrapper) {
         grid-template-columns: 1fr 1fr;
     }
 }
+
+.inline-form {
+    display: inline;
+    margin: 0;
+    padding: 0;
+}
+
+.inline-form button {
+    cursor: pointer;
+}

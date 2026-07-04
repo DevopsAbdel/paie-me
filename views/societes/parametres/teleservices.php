@@ -1,4 +1,5 @@
 <form method="post" action="<?= $baseUrl ?>/teleservices">
+<?= \Core\Session::csrfField() ?>
 <input type="hidden" name="sous_tab" value="teleservices">
 <div class="card">
     <div class="card-header"><h3>Damancom (CNSS)</h3></div>

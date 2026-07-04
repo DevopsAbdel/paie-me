@@ -3,6 +3,7 @@
         <h3>Nouvelle période de paie</h3>
     </div>
     <form method="POST">
+        <?= \Core\Session::csrfField() ?>
         <div class="form-group">
             <label>Société *</label>
             <select name="societe_id" class="form-control" required>

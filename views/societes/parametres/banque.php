@@ -1,4 +1,5 @@
 <form method="post" action="<?= $baseUrl ?>/banque">
+<?= \Core\Session::csrfField() ?>
 <input type="hidden" name="sous_tab" value="banque">
 <div class="card">
     <div class="card-header"><h3>Coordonnées bancaires</h3></div>
