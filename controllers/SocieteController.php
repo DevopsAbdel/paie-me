@@ -5,6 +5,7 @@ namespace Controllers;
 use Core\Controller;
 use Core\Model;
 use Core\Session;
+use Core\Validator;
 use PDO;
 
 class SocieteController extends Controller
@@ -34,6 +35,19 @@ class SocieteController extends Controller
     {
         if ($this->isPost()) {
             $this->checkCsrf();
+            $v = new Validator($_POST);
+            $v->required('raison_sociale', 'Raison sociale')
+              ->required('ice', 'ICE')
+              ->required('if_fiscal', 'IF')
+              ->maxLength('ice', 20, 'ICE')
+              ->maxLength('if_fiscal', 20, 'IF')
+              ->email('email', 'Email');
+
+            if (!$v->passes()) {
+                Session::setFlash('error', $v->firstError());
+                $this->redirect('/paie-me/societes/create');
+            }
+
             $userId = Session::get('user_id');
             $data = $this->getPostData();
 
@@ -111,6 +125,14 @@ class SocieteController extends Controller
 
         if ($this->isPost()) {
             $this->checkCsrf();
+            $v = new Validator($_POST);
+            $v->required('raison_sociale', 'Raison sociale')
+              ->required('ice', 'ICE')
+              ->required('if_fiscal', 'IF');
+            if (!$v->passes()) {
+                Session::setFlash('error', $v->firstError());
+                $this->redirect('/paie-me/societes/' . $id . '/edit');
+            }
             $data = $this->getPostData();
 
             $stmt = $this->db->prepare("

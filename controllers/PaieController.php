@@ -4,12 +4,15 @@ namespace Controllers;
 
 use Core\Controller;
 use Core\Model;
+use Core\PaieCalculator;
 use Core\Session;
+use Core\Validator;
 use PDO;
 
 class PaieController extends Controller
 {
     private PDO $db;
+    private PaieCalculator $calculator;
 
     public function __construct()
     {
@@ -17,6 +20,7 @@ class PaieController extends Controller
             $this->redirect('/paie-me/login');
         }
         $this->db = Model::db();
+        $this->calculator = new PaieCalculator($this->db);
     }
 
     public function index(): void
@@ -37,117 +41,6 @@ class PaieController extends Controller
         ]);
     }
 
-    private function calcAnciennete(string $dateEmbauche, string $dateFin): float
-    {
-        $embauche = new \DateTime($dateEmbauche);
-        $fin = new \DateTime($dateFin);
-        $annees = (int) $embauche->diff($fin)->format('%y');
-
-        if ($annees >= 25) return 0.25;
-        if ($annees >= 20) return 0.20;
-        if ($annees >= 12) return 0.15;
-        if ($annees >= 5)  return 0.10;
-        if ($annees >= 2)  return 0.05;
-        return 0.00;
-    }
-
-    private function calculerPaie(array $s, array $cnssParams, string $dateFin, float $heuresSup = 0, array $gains = [], array $retenues = [], string $dateDebut = ''): array
-    {
-        $salaireBase = (float) $s['salaire_base'];
-
-        $joursTravailles = 26;
-        if ($dateDebut && !empty($s['date_embauche'])) {
-            $embauche = new \DateTime($s['date_embauche']);
-            $debut = new \DateTime($dateDebut);
-            $fin = new \DateTime($dateFin);
-            $dateSortie = !empty($s['date_sortie']) ? new \DateTime($s['date_sortie']) : null;
-
-            $debutPeriode = $embauche > $debut ? $embauche : $debut;
-            $finPeriode = ($dateSortie && $dateSortie < $fin) ? $dateSortie : $fin;
-            $diff = (int) $debutPeriode->diff($finPeriode)->format('%a') + 1;
-            $joursTravailles = max(min($diff, 26), 0);
-        }
-        $prorata = $joursTravailles / 26;
-
-        $primeAnciennete = 0;
-        if (!empty($s['date_embauche'])) {
-            $primeAnciennete = round($salaireBase * $this->calcAnciennete($s['date_embauche'], $dateFin), 2) * $prorata;
-        }
-
-        $montantHeuresSup = 0;
-        if ($heuresSup > 0 && $salaireBase > 0) {
-            $montantHeuresSup = round($heuresSup * ($salaireBase / 191) * 1.25, 2);
-        }
-
-        $salaireBaseProrata = round($salaireBase * $prorata, 2);
-
-        $transport     = round((float) ($s['indemnite_transport'] ?? 0) * $prorata, 2);
-        $panier        = round((float) ($s['indemnite_panier'] ?? 0) * $prorata, 2);
-        $representation = round((float) ($s['indemnite_representation'] ?? 0) * $prorata, 2);
-        $logement      = round((float) ($s['avantage_logement'] ?? 0) * $prorata, 2);
-
-        $totalGains = 0;
-        $gainsImposables = 0;
-        foreach ($gains as $g) {
-            $baseGain = $g['type_montant'] === 'proportionnel'
-                ? $salaireBase * (float) $g['valeur_defaut'] / 100
-                : (float) $g['valeur_defaut'];
-            $montant = round($baseGain * $prorata, 2);
-            $totalGains += $montant;
-            if ($g['imposable']) $gainsImposables += $montant;
-        }
-
-        $totalRetenuesCustom = 0;
-        foreach ($retenues as $r) {
-            $baseRet = $r['type_montant'] === 'proportionnel'
-                ? $salaireBase * (float) $r['valeur_defaut'] / 100
-                : (float) $r['valeur_defaut'];
-            $totalRetenuesCustom += round($baseRet * $prorata, 2);
-        }
-
-        $sb = $salaireBaseProrata + $primeAnciennete + $montantHeuresSup + $transport + $panier + $representation + $logement + $totalGains;
-
-        $plafondTransport = round(500 * $prorata, 2);
-        $plafondPanier = round(780 * $prorata, 2);
-        $transportExonere = min($transport, $plafondTransport);
-        $panierExonere = min($panier, $plafondPanier);
-        $sbi = $sb - $transportExonere - $panierExonere;
-
-        $plafonne = min($sb, (float) ($cnssParams['plafond_cnss'] ?? 6000));
-        $cnss = round($plafonne * (float) ($cnssParams['taux_cnss_salarial'] ?? 4.48) / 100, 2);
-        $amo  = round($sb * (float) ($cnssParams['taux_amo_salarial'] ?? 2.26) / 100, 2);
-
-        $tauxFraisPro = ($sbi * 12 <= 78000) ? 0.35 : 0.25;
-        $fraisPro = round(min($sbi * $tauxFraisPro, 2500), 2);
-
-        $sni = round($sbi - ($cnss + $amo) - $fraisPro, 2);
-
-        $ir = $this->calculateIr(max($sni, 0));
-
-        $nbEnfants = (int) ($s['nb_enfants'] ?? 0);
-        $nbCharges = $nbEnfants + (($s['situation_familiale'] ?? 'celibataire') === 'marie' ? 1 : 0);
-        $deductionsFamiliales = round(min($nbCharges, 6) * 50, 2);
-
-        $irNet = round(max($ir - $deductionsFamiliales, 0), 2);
-
-        $avances = (float) ($s['avances_salaire'] ?? 0);
-        $mutuelle = (float) ($s['mutuelle'] ?? 0);
-        $autresRetenues = $avances + $mutuelle + $totalRetenuesCustom;
-
-        $netAvant = round($sb - ($cnss + $amo) - $ir, 2);
-        $net = round(max($netAvant + $deductionsFamiliales - $autresRetenues, 0), 2);
-
-        $cnssPatronale = round($plafonne * (float) ($cnssParams['taux_cnss_patronal'] ?? 8.98) / 100, 2);
-        $amoPatronale  = round($sb * (float) ($cnssParams['taux_amo_patronal'] ?? 4.11) / 100, 2);
-
-        return compact(
-            'joursTravailles', 'primeAnciennete', 'heuresSup', 'montantHeuresSup', 'transport', 'panier',
-            'representation', 'logement', 'totalGains', 'sb', 'sbi', 'plafonne', 'cnss', 'amo',
-            'fraisPro', 'sni', 'deductionsFamiliales', 'avances',
-            'mutuelle', 'autresRetenues', 'netAvant', 'net', 'cnssPatronale', 'amoPatronale'
-        ) + ['ir' => $ir, 'irNet' => $irNet];
-    }
-
     public function create(): void
     {
         $userId = Session::get('user_id');
@@ -157,16 +50,25 @@ class PaieController extends Controller
 
         if ($this->isPost()) {
             $this->checkCsrf();
-            $societeId  = (int) ($_POST['societe_id'] ?? 0);
-            $mois       = (int) ($_POST['mois'] ?? 0);
-            $annee      = (int) ($_POST['annee'] ?? 0);
-            $dateDebut  = $_POST['date_debut'] ?? null;
-            $dateFin    = $_POST['date_fin'] ?? null;
+            $v = new Validator($_POST);
+            $v->required('societe_id', 'Société')
+              ->required('mois', 'Mois')
+              ->required('annee', 'Année')
+              ->numeric('mois', 'Mois')
+              ->numeric('annee', 'Année')
+              ->date('date_debut', 'Date début')
+              ->date('date_fin', 'Date fin');
 
-            if (!$societeId || !$mois || !$annee) {
-                Session::setFlash('error', 'Veuillez remplir tous les champs.');
+            if (!$v->passes()) {
+                Session::setFlash('error', $v->firstError());
                 $this->redirect('/paie-me/paies/create');
             }
+
+            $societeId  = (int) $_POST['societe_id'];
+            $mois       = (int) $_POST['mois'];
+            $annee      = (int) $_POST['annee'];
+            $dateDebut  = $_POST['date_debut'];
+            $dateFin    = $_POST['date_fin'];
 
             $existing = $this->db->prepare("SELECT id FROM periodes WHERE societe_id = ? AND mois = ? AND annee = ?");
             $existing->execute([$societeId, $mois, $annee]);
@@ -189,7 +91,7 @@ class PaieController extends Controller
             $salaries = $this->db->query("SELECT id, salaire_base, date_embauche, date_sortie, situation_familiale, indemnite_transport, indemnite_panier, indemnite_representation, avantage_logement, nb_enfants, avances_salaire, mutuelle FROM salaries WHERE societe_id = $societeId AND actif = 1")->fetchAll();
 
             foreach ($salaries as $s) {
-                $c = $this->calculerPaie($s, $cnssParams, $dateFin, 0, $gains, $retenues, $dateDebut);
+                $c = $this->calculator->calculerPaie($s, $cnssParams, $dateFin, 0, $gains, $retenues, $dateDebut);
 
                 $stmtPaie = $this->db->prepare("
                     INSERT INTO paies (periode_id, salarie_id, societe_id, jours_travailles, salaire_brut, sbi, prime_anciennete, salaire_plafonne_cnss, indemnite_transport, indemnite_panier, indemnite_representation, avantage_logement, total_gains, heures_supplementaires, montant_heures_sup, cnss_salariale, amo_salariale, mutuelle, sni, ir, deductions_familiales, autres_retenues, net_avant_retenues, net_a_payer, cnss_patronale, amo_patronale, frais_professionnels)
@@ -261,7 +163,7 @@ class PaieController extends Controller
 
         foreach ($salaries as $s) {
             $heuresSup = $heuresSupMap[(int) $s['id']] ?? 0;
-            $c = $this->calculerPaie($s, $cnssParams, $dateFin, $heuresSup, $gains, $retenues, $dateDebut);
+            $c = $this->calculator->calculerPaie($s, $cnssParams, $dateFin, $heuresSup, $gains, $retenues, $dateDebut);
 
             $stmtPaie = $this->db->prepare("
                 INSERT INTO paies (periode_id, salarie_id, societe_id, jours_travailles, salaire_brut, sbi, prime_anciennete, salaire_plafonne_cnss, indemnite_transport, indemnite_panier, indemnite_representation, avantage_logement, total_gains, heures_supplementaires, montant_heures_sup, cnss_salariale, amo_salariale, mutuelle, sni, ir, deductions_familiales, autres_retenues, net_avant_retenues, net_a_payer, cnss_patronale, amo_patronale, frais_professionnels)
@@ -428,18 +330,6 @@ class PaieController extends Controller
             'paies'  => $paies,
             'totaux' => $totaux,
         ]);
-    }
-
-    private function calculateIr(float $sni): float
-    {
-        $brackets = $this->db->query("SELECT * FROM bareme_ir ORDER BY min")->fetchAll();
-        foreach ($brackets as $b) {
-            if ($sni >= (float) $b['min'] && $sni <= (float) $b['max']) {
-                $ir = $sni * (float) $b['taux'] / 100 - (float) $b['deduction'];
-                return round(max($ir, 0), 2);
-            }
-        }
-        return 0;
     }
 
     protected function render(string $view, array $data = []): void
