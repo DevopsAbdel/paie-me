@@ -61,6 +61,7 @@ function fillForm(g) {
     setVal('f_type_montant', g.type_montant || 'fixe');
     setVal('f_valeur_defaut', g.valeur_defaut || '');
     setVal('f_source', g.source || '');
+    setVal('f_source_maj', g.source_maj || '');
     setVal('f_justificatifs', g.justificatifs || '');
     setVal('f_nature_edi', g.nature_edi || '');
     setVal('f_categorie', g.categorie || '');

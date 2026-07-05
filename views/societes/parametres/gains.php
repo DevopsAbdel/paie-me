@@ -26,12 +26,13 @@
                     <th>Compte</th>
                     <th>Justificatifs</th>
                     <th>Source</th>
+                    <th>MAJ Source</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 <?php if (empty($gains)): ?>
-                <tr><td colspan="17" style="text-align:center; color:var(--text-muted);">Aucune rubrique de gain</td></tr>
+                <tr><td colspan="18" style="text-align:center; color:var(--text-muted);">Aucune rubrique de gain</td></tr>
                 <?php else: ?>
                 <?php foreach ($gains as $g): ?>
                 <tr>
@@ -51,6 +52,7 @@
                     <td><code><?= htmlspecialchars($g['compte'] ?? '') ?></code></td>
                     <td><small title="<?= htmlspecialchars($g['justificatifs'] ?? '') ?>"><?= htmlspecialchars(mb_substr($g['justificatifs'] ?? '', 0, 30)) ?><?= isset($g['justificatifs']) && mb_strlen($g['justificatifs']) > 30 ? '…' : '' ?></small></td>
                     <td><small><?= htmlspecialchars($g['source'] ?? '') ?></small></td>
+                    <td><small><?= htmlspecialchars($g['source_maj'] ?? '') ?></small></td>
                     <td>
                         <div class="table-actions">
                             <button type="button" class="btn-icon btn-view" title="Voir" onclick="viewGain(<?= (int)$g['id'] ?>)">
@@ -120,6 +122,10 @@
                         <div class="col-md-4">
                             <label class="form-label">Nature EDI</label>
                             <input type="text" name="nature_edi" id="f_nature_edi" class="form-control" placeholder="Code nature pour export">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">MAJ Source</label>
+                            <input type="date" name="source_maj" id="f_source_maj" class="form-control">
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Catégorie</label>

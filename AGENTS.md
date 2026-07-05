@@ -95,3 +95,28 @@ Net  = salaire - (CNSS + AMO + IR)
 - **Corruption connue** : `0xC3 0x9A` au lieu de `0xC3 0xA9` (caractère `é`). Vérifier avec `SELECT id, HEX(nom) FROM services WHERE HEX(nom) LIKE '%C39A%'`.
 - **Fix** si données corrompues : `UPDATE table SET col = REPLACE(col, _utf8mb4 0xC39A, _utf8mb4 0xC3A9) WHERE HEX(col) LIKE '%C39A%';`
 - Les fichiers PHP et SQL ne doivent **jamais** être ouverts/sauvés avec un éditeur qui utilise l'encodage système Windows (cp850/Windows-1252) par défaut.
+
+## Progress (current session)
+
+### Done
+- Confirmed via web: "Décret n° 2-24-130" was wrong — correct source is **Arrêté n° 1314-25 du 19 mai 2025** (BO n° 7443, effective 1er octobre 2025), issued under décret n° 2-25-266
+- Replaced all "Décret n° 2-24-130" → "Arrêté n° 1314-25" in migrate.php, schema.sql, markdown docs
+- Added `source_maj DATE DEFAULT NULL` column to `rubriques_gains` table (schema.sql CREATE TABLE + ALTER TABLE)
+- Added `source_maj` to migrate.php: column list, all INSERT values (`'2025-10-01'`), all UPDATE SET clauses
+- Added display column "MAJ Source" in gains.php table header + data cell
+- Added `source_maj` date input field in the gains modal form
+- Added `setVal('f_source_maj', ...)` in gains.js `fillForm()`
+- Added `'source_maj' => $p('source_maj')` in SocieteController::parametres() POST handler
+
+### Pending
+- (none)
+
+### Key changes
+| File | Change |
+|------|--------|
+| `database/migrate.php` | source name corrected, `source_maj` added to all INSERT/UPDATE |
+| `database/schema.sql` | added `compte`, `source`, `source_maj`, `nature_edi`, `base_anciennete`, `au_prorata` cols + ALTER TABLE |
+| `views/societes/parametres/gains.php` | "MAJ Source" column in table + date input in modal |
+| `assets/js/gains.js` | fills `source_maj` from data |
+| `controllers/SocieteController.php` | saves `source_maj` from POST |
+| `docs-paie-me/*.md`, `database/update_rubriques_from_md.sql` | source name corrected |

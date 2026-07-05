@@ -244,6 +244,12 @@ CREATE TABLE IF NOT EXISTS rubriques_gains (
     plafond_dgi     VARCHAR(200)        DEFAULT NULL,
     plafond_cnss    VARCHAR(200)        DEFAULT NULL,
     justificatifs   VARCHAR(500)        DEFAULT NULL,
+    compte          VARCHAR(20)         DEFAULT NULL,
+    source          VARCHAR(100)        DEFAULT NULL,
+    source_maj      DATE                DEFAULT NULL,
+    nature_edi      VARCHAR(20)         DEFAULT NULL,
+    base_anciennete TINYINT(1)          NOT NULL DEFAULT 0,
+    au_prorata      TINYINT(1)          NOT NULL DEFAULT 0,
     actif           TINYINT(1)          NOT NULL DEFAULT 1,
     created_at      DATETIME            NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (societe_id) REFERENCES societes(id) ON DELETE CASCADE
@@ -332,6 +338,14 @@ ALTER TABLE rubriques_gains
     ADD COLUMN plafond_dgi     VARCHAR(200) DEFAULT NULL AFTER affectation,
     ADD COLUMN plafond_cnss    VARCHAR(200) DEFAULT NULL AFTER plafond_dgi,
     ADD COLUMN justificatifs   VARCHAR(500) DEFAULT NULL AFTER plafond_cnss;
+
+ALTER TABLE rubriques_gains
+    ADD COLUMN compte          VARCHAR(20)  DEFAULT NULL AFTER justificatifs,
+    ADD COLUMN source          VARCHAR(100) DEFAULT NULL AFTER compte,
+    ADD COLUMN source_maj      DATE         DEFAULT NULL AFTER source,
+    ADD COLUMN nature_edi      VARCHAR(20)  DEFAULT NULL AFTER source_maj,
+    ADD COLUMN base_anciennete TINYINT(1)   NOT NULL DEFAULT 0 AFTER nature_edi,
+    ADD COLUMN au_prorata      TINYINT(1)   NOT NULL DEFAULT 0 AFTER base_anciennete;
 
 -- -----------------------------------------------------------
 -- Audit log

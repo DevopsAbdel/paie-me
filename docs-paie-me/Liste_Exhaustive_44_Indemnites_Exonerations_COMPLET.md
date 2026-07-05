@@ -1,6 +1,6 @@
 # Référentiel Des Exonérations De L'Assiette Sociale Et Fiscale
 
-**Liste exhaustive des 49 rubriques avec plafonds stricts et exigences documentaires (Décret n° 2-24-130 + primes standards)**
+**Liste exhaustive des 49 rubriques avec plafonds stricts et exigences documentaires (Arrêté n° 1314-25 + primes standards)**
 
 Source : conversion complète du fichier Excel fourni `Liste_Exhaustive_44_Indemnites_Exonerations.xlsx`.
 

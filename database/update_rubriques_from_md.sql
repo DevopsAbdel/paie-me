@@ -1,5 +1,5 @@
 -- Mise à jour des rubriques de gains globales depuis le fichier MD
--- Liste exhaustive des 44 indemnités et primes (Décret n° 2-24-130)
+-- Liste exhaustive des 44 indemnités et primes (Arrêté n° 1314-25)
 
 -- ============================================================
 -- I. Transport & Déplacement

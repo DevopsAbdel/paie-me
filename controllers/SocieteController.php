@@ -334,6 +334,7 @@ class SocieteController extends Controller
                         'compte' => $p('compte'),
                         'justificatifs' => $p('justificatifs'),
                         'source' => $p('source'),
+                        'source_maj' => $p('source_maj'),
                         'nature_edi' => $p('nature_edi'),
                         'actif' => (int)$p('actif', 0),
                         'is_global' => (int)$p('is_global', 0),
