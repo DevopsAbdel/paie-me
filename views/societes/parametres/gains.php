@@ -21,6 +21,8 @@
                     <th>Prorata</th>
                     <th>Plafond DGI</th>
                     <th>Plafond CNSS</th>
+                    <th>Desc. DGI</th>
+                    <th>Desc. CNSS</th>
                     <th>Compte</th>
                     <th>Justificatifs</th>
                     <th>Source</th>
@@ -29,7 +31,7 @@
             </thead>
             <tbody>
                 <?php if (empty($gains)): ?>
-                <tr><td colspan="15" style="text-align:center; color:var(--text-muted);">Aucune rubrique de gain</td></tr>
+                <tr><td colspan="17" style="text-align:center; color:var(--text-muted);">Aucune rubrique de gain</td></tr>
                 <?php else: ?>
                 <?php foreach ($gains as $g): ?>
                 <tr>
@@ -44,6 +46,8 @@
                     <td><span class="badge badge-<?= $g['au_prorata'] ? 'success' : 'secondary' ?>"><?= $g['au_prorata'] ? 'Oui' : 'Non' ?></span></td>
                     <td><small><?php if ($g['plafond_dgi_actif']): ?><?= htmlspecialchars($g['plafond_dgi_valeur'] ?? '') ?> / <?= htmlspecialchars($g['plafond_dgi_type'] ?? '') ?><?php endif; ?></small></td>
                     <td><small><?php if ($g['plafond_cnss_actif']): ?><?= htmlspecialchars($g['plafond_cnss_valeur'] ?? '') ?> / <?= htmlspecialchars($g['plafond_cnss_type'] ?? '') ?><?php endif; ?></small></td>
+                    <td><small title="<?= htmlspecialchars($g['plafond_dgi_desc'] ?? '') ?>"><?= htmlspecialchars(mb_substr($g['plafond_dgi_desc'] ?? '', 0, 25)) ?><?= isset($g['plafond_dgi_desc']) && mb_strlen($g['plafond_dgi_desc']) > 25 ? '…' : '' ?></small></td>
+                    <td><small title="<?= htmlspecialchars($g['plafond_cnss_desc'] ?? '') ?>"><?= htmlspecialchars(mb_substr($g['plafond_cnss_desc'] ?? '', 0, 25)) ?><?= isset($g['plafond_cnss_desc']) && mb_strlen($g['plafond_cnss_desc']) > 25 ? '…' : '' ?></small></td>
                     <td><code><?= htmlspecialchars($g['compte'] ?? '') ?></code></td>
                     <td><small title="<?= htmlspecialchars($g['justificatifs'] ?? '') ?>"><?= htmlspecialchars(mb_substr($g['justificatifs'] ?? '', 0, 30)) ?><?= isset($g['justificatifs']) && mb_strlen($g['justificatifs']) > 30 ? '…' : '' ?></small></td>
                     <td><small><?= htmlspecialchars($g['source'] ?? '') ?></small></td>
@@ -209,6 +213,16 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Limites / Plafond DGI</label>
+                            <textarea name="plafond_dgi_desc" id="f_plafond_dgi_desc" class="form-control" rows="2" placeholder="Ex: 500.00 DH / mois"></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Limites / Plafond CNSS</label>
+                            <textarea name="plafond_cnss_desc" id="f_plafond_cnss_desc" class="form-control" rows="2" placeholder="Ex: 500.00 DH / mois"></textarea>
                         </div>
                     </div>
 

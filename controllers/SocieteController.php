@@ -347,6 +347,8 @@ class SocieteController extends Controller
                         'plafond_cnss_actif' => (int)$p('plafond_cnss_actif', 0),
                         'plafond_cnss_valeur' => $p('plafond_cnss_valeur'),
                         'plafond_cnss_type' => $p('plafond_cnss_type'),
+                        'plafond_dgi_desc' => $p('plafond_dgi_desc'),
+                        'plafond_cnss_desc' => $p('plafond_cnss_desc'),
                     ];
                     if ($gainId) {
                         $sql = "UPDATE rubriques_gains SET " . implode(', ', array_map(fn($k) => "$k=?", array_keys($fields))) . " WHERE id=? AND (societe_id=? OR societe_id IS NULL)";

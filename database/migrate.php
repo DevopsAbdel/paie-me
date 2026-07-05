@@ -234,4 +234,7 @@ try {
 $count = $p->exec("UPDATE rubriques_gains SET compte = affectation WHERE (compte IS NULL OR compte = '') AND (affectation IS NOT NULL AND affectation != '')");
 if ($count > 0) echo "  + $count enregistrements: affectation → compte\n";
 
+addCol($p, 'rubriques_gains', 'plafond_dgi_desc TEXT DEFAULT NULL AFTER plafond_cnss_type');
+addCol($p, 'rubriques_gains', 'plafond_cnss_desc TEXT DEFAULT NULL AFTER plafond_dgi_desc');
+
 echo "\nMigrations terminées.\n";

@@ -74,6 +74,8 @@ function fillForm(g) {
     setCheck('f_plafond_cnss_actif', g.plafond_cnss_actif);
     setVal('f_plafond_cnss_valeur', g.plafond_cnss_valeur || '');
     setVal('f_plafond_cnss_type', g.plafond_cnss_type || 'mensuel');
+    setVal('f_plafond_dgi_desc', g.plafond_dgi_desc || '');
+    setVal('f_plafond_cnss_desc', g.plafond_cnss_desc || '');
     setCompte(g.compte || '');
     setCheck('f_actif', g.actif);
     setCheck('f_is_global', g.is_global);
