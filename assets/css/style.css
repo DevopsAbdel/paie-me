@@ -310,12 +310,14 @@ a:hover {
     background: #64748b;
 }
 
-table {
+.table {
+    --bs-table-bg: var(--bg-surface);
     width: 100%;
     border-collapse: collapse;
 }
 
-thead th {
+.table thead th {
+    --bs-table-bg: var(--bg-hover);
     text-align: left;
     padding: 0.75rem 1rem;
     font-size: 0.8125rem;
@@ -326,14 +328,14 @@ thead th {
     border-bottom: 2px solid var(--border);
 }
 
-tbody td {
+.table tbody td {
     padding: 0.75rem 1rem;
     border-bottom: 1px solid var(--border);
     font-size: 0.875rem;
     color: var(--text);
 }
 
-tbody tr:hover {
+.table tbody tr:hover {
     background: var(--bg-hover);
 }
 
@@ -496,6 +498,21 @@ input[type="datetime-local"].form-control {
     color: var(--success);
 }
 
+.badge-primary {
+    background: rgba(59, 130, 246, 0.2);
+    color: #3b82f6;
+}
+
+.badge-info {
+    background: rgba(6, 182, 212, 0.2);
+    color: #06b6d4;
+}
+
+.badge-success {
+    background: rgba(34, 197, 94, 0.2);
+    color: var(--success);
+}
+
 .badge-warning {
     background: rgba(245, 158, 11, 0.2);
     color: var(--warning);
@@ -504,6 +521,11 @@ input[type="datetime-local"].form-control {
 .badge-danger {
     background: rgba(239, 68, 68, 0.2);
     color: var(--danger);
+}
+
+.badge-dark {
+    background: rgba(100, 116, 139, 0.25);
+    color: #94a3b8;
 }
 
 /* ── Empty state ── */

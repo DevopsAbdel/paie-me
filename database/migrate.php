@@ -237,4 +237,148 @@ if ($count > 0) echo "  + $count enregistrements: affectation → compte\n";
 addCol($p, 'rubriques_gains', 'plafond_dgi_desc TEXT DEFAULT NULL AFTER plafond_cnss_type');
 addCol($p, 'rubriques_gains', 'plafond_cnss_desc TEXT DEFAULT NULL AFTER plafond_dgi_desc');
 
+// === Sources légales ===
+$p->exec("CREATE TABLE IF NOT EXISTS sources_legales (
+    id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    code            VARCHAR(20) NOT NULL UNIQUE,
+    libelle         VARCHAR(200) NOT NULL,
+    type            ENUM('loi','decret','arrete','note','circulaire','convention') NOT NULL,
+    organisme       VARCHAR(50) NOT NULL,
+    description     TEXT,
+    reference_bo    VARCHAR(50),
+    date_publication DATE,
+    date_effet      DATE,
+    url_officiel    VARCHAR(300),
+    statut          ENUM('en_vigueur','modifie','abroge') DEFAULT 'en_vigueur',
+    ordre           INT DEFAULT 0
+) ENGINE=InnoDB");
+echo "   + table sources_legales créée\n";
+
+$existing = $p->query("SELECT COUNT(*) FROM sources_legales")->fetchColumn();
+if (!$existing) {
+    $p->exec("INSERT INTO sources_legales (code, libelle, type, organisme, description, reference_bo, date_publication, date_effet, statut, ordre) VALUES
+        ('CT', 'Code du Travail (Loi n° 65-99)', 'loi', 'Inspection du Travail', 'Code du Travail marocain promulgué par la Loi n° 65-99. Régit les relations individuelles et collectives de travail.', 'BO n° 5210', '2003-09-11', '2004-06-08', 'en_vigueur', 1),
+        ('DAHIR_CNSS', 'Dahir n° 1.72.184 — Régime de sécurité sociale', 'loi', 'CNSS', 'Dahir portant institution du régime de sécurité sociale au Maroc. Base légale de la CNSS.', 'BO n° 3120', '1972-07-27', '1972-10-01', 'modifie', 2),
+        ('D266', 'Décret n° 2-25-266 — Application CNSS', 'decret', 'CNSS', 'Décret fixant les modalités d''application des dispositions relatives aux exonérations de cotisations CNSS.', 'BO n° 7443', '2025-04-24', '2025-10-01', 'en_vigueur', 3),
+        ('A1314', 'Arrêté n° 1314-25 — Indemnités exonérées CNSS', 'arrete', 'CNSS', 'Arrêté du ministre de l''Économie et des Finances fixant la liste des indemnités exonérées de cotisations CNSS.', 'BO n° 7443', '2025-05-19', '2025-10-01', 'en_vigueur', 4),
+        ('CGI', 'Code Général des Impôts', 'loi', 'DGI', 'Code Général des Impôts marocain. Définit les règles d''assujettissement à l''IR et à l''IS.', NULL, NULL, NULL, 'en_vigueur', 5),
+        ('N16_2017', 'Note n° 16/2017 — Indemnités exonérées IR', 'note', 'DGI', 'Note circulaire de la DGI précisant la liste des indemnités exonérées de l''impôt sur le revenu.', NULL, '2017-01-01', '2017-01-01', 'en_vigueur', 6),
+        ('LF', 'Loi de Finances', 'loi', 'DGI', 'Loi de Finances annuelle. Modifie chaque année les dispositions fiscales (barème IR, plafonds, etc.).', NULL, NULL, NULL, 'en_vigueur', 7),
+        ('CCOLL', 'Conventions collectives sectorielles', 'convention', 'Inspection du Travail', 'Conventions collectives de travail applicables par secteur d''activité. Peuvent prévoir des indemnités spécifiques.', NULL, NULL, NULL, 'en_vigueur', 8)");
+    echo "   + sources légales insérées\n";
+}
+
+// === Table pivot rubrique ↔ source ===
+$p->exec("CREATE TABLE IF NOT EXISTS rubrique_sources_articles (
+    id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    rubrique_id     INT UNSIGNED NOT NULL,
+    source_id       INT UNSIGNED NOT NULL,
+    article         VARCHAR(50) NOT NULL,
+    created_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY unique_rubrique_source (rubrique_id, source_id, article),
+    FOREIGN KEY (rubrique_id) REFERENCES rubriques_gains(id) ON DELETE CASCADE,
+    FOREIGN KEY (source_id) REFERENCES sources_legales(id) ON DELETE CASCADE
+) ENGINE=InnoDB");
+echo "   + table rubrique_sources_articles créée\n";
+
+$existing = $p->query("SELECT COUNT(*) FROM rubrique_sources_articles")->fetchColumn();
+if (!$existing) {
+    $p->exec("INSERT INTO rubrique_sources_articles (rubrique_id, source_id, article)
+        SELECT r.id, s.id, a.article
+        FROM rubriques_gains r
+        CROSS JOIN (SELECT 'CGI' AS c, 'Art. 57-1°' AS article, '330' AS code UNION ALL
+                    SELECT 'CGI', 'Art. 57-1°', '331' UNION ALL
+                    SELECT 'CGI', 'Art. 57-1°', '334' UNION ALL
+                    SELECT 'CGI', 'Art. 57-1°', '337' UNION ALL
+                    SELECT 'CGI', 'Art. 57-1°', '339' UNION ALL
+                    SELECT 'CGI', 'Art. 57-1°', '340' UNION ALL
+                    SELECT 'CGI', 'Art. 57-1°', '341' UNION ALL
+                    SELECT 'CGI', 'Art. 57-1°', '342' UNION ALL
+                    SELECT 'CGI', 'Art. 57-1°', '343' UNION ALL
+                    SELECT 'CGI', 'Art. 57-1°', '344' UNION ALL
+                    SELECT 'CGI', 'Art. 57-1°', '345' UNION ALL
+                    SELECT 'CGI', 'Art. 57-1°', '346' UNION ALL
+                    SELECT 'CGI', 'Art. 57-1°', '347' UNION ALL
+                    SELECT 'CGI', 'Art. 57-1°', '348' UNION ALL
+                    SELECT 'CGI', 'Art. 57-1°', '349' UNION ALL
+                    SELECT 'CGI', 'Art. 57-1°', '350' UNION ALL
+                    SELECT 'CGI', 'Art. 57-1°', '351' UNION ALL
+                    SELECT 'CGI', 'Art. 57-1°', '352' UNION ALL
+                    SELECT 'CGI', 'Art. 57-1°', '353' UNION ALL
+                    SELECT 'CGI', 'Art. 57-1°', '354' UNION ALL
+                    SELECT 'CGI', 'Art. 57-1°', '355' UNION ALL
+                    SELECT 'CGI', 'Art. 57-1°', '356' UNION ALL
+                    SELECT 'CGI', 'Art. 57-1°', '357' UNION ALL
+                    SELECT 'CGI', 'Art. 57-1°', '358' UNION ALL
+                    SELECT 'CGI', 'Art. 57-1°', '359' UNION ALL
+                    SELECT 'CGI', 'Art. 57-1°', '360' UNION ALL
+                    SELECT 'CGI', 'Art. 57-1°', '361' UNION ALL
+                    SELECT 'CGI', 'Art. 57-1°', '362' UNION ALL
+                    SELECT 'CGI', 'Art. 57-1°', '363' UNION ALL
+                    SELECT 'CGI', 'Art. 57-1°', '364' UNION ALL
+                    SELECT 'CGI', 'Art. 57-1°', '365' UNION ALL
+                    SELECT 'CGI', 'Art. 57-7°', '366' UNION ALL
+                    SELECT 'CGI', 'Art. 57-7°', '367' UNION ALL
+                    SELECT 'CGI', 'Art. 57-7°', '368' UNION ALL
+                    SELECT 'CGI', 'Art. 57 (soumis)', '501' UNION ALL
+                    SELECT 'CGI', 'Art. 57 (soumis)', '502' UNION ALL
+                    SELECT 'CGI', 'Art. 57 (soumis)', '503' UNION ALL
+                    SELECT 'CGI', 'Art. 57 (soumis)', '504' UNION ALL
+                    SELECT 'CGI', 'Art. 57 (soumis)', '505' UNION ALL
+                    SELECT 'CT', 'Art. 53', '366' UNION ALL
+                    SELECT 'CT', 'Art. 41', '367' UNION ALL
+                    SELECT 'CT', 'Art. 43', '369' UNION ALL
+                    SELECT 'CT', 'Art. 345-353', '501' UNION ALL
+                    SELECT 'CT', 'Art. 345-353', '502' UNION ALL
+                    SELECT 'CT', 'Art. 345-353', '503' UNION ALL
+                    SELECT 'CT', 'Art. 345-353', '504' UNION ALL
+                    SELECT 'CT', 'Art. 345', '505' UNION ALL
+                    SELECT 'A1314', 'Titre I', '330' UNION ALL
+                    SELECT 'A1314', 'Titre I', '334' UNION ALL
+                    SELECT 'A1314', 'Titre I', '337' UNION ALL
+                    SELECT 'A1314', 'Titre I', '339' UNION ALL
+                    SELECT 'A1314', 'Titre I', '340' UNION ALL
+                    SELECT 'A1314', 'Titre I', '341' UNION ALL
+                    SELECT 'A1314', 'Titre I', '342' UNION ALL
+                    SELECT 'A1314', 'Titre I', '351' UNION ALL
+                    SELECT 'A1314', 'Titre I', '352' UNION ALL
+                    SELECT 'A1314', 'Titre I', '353' UNION ALL
+                    SELECT 'A1314', 'Titre II', '331' UNION ALL
+                    SELECT 'A1314', 'Titre II', '343' UNION ALL
+                    SELECT 'A1314', 'Titre II', '344' UNION ALL
+                    SELECT 'A1314', 'Titre II', '345' UNION ALL
+                    SELECT 'A1314', 'Titre II', '346' UNION ALL
+                    SELECT 'A1314', 'Titre II', '347' UNION ALL
+                    SELECT 'A1314', 'Titre II', '348' UNION ALL
+                    SELECT 'A1314', 'Titre II', '349' UNION ALL
+                    SELECT 'A1314', 'Titre II', '350' UNION ALL
+                    SELECT 'A1314', 'Titre II', '360' UNION ALL
+                    SELECT 'A1314', 'Titre V', '354' UNION ALL
+                    SELECT 'A1314', 'Titre V', '355' UNION ALL
+                    SELECT 'A1314', 'Titre V', '356' UNION ALL
+                    SELECT 'A1314', 'Titre V', '357' UNION ALL
+                    SELECT 'A1314', 'Titre V', '358' UNION ALL
+                    SELECT 'A1314', 'Titre V', '359' UNION ALL
+                    SELECT 'A1314', 'Titre V', '361' UNION ALL
+                    SELECT 'A1314', 'Titre V', '362' UNION ALL
+                    SELECT 'A1314', 'Titre V', '363' UNION ALL
+                    SELECT 'A1314', 'Titre V', '364' UNION ALL
+                    SELECT 'A1314', 'Titre V', '365' UNION ALL
+                    SELECT 'A1314', 'Titre III', '366' UNION ALL
+                    SELECT 'A1314', 'Titre III', '367' UNION ALL
+                    SELECT 'A1314', 'Titre III', '368' UNION ALL
+                    SELECT 'A1314', 'Titre III', '369' UNION ALL
+                    SELECT 'A1314', 'Titre III', '370' UNION ALL
+                    SELECT 'A1314', 'Titre III', '371' UNION ALL
+                    SELECT 'A1314', 'Titre III', '372' UNION ALL
+                    SELECT 'A1314', 'Titre III', '373' UNION ALL
+                    SELECT 'A1314', 'Titre III', '374' UNION ALL
+                    SELECT 'A1314', 'Titre III', '375' UNION ALL
+                    SELECT 'A1314', 'Titre III', '376' UNION ALL
+                    SELECT 'A1314', 'Titre VII', '377') AS a
+        JOIN sources_legales s ON s.code = a.c
+        WHERE r.code = a.code AND r.societe_id IS NULL");
+    echo "   + articles par rubrique insérés\n";
+}
+
 echo "\nMigrations terminées.\n";

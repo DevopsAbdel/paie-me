@@ -10,6 +10,7 @@ use Controllers\BulletinController;
 use Controllers\DamancomController;
 use Controllers\IrController;
 use Controllers\ComptabiliteController;
+use Controllers\SourceLegaleController;
 
 Router::get('/',                       [AuthController::class, 'login']);
 Router::get('/login',                  [AuthController::class, 'login']);
@@ -64,3 +65,6 @@ Router::get('/ir/export',              [IrController::class, 'export']);
 
 Router::get('/comptabilite',           [ComptabiliteController::class, 'index']);
 Router::post('/comptabilite/export',   [ComptabiliteController::class, 'export']);
+
+Router::get('/societes/{id}/sources-legales', [SourceLegaleController::class, 'index']);
+Router::post('/societes/{id}/sources-legales', [SourceLegaleController::class, 'index']);
