@@ -79,11 +79,11 @@ Pour s'intégrer dans le système d'information des entreprises, l'application d
 
 ### Schéma d'Imputation Standard (Fin de mois) :
 * **Débit :**
-    * `61711` : Appointements et salaires (Salaire de base + heures sup + primes)
-    * `61712` : Primes et gratifications
-    * `61713` : Indemnités et avantages divers
-    * `61741` : Cotisations aux caisses de retraite (Part patronale)
-    * `61742` : Cotisations à la CNSS (Part patronale)
+    * `61711000` : Appointements et salaires (Salaire de base + heures sup + primes)
+    * `61712000` : Primes et gratifications
+    * `61713000` : Indemnités et avantages divers
+    * `61741000` : Cotisations aux caisses de retraite (Part patronale)
+    * `61742000` : Cotisations à la CNSS (Part patronale)
 * **Crédit :**
     * `4432` : Rémunérations dues au personnel (Le Salaire Net à Payer)
     * `4441` : Caisse Nationale de Sécurité Sociale (Part salariale + patronale)
