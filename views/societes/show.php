@@ -207,11 +207,16 @@ $baseUrl = '/paie-me/societes/' . $societe['id'];
         <div class="empty-state"><p>Aucune période de paie. Créez une paie avant de générer la déclaration CNSS.</p></div>
     <?php else: ?>
     <div style="padding:1rem;">
-        <h4 style="color:var(--accent); margin-bottom:0.75rem;">Déclarations par période</h4>
+        <h4 class="form-section-title">Déclarations par période</h4>
+        <hr class="form-section-sep">
         <div class="table-wrapper">
             <table>
                 <thead>
-                    <tr><th>Période</th><th>Salariés</th><th>Statut</th><th>Actions</th></tr>
+                    <tr>
+                        <th>Période</th><th>Salariés</th><th>Statut</th>
+                        <th>Pénalités CNSS</th><th>Pénalités TFP</th><th>Pénalités AMO</th>
+                        <th>Actions</th>
+                    </tr>
                 </thead>
                 <tbody>
                     <?php foreach ($periodes as $p): ?>
@@ -219,6 +224,33 @@ $baseUrl = '/paie-me/societes/' . $societe['id'];
                         <td><?= str_pad($p['mois'], 2, '0', STR_PAD_LEFT) ?>/<?= $p['annee'] ?></td>
                         <td><?= (int)$p['nb_paies'] ?></td>
                         <td><span class="badge badge-<?= $p['cloturee'] ? 'success' : 'warning' ?>"><?= $p['cloturee'] ? 'Clôturée' : 'En cours' ?></span></td>
+                        <td>
+                            <form method="POST" action="/paie-me/societes/<?= $societe['id'] ?>/parametres/cnss_amo" style="display:flex; align-items:center; gap:0.25rem;">
+                                <?= \Core\Session::csrfField() ?>
+                                <input type="hidden" name="sous_tab" value="penalites">
+                                <input type="hidden" name="periode_id" value="<?= $p['id'] ?>">
+                                <input type="number" name="penalites_cnss" value="<?= number_format((float)($p['penalites_cnss'] ?? 0), 2, '.', '') ?>" class="form-control" style="width:90px; padding:0.25rem 0.4rem; font-size:0.75rem;" step="0.01" min="0">
+                                <button type="submit" class="btn btn-secondary btn-sm" style="padding:0.25rem 0.4rem; font-size:0.7rem;">OK</button>
+                            </form>
+                        </td>
+                        <td>
+                            <form method="POST" action="/paie-me/societes/<?= $societe['id'] ?>/parametres/cnss_amo" style="display:flex; align-items:center; gap:0.25rem;">
+                                <?= \Core\Session::csrfField() ?>
+                                <input type="hidden" name="sous_tab" value="penalites">
+                                <input type="hidden" name="periode_id" value="<?= $p['id'] ?>">
+                                <input type="number" name="penalites_tfp" value="<?= number_format((float)($p['penalites_tfp'] ?? 0), 2, '.', '') ?>" class="form-control" style="width:90px; padding:0.25rem 0.4rem; font-size:0.75rem;" step="0.01" min="0">
+                                <button type="submit" class="btn btn-secondary btn-sm" style="padding:0.25rem 0.4rem; font-size:0.7rem;">OK</button>
+                            </form>
+                        </td>
+                        <td>
+                            <form method="POST" action="/paie-me/societes/<?= $societe['id'] ?>/parametres/cnss_amo" style="display:flex; align-items:center; gap:0.25rem;">
+                                <?= \Core\Session::csrfField() ?>
+                                <input type="hidden" name="sous_tab" value="penalites">
+                                <input type="hidden" name="periode_id" value="<?= $p['id'] ?>">
+                                <input type="number" name="penalites_amo" value="<?= number_format((float)($p['penalites_amo'] ?? 0), 2, '.', '') ?>" class="form-control" style="width:90px; padding:0.25rem 0.4rem; font-size:0.75rem;" step="0.01" min="0">
+                                <button type="submit" class="btn btn-secondary btn-sm" style="padding:0.25rem 0.4rem; font-size:0.7rem;">OK</button>
+                            </form>
+                        </td>
                         <td>
                             <div class="table-actions">
                                 <a href="/paie-me/damancom/generate?periode_id=<?= $p['id'] ?>&from_societe=<?= $societe['id'] ?>" class="btn btn-secondary btn-sm">DS</a>
@@ -237,7 +269,7 @@ $baseUrl = '/paie-me/societes/' . $societe['id'];
                 CNSS : <strong><?= htmlspecialchars($societe['cnss']) ?></strong>
             </p>
             <p style="font-size:0.8125rem; color:var(--text-muted);">
-                Le fichier DS est généré au format XML conforme à la spécification Damancom de la CNSS.
+                Le fichier DS est généré au format fixed-width conforme à la spécification Damancom de la CNSS.
             </p>
         </div>
     </div>

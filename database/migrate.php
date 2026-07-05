@@ -180,4 +180,17 @@ if (!$existing) {
     echo "   + rubriques retenues globales insérées\n";
 }
 
+// === RIB : VARCHAR(40) → VARCHAR(255) pour stocker la valeur chiffrée ===
+$needRibResize = $p->query("SHOW COLUMNS FROM societes LIKE 'rib'")->fetch()['Type'] === 'varchar(40)';
+if ($needRibResize) {
+    $p->exec("ALTER TABLE societes MODIFY COLUMN rib VARCHAR(255)");
+    $p->exec("ALTER TABLE salaries MODIFY COLUMN rib VARCHAR(255)");
+    echo "   + rib étendu à VARCHAR(255) (societes + salaries)\n";
+}
+
+// === Pénalités CNSS/AMO/TFP dans periodes ===
+addCol($p, 'periodes', 'penalites_cnss DECIMAL(10,2) NOT NULL DEFAULT 0.00 AFTER cloturee');
+addCol($p, 'periodes', 'penalites_tfp DECIMAL(10,2) NOT NULL DEFAULT 0.00 AFTER penalites_cnss');
+addCol($p, 'periodes', 'penalites_amo DECIMAL(10,2) NOT NULL DEFAULT 0.00 AFTER penalites_tfp');
+
 echo "\nMigrations terminées.\n";

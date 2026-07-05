@@ -261,6 +261,20 @@ class SocieteController extends Controller
                     $_POST['participation_amo'] ?? 1.85,
                 ]);
                 Session::setFlash('success', 'Taux CNSS/AMO mis à jour.');
+                } elseif ($sousTab === 'penalites') {
+                    $periodeId = (int) ($_POST['periode_id'] ?? 0);
+                    if ($periodeId) {
+                        $stmt = $this->db->prepare("UPDATE periodes SET penalites_cnss=?, penalites_tfp=?, penalites_amo=? WHERE id=? AND societe_id=?");
+                        $stmt->execute([
+                            $_POST['penalites_cnss'] ?? 0,
+                            $_POST['penalites_tfp'] ?? 0,
+                            $_POST['penalites_amo'] ?? 0,
+                            $periodeId, $id,
+                        ]);
+                        Session::setFlash('success', 'Pénalités mises à jour.');
+                    }
+                    $this->redirect('/paie-me/societes/' . $id . '?tab=cnss');
+                    return;
             } elseif ($sousTab === 'services') {
                 if (!empty($_POST['service_nom'])) {
                     $stmt = $this->db->prepare("INSERT INTO services (societe_id, nom, description) VALUES (?, ?, ?)");

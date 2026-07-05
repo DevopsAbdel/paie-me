@@ -87,8 +87,12 @@ class DamancomController extends Controller
 
         $totalSalaries = count($paies);
         $totalCnss = array_sum(array_column($paies, 'cnss_salariale'));
+        $penalitesCnss = (float) ($periode['penalites_cnss'] ?? 0);
+        $penalitesTfp = (float) ($periode['penalites_tfp'] ?? 0);
+        $penalitesAmo = (float) ($periode['penalites_amo'] ?? 0);
+        $totalGeneral = $totalCnss + $penalitesCnss + $penalitesTfp + $penalitesAmo;
         $lines[] = 'B05' . str_pad('', 200);
-        $lines[] = 'B06' . str_pad($totalSalaries, 10, '0', STR_PAD_LEFT) . str_pad((int) round($totalCnss * 100), 15, '0', STR_PAD_LEFT) . str_pad('', 175);
+        $lines[] = 'B06' . str_pad($totalSalaries, 10, '0', STR_PAD_LEFT) . str_pad((int) round($totalGeneral * 100), 15, '0', STR_PAD_LEFT) . str_pad('', 175);
 
         $content = implode("\r\n", $lines);
 
