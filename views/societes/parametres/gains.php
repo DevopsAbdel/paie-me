@@ -233,14 +233,14 @@
                             <label class="form-label">Compte comptable</label>
                             <select name="compte" id="f_compte" class="form-select" onchange="toggleCompteInput()">
                                 <option value="">—</option>
-                                <option value="61711">61711 — Salaires fixes</option>
-                                <option value="61712">61712 — Allocations familiales, primes</option>
-                                <option value="61713">61713 — Indemnités et avantages</option>
-                                <option value="61714">61714 — Commissions et courtages</option>
-                                <option value="61715">61715 — Indemnités de fin de contrat</option>
-                                <option value="61716">61716 — Avantages en nature</option>
-                                <option value="61717">61717 — Autres charges de personnel</option>
-                                <option value="6174">6174 — Charges sociales</option>
+                                <option value="61711000">61711000 — Salaires fixes</option>
+                                <option value="61712000">61712000 — Allocations familiales, primes</option>
+                                <option value="61713000">61713000 — Indemnités et avantages</option>
+                                <option value="61714000">61714000 — Commissions et courtages</option>
+                                <option value="61715000">61715000 — Indemnités de fin de contrat</option>
+                                <option value="61716000">61716000 — Avantages en nature</option>
+                                <option value="61717000">61717000 — Autres charges de personnel</option>
+                                <option value="61740000">61740000 — Charges sociales</option>
                                 <option value="autre">Autre…</option>
                             </select>
                             <input type="text" name="compte_custom" id="f_compte_custom" class="form-control" placeholder="Code personnalisé" style="display:none;margin-top:0.35rem;">
