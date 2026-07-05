@@ -215,19 +215,28 @@ a:hover {
     color: var(--accent);
 }
 
+.btn-icon.btn-view {
+    color: #3b82f6;
+}
+
 .btn-icon.btn-view:hover {
     background: rgba(59, 130, 246, 0.12);
-    color: #3b82f6;
+}
+
+.btn-icon.btn-edit {
+    color: #eab308;
 }
 
 .btn-icon.btn-edit:hover {
     background: rgba(234, 179, 8, 0.12);
-    color: #eab308;
+}
+
+.btn-icon.btn-delete {
+    color: #ef4444;
 }
 
 .btn-icon.btn-delete:hover {
     background: rgba(239, 68, 68, 0.12);
-    color: #ef4444;
 }
 
 /* ── Cards ── */
