@@ -388,6 +388,7 @@ class SocieteController extends Controller
             'bareme'       => 'Barème IR 2025',
             'codification' => 'Codification & numérotation',
             'cnss_amo'     => 'Taux CNSS & AMO',
+            'declaration'  => 'Exemple de déclaration Damancom',
             'services'     => 'Services',
             'gains'        => 'Rubriques de gains',
             'retenues'     => 'Rubriques de retenues',
