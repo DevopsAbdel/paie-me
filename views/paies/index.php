@@ -38,13 +38,15 @@
                                 <span class="badge badge-warning">En cours</span>
                             <?php endif; ?>
                         </td>
-                        <td class="table-actions">
-                            <a href="/paie-me/paies/<?= $p['id'] ?>/lignes" class="btn btn-secondary btn-sm">Détail</a>
-                            <a href="/paie-me/paies/<?= $p['id'] ?>/journal" class="btn btn-secondary btn-sm">Journal</a>
-                            <?php if (!$p['cloturee']): ?>
-                                <a href="/paie-me/paies/<?= $p['id'] ?>/calculate" class="btn btn-secondary btn-sm" onclick="return confirm('Recalculer les paies pour cette période ?')">Recalculer</a>
-                                <a href="/paie-me/paies/<?= $p['id'] ?>/cloturer" class="btn btn-danger btn-sm" onclick="return confirm('Clôturer cette période ? Cette action est irréversible.')">Clôturer</a>
-                            <?php endif; ?>
+                        <td>
+                            <div class="table-actions">
+                                <a href="/paie-me/paies/<?= $p['id'] ?>/lignes" class="btn btn-secondary btn-sm">Détail</a>
+                                <a href="/paie-me/paies/<?= $p['id'] ?>/journal" class="btn btn-secondary btn-sm">Journal</a>
+                                <?php if (!$p['cloturee']): ?>
+                                    <a href="/paie-me/paies/<?= $p['id'] ?>/calculate" class="btn btn-secondary btn-sm" onclick="return confirm('Recalculer les paies pour cette période ?')">Recalculer</a>
+                                    <a href="/paie-me/paies/<?= $p['id'] ?>/cloturer" class="btn btn-danger btn-sm" onclick="return confirm('Clôturer cette période ? Cette action est irréversible.')">Clôturer</a>
+                                <?php endif; ?>
+                            </div>
                         </td>
                     </tr>
                     <?php endforeach; ?>

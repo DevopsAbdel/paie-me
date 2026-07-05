@@ -85,9 +85,11 @@ $baseUrl = '/paie-me/societes/' . $societe['id'];
                     <td><?= htmlspecialchars($s['fonction_nom'] ?? $s['poste']) ?></td>
                     <td><?= number_format($s['salaire_base'], 2, ',', ' ') ?></td>
                     <td><?= htmlspecialchars($s['cnss']) ?></td>
-                    <td class="table-actions">
-                        <a href="/paie-me/salaries/<?= $s['id'] ?>/edit?from_societe=<?= $societe['id'] ?>" class="btn btn-secondary btn-sm">Modifier</a>
-                        <a href="/paie-me/salaries/<?= $s['id'] ?>/delete" class="btn btn-danger btn-sm" onclick="return confirm('Supprimer ?')">Supprimer</a>
+                    <td>
+                        <div class="table-actions">
+                            <a href="/paie-me/salaries/<?= $s['id'] ?>/edit?from_societe=<?= $societe['id'] ?>" class="btn btn-secondary btn-sm">Modifier</a>
+                            <a href="/paie-me/salaries/<?= $s['id'] ?>/delete" class="btn btn-danger btn-sm" onclick="return confirm('Supprimer ?')">Supprimer</a>
+                        </div>
                     </td>
                 </tr>
                 <?php endforeach; ?>
@@ -120,8 +122,10 @@ $baseUrl = '/paie-me/societes/' . $societe['id'];
                     <td><?= $p['date_debut'] ?></td><td><?= $p['date_fin'] ?></td>
                     <td><?= (int) $p['nb_paies'] ?></td>
                     <td><span class="badge badge-<?= $p['cloturee'] ? 'success' : 'warning' ?>"><?= $p['cloturee'] ? 'Clôturée' : 'En cours' ?></span></td>
-                    <td class="table-actions">
-                        <a href="/paie-me/paies/<?= $p['id'] ?>/calculate" class="btn btn-secondary btn-sm" onclick="return confirm('Recalculer ?')">Recalculer</a>
+                    <td>
+                        <div class="table-actions">
+                            <a href="/paie-me/paies/<?= $p['id'] ?>/calculate" class="btn btn-secondary btn-sm" onclick="return confirm('Recalculer ?')">Recalculer</a>
+                        </div>
                     </td>
                 </tr>
                 <?php endforeach; ?>
@@ -155,9 +159,11 @@ $baseUrl = '/paie-me/societes/' . $societe['id'];
                     <td><?= htmlspecialchars($b['nom_famille']) ?> <?= htmlspecialchars($b['prenom']) ?></td>
                     <td><?= number_format($b['salaire_brut'], 2, ',', ' ') ?></td>
                     <td><strong style="color:var(--accent);"><?= number_format($b['net_a_payer'], 2, ',', ' ') ?></strong></td>
-                    <td class="table-actions">
-                        <a href="/paie-me/bulletins/<?= $b['id'] ?>" class="btn btn-secondary btn-sm">Voir</a>
-                        <a href="/paie-me/bulletins/<?= $b['id'] ?>/pdf" class="btn btn-primary btn-sm" target="_blank">PDF</a>
+                    <td>
+                        <div class="table-actions">
+                            <a href="/paie-me/bulletins/<?= $b['id'] ?>" class="btn btn-secondary btn-sm">Voir</a>
+                            <a href="/paie-me/bulletins/<?= $b['id'] ?>/pdf" class="btn btn-primary btn-sm" target="_blank">PDF</a>
+                        </div>
                     </td>
                 </tr>
                 <?php endforeach; ?>
@@ -189,8 +195,10 @@ $baseUrl = '/paie-me/societes/' . $societe['id'];
                         <td><?= str_pad($p['mois'], 2, '0', STR_PAD_LEFT) ?>/<?= $p['annee'] ?></td>
                         <td><?= (int)$p['nb_paies'] ?></td>
                         <td><span class="badge badge-<?= $p['cloturee'] ? 'success' : 'warning' ?>"><?= $p['cloturee'] ? 'Clôturée' : 'En cours' ?></span></td>
-                        <td class="table-actions">
-                            <a href="/paie-me/damancom/generate?periode_id=<?= $p['id'] ?>&from_societe=<?= $societe['id'] ?>" class="btn btn-secondary btn-sm">DS</a>
+                        <td>
+                            <div class="table-actions">
+                                <a href="/paie-me/damancom/generate?periode_id=<?= $p['id'] ?>&from_societe=<?= $societe['id'] ?>" class="btn btn-secondary btn-sm">DS</a>
+                            </div>
                         </td>
                     </tr>
                     <?php endforeach; ?>
@@ -246,8 +254,10 @@ $baseUrl = '/paie-me/societes/' . $societe['id'];
                         <td><?= $key ?></td>
                         <td><?= (int)$p['nb_paies'] ?></td>
                         <td><strong style="color:var(--accent);"><?= number_format($irByPeriode[$key]['total_ir'] ?? 0, 2, ',', ' ') ?> MAD</strong></td>
-                        <td class="table-actions">
-                            <a href="/paie-me/ir/export?periode_id=<?= $p['id'] ?>" class="btn btn-secondary btn-sm">CSV</a>
+                        <td>
+                            <div class="table-actions">
+                                <a href="/paie-me/ir/export?periode_id=<?= $p['id'] ?>" class="btn btn-secondary btn-sm">CSV</a>
+                            </div>
                         </td>
                     </tr>
                     <?php endforeach; ?>

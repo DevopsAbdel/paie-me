@@ -70,6 +70,18 @@ IR   = (SNI × taux) - déduction (barème progressif 2025)
 Net  = salaire - (CNSS + AMO + IR)
 ```
 
+## Règles CSS — Tableaux
+- **Ne jamais mettre `display: flex` directement sur un `<td>`.** Cela casse le comportement natif `table-cell` et désaligne les bordures de ligne. Toujours utiliser un `<div>` interne :
+  ```html
+  <td>
+      <div class="table-actions">
+          <a href="..." class="btn btn-sm">Action</a>
+      </div>
+  </td>
+  ```
+- La classe `.table-actions` applique `display: flex; align-items: center; gap: 0.35rem; white-space: nowrap;`.
+- Les boutons dans `.table-actions` utilisent `.btn-sm` avec `padding: 0.25rem 0.5rem; font-size: 0.75rem;`.
+
 ## Encodage UTF-8 — RÈGLE CRITIQUE
 - **Tous les fichiers PHP, SQL, CSS, JS** doivent être **sauvés en UTF-8 sans BOM**.
 - **Toute donnée contenant des accents français** (`é`, `è`, `ê`, `ë`, `à`, `â`, `ù`, `û`, `ô`, `î`, `ç`, `É`, `È`, etc.) doit être **validée** avant insertion.

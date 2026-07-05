@@ -33,8 +33,10 @@
                         <td><?= number_format($b['salaire_brut'], 2, ',', ' ') ?></td>
                         <td><strong><?= number_format($b['net_a_payer'], 2, ',', ' ') ?></strong></td>
                         <td><?= $b['date_emission'] ?></td>
-                        <td class="table-actions">
-                            <a href="/paie-me/bulletins/<?= $b['id'] ?>" class="btn btn-secondary btn-sm">Voir</a>
+                        <td>
+                            <div class="table-actions">
+                                <a href="/paie-me/bulletins/<?= $b['id'] ?>" class="btn btn-secondary btn-sm">Voir</a>
+                            </div>
                         </td>
                     </tr>
                     <?php endforeach; ?>

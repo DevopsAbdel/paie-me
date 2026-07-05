@@ -48,8 +48,10 @@
                         <td><?= number_format($pa['amo_salariale'], 2, ',', ' ') ?></td>
                         <td><?= number_format($pa['ir'], 2, ',', ' ') ?></td>
                         <td><strong><?= number_format($pa['net_a_payer'], 2, ',', ' ') ?></strong></td>
-                        <td class="table-actions">
-                            <a href="/paie-me/paies/paie/<?= $pa['id'] ?>/edit" class="btn btn-secondary btn-sm">HS</a>
+                        <td>
+                            <div class="table-actions">
+                                <a href="/paie-me/paies/paie/<?= $pa['id'] ?>/edit" class="btn btn-secondary btn-sm">HS</a>
+                            </div>
                         </td>
                     </tr>
                     <?php endforeach; ?>

@@ -276,7 +276,15 @@ tbody tr:hover {
 
 .table-actions {
     display: flex;
-    gap: 0.5rem;
+    align-items: center;
+    gap: 0.35rem;
+    white-space: nowrap;
+}
+
+.table-actions .btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    line-height: 1.2;
 }
 
 /* ── Forms ── */
