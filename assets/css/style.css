@@ -193,6 +193,51 @@ a:hover {
     font-size: 0.8125rem;
 }
 
+.btn-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.35rem;
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    line-height: 1;
+    width: 30px;
+    height: 30px;
+}
+
+.btn-icon:hover {
+    background: var(--bg-hover);
+    color: var(--text);
+    border-color: var(--accent);
+}
+
+.btn-danger-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.35rem;
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    line-height: 1;
+    width: 30px;
+    height: 30px;
+    text-decoration: none;
+}
+
+.btn-danger-icon:hover {
+    background: rgba(239, 68, 68, 0.15);
+    color: var(--danger);
+    border-color: var(--danger);
+}
+
 /* ── Cards ── */
 .card {
     background: var(--bg-surface);
@@ -200,6 +245,7 @@ a:hover {
     border-radius: 10px;
     padding: 1.5rem;
     margin-bottom: 1.5rem;
+    color: var(--text);
 }
 
 .card-header {
@@ -246,6 +292,21 @@ a:hover {
 /* ── Tables ── */
 .table-wrapper {
     overflow-x: auto;
+    padding-bottom: 1px;
+}
+.table-wrapper::-webkit-scrollbar {
+    height: 10px;
+}
+.table-wrapper::-webkit-scrollbar-track {
+    background: #1e293b;
+    border-radius: 5px;
+}
+.table-wrapper::-webkit-scrollbar-thumb {
+    background: #475569;
+    border-radius: 5px;
+}
+.table-wrapper::-webkit-scrollbar-thumb:hover {
+    background: #64748b;
 }
 
 table {
@@ -268,6 +329,7 @@ tbody td {
     padding: 0.75rem 1rem;
     border-bottom: 1px solid var(--border);
     font-size: 0.875rem;
+    color: var(--text);
 }
 
 tbody tr:hover {
@@ -548,4 +610,106 @@ body:has(.login-wrapper) {
 
 .inline-form button {
     cursor: pointer;
+}
+
+/* ── Bootstrap Modal Dark Overrides ── */
+.modal-content {
+    background: var(--bg-surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+}
+.modal-header {
+    border-bottom: 1px solid var(--border);
+}
+.modal-header .btn-close {
+    filter: invert(1);
+}
+.modal-footer {
+    border-top: 1px solid var(--border);
+}
+.modal-body .form-control,
+.modal-body .form-select {
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+    color: var(--text);
+}
+.modal-body .form-control:focus,
+.modal-body .form-select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.25);
+}
+.modal-body .form-control::placeholder {
+    color: var(--text-muted);
+}
+.modal-body .form-check-input {
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+}
+.modal-body .form-check-input:checked {
+    background: var(--accent);
+    border-color: var(--accent);
+}
+.form-check-label {
+    color: var(--text);
+    font-size: 0.875rem;
+}
+.modal-body select.form-select option {
+    background: var(--bg-surface);
+    color: var(--text);
+}
+
+/* ── Custom Toast ── */
+.toast-container {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    pointer-events: none;
+}
+.custom-toast {
+    pointer-events: auto;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    min-width: 280px;
+    max-width: 420px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    animation: toast-in 0.3s ease-out;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.custom-toast.toast-success {
+    background: #14532d;
+    border: 1px solid var(--success);
+    color: #bbf7d0;
+}
+.custom-toast.toast-error {
+    background: #450a0a;
+    border: 1px solid var(--danger);
+    color: #fecaca;
+}
+.custom-toast .toast-close {
+    margin-left: auto;
+    cursor: pointer;
+    opacity: 0.7;
+    background: none;
+    border: none;
+    color: inherit;
+    font-size: 1.1rem;
+    line-height: 1;
+}
+.custom-toast .toast-close:hover {
+    opacity: 1;
+}
+@keyframes toast-in {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+.toast-container:empty {
+    display: none;
 }

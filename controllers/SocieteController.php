@@ -323,9 +323,51 @@ class SocieteController extends Controller
                 }
             } elseif ($sousTab === 'gains') {
                 if (!empty($_POST['code'])) {
-                    $stmt = $this->db->prepare("INSERT INTO rubriques_gains (societe_id, code, libelle, type_montant, valeur_defaut) VALUES (?, ?, ?, ?, ?)");
-                    $stmt->execute([$id, $_POST['code'], $_POST['libelle'], $_POST['type_montant'] ?? 'fixe', $_POST['valeur_defaut'] ?? 0]);
-                    Session::setFlash('success', 'Gain ajouté.');
+                    $gainId = !empty($_POST['gain_id']) ? (int)$_POST['gain_id'] : null;
+                    $p = function($k, $d = null) { return $_POST[$k] ?? $d; };
+                    $fields = [
+                        'code' => $p('code'),
+                        'libelle' => $p('libelle'),
+                        'type_montant' => $p('type_montant', 'fixe'),
+                        'valeur_defaut' => $p('valeur_defaut', 0),
+                        'categorie' => $p('categorie'),
+                        'compte' => $p('compte'),
+                        'justificatifs' => $p('justificatifs'),
+                        'source' => $p('source'),
+                        'nature_edi' => $p('nature_edi'),
+                        'actif' => (int)$p('actif', 0),
+                        'is_global' => (int)$p('is_global', 0),
+                        'base_anciennete' => (int)$p('base_anciennete', 0),
+                        'au_prorata' => (int)$p('au_prorata', 0),
+                        'imposable_ir' => (int)$p('imposable_ir', 0),
+                        'imposable_cnss' => (int)$p('imposable_cnss', 0),
+                        'plafond_dgi_actif' => (int)$p('plafond_dgi_actif', 0),
+                        'plafond_dgi_valeur' => $p('plafond_dgi_valeur'),
+                        'plafond_dgi_type' => $p('plafond_dgi_type'),
+                        'plafond_cnss_actif' => (int)$p('plafond_cnss_actif', 0),
+                        'plafond_cnss_valeur' => $p('plafond_cnss_valeur'),
+                        'plafond_cnss_type' => $p('plafond_cnss_type'),
+                    ];
+                    if ($gainId) {
+                        $sql = "UPDATE rubriques_gains SET " . implode(', ', array_map(fn($k) => "$k=?", array_keys($fields))) . " WHERE id=? AND (societe_id=? OR societe_id IS NULL)";
+                        $stmt = $this->db->prepare($sql);
+                        $stmt->execute([...array_values($fields), $gainId, $id]);
+                        $msg = 'Rubrique modifiée.';
+                    } else {
+                        $fields['societe_id'] = $id;
+                        $cols = array_keys($fields);
+                        $vals = array_values($fields);
+                        $sql = "INSERT INTO rubriques_gains (" . implode(',', $cols) . ") VALUES (" . implode(',', array_fill(0, count($cols), '?')) . ")";
+                        $stmt = $this->db->prepare($sql);
+                        $stmt->execute($vals);
+                        $msg = 'Rubrique ajoutée.';
+                    }
+                    if (($p('format') ?? '') === 'json') {
+                        header('Content-Type: application/json');
+                        echo json_encode(['success' => true, 'message' => $msg]);
+                        exit;
+                    }
+                    Session::setFlash('success', $msg);
                 }
             } elseif ($sousTab === 'retenues') {
                 if (!empty($_POST['code'])) {

@@ -208,4 +208,30 @@ addCol($p, 'parametres_cnss_amo', 'penalite_amo_taux DECIMAL(5,2) NOT NULL DEFAU
 addCol($p, 'parametres_cnss_amo', 'astreinte_cnss_par_salarie DECIMAL(10,2) NOT NULL DEFAULT 50.00 AFTER penalite_amo_taux');
 addCol($p, 'parametres_cnss_amo', 'astreinte_amo_par_salarie DECIMAL(10,2) NOT NULL DEFAULT 100.00 AFTER astreinte_cnss_par_salarie');
 
+addCol($p, 'rubriques_gains', 'compte VARCHAR(20) DEFAULT NULL AFTER affectation');
+addCol($p, 'rubriques_gains', 'plafond_dgi_actif TINYINT(1) NOT NULL DEFAULT 0 AFTER justificatifs');
+addCol($p, 'rubriques_gains', 'plafond_dgi_valeur DECIMAL(10,2) DEFAULT NULL AFTER plafond_dgi_actif');
+addCol($p, 'rubriques_gains', 'plafond_dgi_type VARCHAR(50) DEFAULT NULL AFTER plafond_dgi_valeur');
+addCol($p, 'rubriques_gains', 'plafond_cnss_actif TINYINT(1) NOT NULL DEFAULT 0 AFTER plafond_dgi_type');
+addCol($p, 'rubriques_gains', 'plafond_cnss_valeur DECIMAL(10,2) DEFAULT NULL AFTER plafond_cnss_actif');
+addCol($p, 'rubriques_gains', 'plafond_cnss_type VARCHAR(50) DEFAULT NULL AFTER plafond_cnss_valeur');
+addCol($p, 'rubriques_gains', 'source VARCHAR(50) DEFAULT NULL AFTER plafond_cnss_type');
+addCol($p, 'rubriques_gains', 'nature_edi VARCHAR(100) DEFAULT NULL AFTER source');
+addCol($p, 'rubriques_gains', 'base_anciennete TINYINT(1) NOT NULL DEFAULT 0 AFTER nature_edi');
+addCol($p, 'rubriques_gains', 'au_prorata TINYINT(1) NOT NULL DEFAULT 0 AFTER base_anciennete');
+addCol($p, 'rubriques_gains', 'imposable_ir TINYINT(1) NOT NULL DEFAULT 1 AFTER au_prorata');
+addCol($p, 'rubriques_gains', 'imposable_cnss TINYINT(1) NOT NULL DEFAULT 1 AFTER imposable_ir');
+
+// Modifier type_montant pour inclure 'calcule'
+try {
+    $p->exec("ALTER TABLE rubriques_gains MODIFY COLUMN type_montant ENUM('fixe','proportionnel','calcule') NOT NULL DEFAULT 'fixe'");
+    echo "  + type_montant: ajouté 'calcule'\n";
+} catch (\PDOException $e) {
+    // déjà modifié
+}
+
+// Copier affectation → compte pour les anciens enregistrements
+$count = $p->exec("UPDATE rubriques_gains SET compte = affectation WHERE (compte IS NULL OR compte = '') AND (affectation IS NOT NULL AND affectation != '')");
+if ($count > 0) echo "  + $count enregistrements: affectation → compte\n";
+
 echo "\nMigrations terminées.\n";
