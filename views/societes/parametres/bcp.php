@@ -19,12 +19,12 @@ $total_general = $total_premier + $total_amo;
 ?>
 
 <div class="card">
-    <div class="card-header"><h3>Bordereau 1 : Cotisations CNSS + Taxe de Formation Professionnelle</h3></div>
+    <div class="card-header"><h3>BCP — Bordereau 1 : Cotisations CNSS + Taxe de Formation Professionnelle</h3></div>
     <p style="font-size:0.8125rem; color:var(--text-muted); margin:0 0 0.75rem 0;">Basé sur une masse salariale de <?= number_format($masse, 2, ',', ' ') ?> MAD et les taux configurés dans <a href="<?= $baseUrl ?>/cnss_amo" style="color:var(--accent);">Taux CNSS & AMO</a></p>
     <div class="table-wrapper">
         <table>
             <thead>
-                <tr><th style="width:50px;">C</th><th>Nature des prestations</th><th style="width:140px; text-align:right;">Masse salariale</th><th style="width:80px; text-align:right;">Taux</th><th style="width:120px; text-align:right;">Montant</th></tr>
+                <tr><th style="width:50px;">C</th><th>Nature des prestations</th><th style="width:140px; text-align:right; white-space:nowrap;">Masse salariale</th><th style="width:80px; text-align:right;">Taux</th><th style="width:120px; text-align:right;">Montant</th></tr>
             </thead>
             <tbody>
                 <tr><td>1</td><td>Allocations Familiales</td><td style="text-align:right; white-space:nowrap;"><?= number_format($masse, 2, ',', ' ') ?></td><td style="text-align:right; white-space:nowrap;"><?= number_format($taux_af, 2, ',', ' ') ?> %</td><td style="text-align:right; font-weight:600; white-space:nowrap;"><?= number_format($mt_af, 2, ',', ' ') ?></td></tr>
@@ -42,11 +42,11 @@ $total_general = $total_premier + $total_amo;
 </div>
 
 <div class="card" style="margin-top:0.75rem;">
-    <div class="card-header"><h3>Bordereau 2 : Cotisations AMO</h3></div>
+    <div class="card-header"><h3>BCP — Bordereau 2 : Cotisations AMO</h3></div>
     <div class="table-wrapper">
         <table>
             <thead>
-                <tr><th style="width:50px;">C</th><th>Nature des prestations</th><th style="width:140px; text-align:right;">Masse salariale</th><th style="width:80px; text-align:right;">Taux</th><th style="width:120px; text-align:right;">Montant</th></tr>
+                <tr><th style="width:50px;">C</th><th>Nature des prestations</th><th style="width:140px; text-align:right; white-space:nowrap;">Masse salariale</th><th style="width:80px; text-align:right;">Taux</th><th style="width:120px; text-align:right;">Montant</th></tr>
             </thead>
             <tbody>
                 <tr><td>1</td><td>Participation AMO</td><td style="text-align:right; white-space:nowrap;"><?= number_format($masse, 2, ',', ' ') ?></td><td style="text-align:right; white-space:nowrap;"><?= number_format($taux_part_amo, 2, ',', ' ') ?> %</td><td style="text-align:right; font-weight:600; white-space:nowrap;"><?= number_format($mt_part_amo, 2, ',', ' ') ?></td></tr>
@@ -60,11 +60,11 @@ $total_general = $total_premier + $total_amo;
 </div>
 
 <div class="card" style="margin-top:0.75rem;">
-    <div class="card-header"><h3>Tableau récapitulatif des cotisations</h3></div>
+    <div class="card-header"><h3>BCP — Tableau récapitulatif des cotisations</h3></div>
     <div class="table-wrapper">
         <table>
             <thead>
-                <tr><th style="width:80px;">Bordereau</th><th style="width:50px;">C</th><th>Nature des prestations</th><th style="width:140px; text-align:right;">Masse salariale</th><th style="width:80px; text-align:right;">Taux</th><th style="width:120px; text-align:right;">Montant</th></tr>
+                <tr><th style="width:80px;">Bordereau</th><th style="width:50px;">C</th><th>Nature des prestations</th><th style="width:140px; text-align:right; white-space:nowrap;">Masse salariale</th><th style="width:80px; text-align:right;">Taux</th><th style="width:120px; text-align:right;">Montant</th></tr>
             </thead>
             <tbody>
                 <tr><td>CNSS</td><td>1</td><td>Allocations Familiales</td><td style="text-align:right; white-space:nowrap;"><?= number_format($masse, 2, ',', ' ') ?></td><td style="text-align:right; white-space:nowrap;"><?= number_format($taux_af, 2, ',', ' ') ?> %</td><td style="text-align:right; font-weight:600; white-space:nowrap;"><?= number_format($mt_af, 2, ',', ' ') ?></td></tr>
@@ -75,12 +75,11 @@ $total_general = $total_premier + $total_amo;
             </tbody>
         </table>
     </div>
-    <p style="font-size:0.9375rem; margin-top:0.75rem; text-align:center;">
-        <strong>Total des cotisations (CNSS + AMO) :</strong>
-        <span style="color:var(--accent); font-weight:700; font-size:1.05rem;"><?= number_format($total_cotisations, 2, ',', ' ') ?></span>
-    </p>
-    <p style="font-size:0.9375rem; text-align:center;">
-        <strong>Montant global des versements (incluant TFP) :</strong>
-        <span style="color:var(--accent); font-weight:700; font-size:1.05rem;"><?= number_format($total_general, 2, ',', ' ') ?></span>
-    </p>
+</div>
+
+<div class="card" style="margin-top:0.75rem; background:linear-gradient(135deg, rgba(59,130,246,0.15), rgba(59,130,246,0.05)); border-color:var(--accent);">
+    <div class="card-header"><h3 style="color:var(--accent);">BCP — Montant global des versements (incluant TFP)</h3></div>
+    <div style="text-align:center; padding:0.75rem;">
+        <span style="font-size:1.5rem; font-weight:700; color:var(--accent);"><?= number_format($total_general, 2, ',', ' ') ?> MAD</span>
+    </div>
 </div>
