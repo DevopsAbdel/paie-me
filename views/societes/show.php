@@ -214,8 +214,13 @@ $baseUrl = '/paie-me/societes/' . $societe['id'];
                 <thead>
                     <tr>
                         <th>Période</th><th>Salariés</th><th>Statut</th>
-                        <th>Pénalités CNSS</th><th>Pénalités TFP</th><th>Pénalités AMO</th>
+                        <th colspan="3" style="text-align:center; border-bottom:2px solid var(--border);">Pénalités (MAD)</th>
                         <th>Actions</th>
+                    </tr>
+                    <tr>
+                        <th colspan="3"></th>
+                        <th>Cotisations CNSS</th><th>TFP</th><th>Cotisations AMO et astreintes</th>
+                        <th></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -252,7 +257,14 @@ $baseUrl = '/paie-me/societes/' . $societe['id'];
                             </form>
                         </td>
                         <td>
-                            <div class="table-actions">
+                            <div class="table-actions" style="flex-wrap:wrap;">
+                                <form method="POST" action="/paie-me/societes/<?= $societe['id'] ?>/parametres/cnss_amo" style="display:flex; align-items:center; gap:0.2rem;">
+                                    <?= \Core\Session::csrfField() ?>
+                                    <input type="hidden" name="sous_tab" value="calcul_penalites">
+                                    <input type="hidden" name="periode_id" value="<?= $p['id'] ?>">
+                                    <input type="number" name="mois_retard" placeholder="Mois retard" min="1" max="120" style="width:70px; padding:0.2rem 0.3rem; font-size:0.7rem; background:var(--bg-tertiary); color:var(--text); border:1px solid var(--border); border-radius:4px;">
+                                    <button type="submit" class="btn btn-secondary btn-sm" style="padding:0.25rem 0.4rem; font-size:0.7rem;">Calc</button>
+                                </form>
                                 <a href="/paie-me/damancom/generate?periode_id=<?= $p['id'] ?>&from_societe=<?= $societe['id'] ?>" class="btn btn-secondary btn-sm">DS</a>
                             </div>
                         </td>

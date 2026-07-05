@@ -198,4 +198,14 @@ addCol($p, 'parametres_cnss_amo', 'taux_penalites_cnss DECIMAL(5,2) NOT NULL DEF
 addCol($p, 'parametres_cnss_amo', 'taux_penalites_tfp DECIMAL(5,2) NOT NULL DEFAULT 0.00 AFTER taux_penalites_cnss');
 addCol($p, 'parametres_cnss_amo', 'taux_penalites_amo DECIMAL(5,2) NOT NULL DEFAULT 0.00 AFTER taux_penalites_tfp');
 
+// === Taux total AMO cotisation ===
+addCol($p, 'parametres_cnss_amo', 'taux_amo_total DECIMAL(5,2) NOT NULL DEFAULT 6.37 AFTER taux_amo_patronal');
+
+// === Détail des pénalités (règles marocaines) ===
+addCol($p, 'parametres_cnss_amo', 'penalite_cnss_premier_mois DECIMAL(5,2) NOT NULL DEFAULT 3.00 AFTER taux_penalites_amo');
+addCol($p, 'parametres_cnss_amo', 'penalite_cnss_mois_suivants DECIMAL(5,2) NOT NULL DEFAULT 0.50 AFTER penalite_cnss_premier_mois');
+addCol($p, 'parametres_cnss_amo', 'penalite_amo_taux DECIMAL(5,2) NOT NULL DEFAULT 1.00 AFTER penalite_cnss_mois_suivants');
+addCol($p, 'parametres_cnss_amo', 'astreinte_cnss_par_salarie DECIMAL(10,2) NOT NULL DEFAULT 50.00 AFTER penalite_amo_taux');
+addCol($p, 'parametres_cnss_amo', 'astreinte_amo_par_salarie DECIMAL(10,2) NOT NULL DEFAULT 100.00 AFTER astreinte_cnss_par_salarie');
+
 echo "\nMigrations terminées.\n";

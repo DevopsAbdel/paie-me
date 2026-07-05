@@ -244,9 +244,9 @@ class SocieteController extends Controller
                 Session::setFlash('success', 'Barème IR mis à jour.');
             } elseif ($sousTab === 'cnss_amo') {
                 $stmt = $this->db->prepare("
-                    INSERT INTO parametres_cnss_amo (societe_id, plafond_cnss, taux_cnss_salarial, taux_cnss_patronal, taux_amo_salarial, taux_amo_patronal, taux_allocations_familiales, taux_prestations_sociales, taxe_formation, participation_amo, taux_penalites_cnss, taux_penalites_tfp, taux_penalites_amo)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                    ON DUPLICATE KEY UPDATE plafond_cnss=VALUES(plafond_cnss), taux_cnss_salarial=VALUES(taux_cnss_salarial), taux_cnss_patronal=VALUES(taux_cnss_patronal), taux_amo_salarial=VALUES(taux_amo_salarial), taux_amo_patronal=VALUES(taux_amo_patronal), taux_allocations_familiales=VALUES(taux_allocations_familiales), taux_prestations_sociales=VALUES(taux_prestations_sociales), taxe_formation=VALUES(taxe_formation), participation_amo=VALUES(participation_amo), taux_penalites_cnss=VALUES(taux_penalites_cnss), taux_penalites_tfp=VALUES(taux_penalites_tfp), taux_penalites_amo=VALUES(taux_penalites_amo)
+                    INSERT INTO parametres_cnss_amo (societe_id, plafond_cnss, taux_cnss_salarial, taux_cnss_patronal, taux_amo_salarial, taux_amo_patronal, taux_amo_total, taux_allocations_familiales, taux_prestations_sociales, taxe_formation, participation_amo, taux_penalites_cnss, taux_penalites_tfp, taux_penalites_amo, penalite_cnss_premier_mois, penalite_cnss_mois_suivants, penalite_amo_taux, astreinte_cnss_par_salarie, astreinte_amo_par_salarie)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ON DUPLICATE KEY UPDATE plafond_cnss=VALUES(plafond_cnss), taux_cnss_salarial=VALUES(taux_cnss_salarial), taux_cnss_patronal=VALUES(taux_cnss_patronal), taux_amo_salarial=VALUES(taux_amo_salarial), taux_amo_patronal=VALUES(taux_amo_patronal), taux_amo_total=VALUES(taux_amo_total), taux_allocations_familiales=VALUES(taux_allocations_familiales), taux_prestations_sociales=VALUES(taux_prestations_sociales), taxe_formation=VALUES(taxe_formation), participation_amo=VALUES(participation_amo), taux_penalites_cnss=VALUES(taux_penalites_cnss), taux_penalites_tfp=VALUES(taux_penalites_tfp), taux_penalites_amo=VALUES(taux_penalites_amo), penalite_cnss_premier_mois=VALUES(penalite_cnss_premier_mois), penalite_cnss_mois_suivants=VALUES(penalite_cnss_mois_suivants), penalite_amo_taux=VALUES(penalite_amo_taux), astreinte_cnss_par_salarie=VALUES(astreinte_cnss_par_salarie), astreinte_amo_par_salarie=VALUES(astreinte_amo_par_salarie)
                 ");
                 $stmt->execute([
                     $id,
@@ -255,6 +255,7 @@ class SocieteController extends Controller
                     $_POST['taux_cnss_patronal'] ?? 8.98,
                     $_POST['taux_amo_salarial'] ?? 2.26,
                     $_POST['taux_amo_patronal'] ?? 4.11,
+                    $_POST['taux_amo_total'] ?? 6.37,
                     $_POST['taux_allocations_familiales'] ?? 6.40,
                     $_POST['taux_prestations_sociales'] ?? 13.46,
                     $_POST['taxe_formation'] ?? 1.60,
@@ -262,6 +263,11 @@ class SocieteController extends Controller
                     $_POST['taux_penalites_cnss'] ?? 0,
                     $_POST['taux_penalites_tfp'] ?? 0,
                     $_POST['taux_penalites_amo'] ?? 0,
+                    $_POST['penalite_cnss_premier_mois'] ?? 3.00,
+                    $_POST['penalite_cnss_mois_suivants'] ?? 0.50,
+                    $_POST['penalite_amo_taux'] ?? 1.00,
+                    $_POST['astreinte_cnss_par_salarie'] ?? 50.00,
+                    $_POST['astreinte_amo_par_salarie'] ?? 100.00,
                 ]);
                 Session::setFlash('success', 'Taux CNSS/AMO mis à jour.');
                 } elseif ($sousTab === 'penalites') {
@@ -278,6 +284,32 @@ class SocieteController extends Controller
                     }
                     $this->redirect('/paie-me/societes/' . $id . '?tab=cnss');
                     return;
+            } elseif ($sousTab === 'calcul_penalites') {
+                $periodeId = (int) ($_POST['periode_id'] ?? 0);
+                $moisRetard = (int) ($_POST['mois_retard'] ?? 0);
+                if ($periodeId && $moisRetard > 0) {
+                    $params = $this->db->query("SELECT * FROM parametres_cnss_amo WHERE societe_id = $id")->fetch();
+                    if (!$params) $params = ['penalite_cnss_premier_mois'=>3.00,'penalite_cnss_mois_suivants'=>0.50,'penalite_amo_taux'=>1.00,'astreinte_cnss_par_salarie'=>50.00,'astreinte_amo_par_salarie'=>100.00,'taux_penalites_tfp'=>0];
+                    $nbSalaries = (int) $this->db->query("SELECT COUNT(*) FROM paies WHERE periode_id = $periodeId")->fetchColumn();
+                    $totalCNSS = (float) $this->db->query("SELECT COALESCE(SUM(cnss),0) FROM paies WHERE periode_id = $periodeId")->fetchColumn();
+                    $totalAMO = (float) $this->db->query("SELECT COALESCE(SUM(amo),0) FROM paies WHERE periode_id = $periodeId")->fetchColumn();
+                    $totalTFP = (float) $this->db->query("SELECT COALESCE(SUM(tfp),0) FROM paies WHERE periode_id = $periodeId")->fetchColumn();
+
+                    $penaliteCNSS = $totalCNSS * ($params['penalite_cnss_premier_mois'] / 100);
+                    if ($moisRetard > 1) {
+                        $penaliteCNSS += $totalCNSS * ($params['penalite_cnss_mois_suivants'] / 100) * ($moisRetard - 1);
+                    }
+                    $penaliteCNSS += $params['astreinte_cnss_par_salarie'] * $moisRetard * $nbSalaries;
+                    $penaliteAMO = $totalAMO * ($params['penalite_amo_taux'] / 100) * $moisRetard;
+                    $penaliteAMO += $params['astreinte_amo_par_salarie'] * $moisRetard * $nbSalaries;
+                    $penaliteTFP = $totalTFP * ($params['taux_penalites_tfp'] / 100) * $moisRetard;
+
+                    $stmt = $this->db->prepare("UPDATE periodes SET penalites_cnss=?, penalites_tfp=?, penalites_amo=? WHERE id=? AND societe_id=?");
+                    $stmt->execute([round($penaliteCNSS, 2), round($penaliteTFP, 2), round($penaliteAMO, 2), $periodeId, $id]);
+                    Session::setFlash('success', 'Pénalités calculées automatiquement.');
+                }
+                $this->redirect('/paie-me/societes/' . $id . '?tab=cnss');
+                return;
             } elseif ($sousTab === 'services') {
                 if (!empty($_POST['service_nom'])) {
                     $stmt = $this->db->prepare("INSERT INTO services (societe_id, nom, description) VALUES (?, ?, ?)");
@@ -339,7 +371,7 @@ class SocieteController extends Controller
         $baremeMensuel = $this->db->query("SELECT * FROM bareme_ir WHERE type='mensuel' ORDER BY `min`")->fetchAll();
         $baremeAnnuel  = $this->db->query("SELECT * FROM bareme_ir WHERE type='annuel' ORDER BY `min`")->fetchAll();
         $cnssParams = $this->db->query("SELECT * FROM parametres_cnss_amo WHERE societe_id = $id")->fetch();
-        if (!$cnssParams) $cnssParams = ['plafond_cnss'=>6000,'taux_cnss_salarial'=>4.48,'taux_cnss_patronal'=>8.98,'taux_amo_salarial'=>2.26,'taux_amo_patronal'=>4.11,'taux_allocations_familiales'=>6.40,'taux_prestations_sociales'=>13.46,'taxe_formation'=>1.60,'participation_amo'=>1.85,'taux_penalites_cnss'=>0,'taux_penalites_tfp'=>0,'taux_penalites_amo'=>0];
+        if (!$cnssParams) $cnssParams = ['plafond_cnss'=>6000,'taux_cnss_salarial'=>4.48,'taux_cnss_patronal'=>8.98,'taux_amo_salarial'=>2.26,'taux_amo_patronal'=>4.11,'taux_amo_total'=>6.37,'taux_allocations_familiales'=>6.40,'taux_prestations_sociales'=>13.46,'taxe_formation'=>1.60,'participation_amo'=>1.85,'taux_penalites_cnss'=>0,'taux_penalites_tfp'=>0,'taux_penalites_amo'=>0,'penalite_cnss_premier_mois'=>3.00,'penalite_cnss_mois_suivants'=>0.50,'penalite_amo_taux'=>1.00,'astreinte_cnss_par_salarie'=>50.00,'astreinte_amo_par_salarie'=>100.00];
         $services = $this->db->query("SELECT * FROM services WHERE societe_id = $id ORDER BY nom")->fetchAll();
         $fonctions = $this->db->query("SELECT f.*, s.nom as service_nom FROM fonctions f LEFT JOIN services s ON f.service_id = s.id WHERE f.societe_id = $id ORDER BY s.nom, f.nom")->fetchAll();
         $gains = $this->db->query("SELECT * FROM rubriques_gains WHERE (societe_id IS NULL OR societe_id = $id) ORDER BY is_global DESC, code")->fetchAll();
