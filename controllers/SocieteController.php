@@ -416,6 +416,7 @@ class SocieteController extends Controller
         $baremeAnnuel  = $this->db->query("SELECT * FROM bareme_ir WHERE type='annuel' ORDER BY `min`")->fetchAll();
         $cnssParams = $this->db->query("SELECT * FROM parametres_cnss_amo WHERE societe_id = $id")->fetch();
         if (!$cnssParams) $cnssParams = ['plafond_cnss'=>6000,'taux_cnss_salarial'=>4.48,'taux_cnss_patronal'=>8.98,'taux_amo_salarial'=>2.26,'taux_amo_patronal'=>4.11,'taux_amo_total'=>6.37,'taux_allocations_familiales'=>6.40,'taux_prestations_sociales'=>13.46,'taxe_formation'=>1.60,'participation_amo'=>1.85,'taux_penalites_cnss'=>0,'taux_penalites_tfp'=>0,'taux_penalites_amo'=>0,'penalite_cnss_premier_mois'=>3.00,'penalite_cnss_mois_suivants'=>0.50,'penalite_amo_taux'=>1.00,'astreinte_cnss_par_salarie'=>50.00,'astreinte_amo_par_salarie'=>100.00];
+        $salaries = $this->db->query("SELECT id, nom_famille, prenom, salaire_base FROM salaries WHERE societe_id = $id AND actif = 1 ORDER BY nom_famille, prenom")->fetchAll();
         $services = $this->db->query("SELECT * FROM services WHERE societe_id = $id ORDER BY nom")->fetchAll();
         $fonctions = $this->db->query("SELECT f.*, s.nom as service_nom FROM fonctions f LEFT JOIN services s ON f.service_id = s.id WHERE f.societe_id = $id ORDER BY s.nom, f.nom")->fetchAll();
         $gains = $this->db->query("SELECT * FROM rubriques_gains WHERE (societe_id IS NULL OR societe_id = $id) ORDER BY is_global DESC, code")->fetchAll();
@@ -453,6 +454,7 @@ class SocieteController extends Controller
             'bareme'        => $baremeMensuel,
             'baremeAnnuel'  => $baremeAnnuel,
             'cnssParams'    => $cnssParams,
+            'salaries'      => $salaries,
             'services'      => $services,
             'fonctions'     => $fonctions,
             'gains'         => $gains,

@@ -1,10 +1,10 @@
 # Référentiel Des Exonérations De L'Assiette Sociale Et Fiscale
 
-**Liste exhaustive des 44 indemnités et primes avec plafonds stricts et exigences documentaires (Décret n° 2-24-130)**
+**Liste exhaustive des 49 rubriques avec plafonds stricts et exigences documentaires (Décret n° 2-24-130 + primes standards)**
 
 Source : conversion complète du fichier Excel fourni `Liste_Exhaustive_44_Indemnites_Exonerations.xlsx`.
 
-Nombre total de rubriques extraites : **44**.
+Nombre total de rubriques extraites : **49** (44 exonérations + 5 primes standards).
 
 ## Tableau exhaustif
 
@@ -53,6 +53,11 @@ Nombre total de rubriques extraites : **44**.
 | IV. Rupture & Fin de Contrat | 375 | Indemnité de chômage technique / Partiel | 61715 | Selon autorisations réglementaires | Exonérée en période de crise majeure | Autorisation du gouverneur ou décision ministérielle |
 | IV. Rupture & Fin de Contrat | 376 | Indemnité transactionnelle globale | 61715 | Limite des dommages légaux | Exonérée à hauteur des plafonds légaux | Protocole de transaction enregistré auprès des autorités |
 | IV. Rupture & Fin de Contrat | 377 | Prime de tutorat / Fin de projet | 61713 | Forfait contractuel | Exonéré si lié à un transfert d'outils de fin de contrat | Rapport de fin de mission validé par l'entreprise |
+| V. Primes standards | 501 | Prime de rendement | 61711 | Imposable | Imposable | Contrat de travail / avenant |
+| V. Primes standards | 502 | Prime d'objectifs | 61711 | Imposable | Imposable | Contrat de travail / avenant |
+| V. Primes standards | 503 | Prime d'assiduité | 61711 | Imposable | Imposable | Règlement intérieur / contrat |
+| V. Primes standards | 504 | Prime de nuit | 61711 | Imposable | Imposable | Planning / pointage |
+| V. Primes standards | 505 | 13ème mois (prorata) | 61711 | Imposable | Imposable | Convention collective / contrat |
 
 ## Version regroupée par catégorie
 
@@ -118,3 +123,13 @@ Nombre total de rubriques extraites : **44**.
 | 375 | Indemnité de chômage technique / Partiel | 61715 | Selon autorisations réglementaires | Exonérée en période de crise majeure | Autorisation du gouverneur ou décision ministérielle |
 | 376 | Indemnité transactionnelle globale | 61715 | Limite des dommages légaux | Exonérée à hauteur des plafonds légaux | Protocole de transaction enregistré auprès des autorités |
 | 377 | Prime de tutorat / Fin de projet | 61713 | Forfait contractuel | Exonéré si lié à un transfert d'outils de fin de contrat | Rapport de fin de mission validé par l'entreprise |
+
+### V. Primes standards
+
+| Code Rubrique | Intitulé de la Prime / Indemnité | Affectation Comptable | Limites ou Plafond DGI | Limites ou Plafond CNSS | Exigences & Justifications Documentaires Strictes |
+| --- | --- | --- | --- | --- | --- |
+| 501 | Prime de rendement | 61711 | Imposable | Imposable | Contrat de travail / avenant |
+| 502 | Prime d'objectifs | 61711 | Imposable | Imposable | Contrat de travail / avenant |
+| 503 | Prime d'assiduité | 61711 | Imposable | Imposable | Règlement intérieur / contrat |
+| 504 | Prime de nuit | 61711 | Imposable | Imposable | Planning / pointage |
+| 505 | 13ème mois (prorata) | 61711 | Imposable | Imposable | Convention collective / contrat |

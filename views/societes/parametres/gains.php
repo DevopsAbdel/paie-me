@@ -44,8 +44,8 @@
                     <td><span class="badge badge-<?= $g['actif'] ? 'success' : 'secondary' ?>"><?= $g['actif'] ? 'Oui' : 'Non' ?></span></td>
                     <td><span class="badge badge-<?= $g['base_anciennete'] ? 'success' : 'secondary' ?>"><?= $g['base_anciennete'] ? 'Oui' : 'Non' ?></span></td>
                     <td><span class="badge badge-<?= $g['au_prorata'] ? 'success' : 'secondary' ?>"><?= $g['au_prorata'] ? 'Oui' : 'Non' ?></span></td>
-                    <td><small><?php if ($g['plafond_dgi_actif']): ?><?= htmlspecialchars($g['plafond_dgi_valeur'] ?? '') ?> / <?= htmlspecialchars($g['plafond_dgi_type'] ?? '') ?><?php endif; ?></small></td>
-                    <td><small><?php if ($g['plafond_cnss_actif']): ?><?= htmlspecialchars($g['plafond_cnss_valeur'] ?? '') ?> / <?= htmlspecialchars($g['plafond_cnss_type'] ?? '') ?><?php endif; ?></small></td>
+                    <td><small><?php if ($g['plafond_dgi_actif']): ?><?= htmlspecialchars($g['plafond_dgi_valeur'] ?? '') ?><?php endif; ?></small></td>
+                    <td><small><?php if ($g['plafond_cnss_actif']): ?><?= htmlspecialchars($g['plafond_cnss_valeur'] ?? '') ?><?php endif; ?></small></td>
                     <td><small title="<?= htmlspecialchars($g['plafond_dgi_desc'] ?? '') ?>"><?= htmlspecialchars(mb_substr($g['plafond_dgi_desc'] ?? '', 0, 25)) ?><?= isset($g['plafond_dgi_desc']) && mb_strlen($g['plafond_dgi_desc']) > 25 ? '…' : '' ?></small></td>
                     <td><small title="<?= htmlspecialchars($g['plafond_cnss_desc'] ?? '') ?>"><?= htmlspecialchars(mb_substr($g['plafond_cnss_desc'] ?? '', 0, 25)) ?><?= isset($g['plafond_cnss_desc']) && mb_strlen($g['plafond_cnss_desc']) > 25 ? '…' : '' ?></small></td>
                     <td><code><?= htmlspecialchars($g['compte'] ?? '') ?></code></td>
@@ -74,7 +74,7 @@
 
 <!-- Modal Bootstrap -->
 <div class="modal fade" id="gainModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
         <div class="modal-content">
             <form id="gainForm" method="post" action="<?= $baseUrl ?>/gains">
                 <?= \Core\Session::csrfField() ?>
