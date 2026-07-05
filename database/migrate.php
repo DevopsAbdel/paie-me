@@ -66,12 +66,12 @@ if (!$check) {
 // === Rubriques gains globales ===
 $existing = $p->query("SELECT COUNT(*) FROM rubriques_gains WHERE is_global = 1 AND code = '501'")->fetchColumn();
 if (!$existing) {
-    $p->exec("INSERT IGNORE INTO rubriques_gains (societe_id, is_global, code, libelle, type_montant, valeur_defaut, categorie, imposable, affectation, plafond_dgi, plafond_cnss, justificatifs) VALUES
-        (NULL,1,'501','Prime de rendement','proportionnel',10.00,'Gain standard',1,NULL,NULL,NULL,NULL),
-        (NULL,1,'502','Prime d''objectifs','proportionnel',5.00,'Gain standard',1,NULL,NULL,NULL,NULL),
-        (NULL,1,'503','Prime d''assiduité','fixe',300.00,'Gain standard',1,NULL,NULL,NULL,NULL),
-        (NULL,1,'504','Prime de nuit','fixe',250.00,'Gain standard',1,NULL,NULL,NULL,NULL),
-        (NULL,1,'505','13ème mois (prorata)','proportionnel',8.33,'Gain standard',1,NULL,NULL,NULL,NULL),
+    $p->exec("INSERT IGNORE INTO rubriques_gains (societe_id, is_global, code, libelle, type_montant, valeur_defaut, categorie, imposable, affectation, compte, plafond_dgi, plafond_cnss, justificatifs, source, nature_edi, base_anciennete, au_prorata) VALUES
+        (NULL,1,'501','Prime de rendement','proportionnel',10.00,'Gain standard',1,'61711000','61711000','Imposable','Imposable','Contrat de travail / avenant définissant les objectifs et critères de rendement','Contrat de travail','REND',1,0),
+        (NULL,1,'502','Prime d''objectifs','proportionnel',5.00,'Gain standard',1,'61711000','61711000','Imposable','Imposable','Contrat de travail / avenant définissant les objectifs','Contrat de travail','OBJEC',1,0),
+        (NULL,1,'503','Prime d''assiduité','fixe',300.00,'Gain standard',1,'61711000','61711000','Imposable','Imposable','Règlement intérieur ou contrat définissant les conditions de présence','Règlement intérieur / contrat','ASSID',1,0),
+        (NULL,1,'504','Prime de nuit','fixe',250.00,'Gain standard',1,'61711000','61711000','Imposable','Imposable','Planning / pointage justifiant les heures de nuit effectuées','Convention collective / contrat','NUIT',1,0),
+        (NULL,1,'505','13ème mois (prorata)','proportionnel',8.33,'Gain standard',1,'61711000','61711000','Imposable','Imposable','Convention collective ou usage d''entreprise','Convention collective','13EME',0,1),
         (NULL,1,'330','Indemnité de transport urbain','fixe',500,'Transport & Déplacement',0,'61713000','500.00 DH / mois','500.00 DH / mois','Lieu de travail situé au milieu urbain de la ville'),
         (NULL,1,'331','Indemnité de représentation','proportionnel',10,'Spécifiques à certains emplois',0,'61713000','10% du salaire de base','10% du salaire de base','Poste de direction, d''encadrement supérieur ou équivalent'),
         (NULL,1,'334','Indemnité kilométrique','fixe',0,'Transport & Déplacement',0,'61713000','3 DH / KM','3 DH / KM','Carnet de bord, carte grise au nom du salarié, trajet < 50 KM'),
