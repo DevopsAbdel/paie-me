@@ -79,6 +79,25 @@
     </div>
 </div>
 
+<div class="card" style="margin-top:1.5rem;">
+    <div class="card-header"><h3>Pénalités</h3></div>
+    <p style="font-size:0.8125rem; color:var(--text-muted); margin:0 0 1rem 0;">Taux appliqués en cas de retard de déclaration</p>
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:1rem;">
+        <div class="form-group">
+            <label>Taux pénalités CNSS (%)</label>
+            <input type="number" name="taux_penalites_cnss" value="<?= htmlspecialchars($cnssParams['taux_penalites_cnss'] ?? '0') ?>" class="form-control" step="0.01">
+        </div>
+        <div class="form-group">
+            <label>Taux pénalités TFP (%)</label>
+            <input type="number" name="taux_penalites_tfp" value="<?= htmlspecialchars($cnssParams['taux_penalites_tfp'] ?? '0') ?>" class="form-control" step="0.01">
+        </div>
+        <div class="form-group">
+            <label>Taux pénalités AMO (%)</label>
+            <input type="number" name="taux_penalites_amo" value="<?= htmlspecialchars($cnssParams['taux_penalites_amo'] ?? '0') ?>" class="form-control" step="0.01">
+        </div>
+    </div>
+</div>
+
 <div style="margin-top:1.5rem; display:flex; justify-content:flex-end;">
     <button type="submit" class="btn btn-primary">Enregistrer les taux</button>
 </div>

@@ -213,6 +213,9 @@ CREATE TABLE IF NOT EXISTS parametres_cnss_amo (
     taux_prestations_sociales   DECIMAL(5,2) NOT NULL DEFAULT 13.46,
     taxe_formation              DECIMAL(5,2) NOT NULL DEFAULT 1.60,
     participation_amo           DECIMAL(5,2) NOT NULL DEFAULT 1.85,
+    taux_penalites_cnss         DECIMAL(5,2) NOT NULL DEFAULT 0.00,
+    taux_penalites_tfp          DECIMAL(5,2) NOT NULL DEFAULT 0.00,
+    taux_penalites_amo          DECIMAL(5,2) NOT NULL DEFAULT 0.00,
     created_at                  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at          DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (societe_id) REFERENCES societes(id) ON DELETE CASCADE

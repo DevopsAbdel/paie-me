@@ -193,4 +193,9 @@ addCol($p, 'periodes', 'penalites_cnss DECIMAL(10,2) NOT NULL DEFAULT 0.00 AFTER
 addCol($p, 'periodes', 'penalites_tfp DECIMAL(10,2) NOT NULL DEFAULT 0.00 AFTER penalites_cnss');
 addCol($p, 'periodes', 'penalites_amo DECIMAL(10,2) NOT NULL DEFAULT 0.00 AFTER penalites_tfp');
 
+// === Taux pénalités dans parametres_cnss_amo ===
+addCol($p, 'parametres_cnss_amo', 'taux_penalites_cnss DECIMAL(5,2) NOT NULL DEFAULT 0.00 AFTER participation_amo');
+addCol($p, 'parametres_cnss_amo', 'taux_penalites_tfp DECIMAL(5,2) NOT NULL DEFAULT 0.00 AFTER taux_penalites_cnss');
+addCol($p, 'parametres_cnss_amo', 'taux_penalites_amo DECIMAL(5,2) NOT NULL DEFAULT 0.00 AFTER taux_penalites_tfp');
+
 echo "\nMigrations terminées.\n";
