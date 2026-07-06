@@ -48,7 +48,7 @@ class DamancomController extends Controller
             Session::setFlash('error', 'Période non spécifiée.');
             $ctx = Session::get('societe_context');
             if ($ctx) {
-                $this->redirect('/paie-me/societes/' . $ctx['id'] . '?tab=cnss');
+                $this->redirect('/paie-me/societes/' . $ctx['id'] . '/cnss');
             }
             $this->redirect('/paie-me/damancom');
         }

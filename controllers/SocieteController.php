@@ -97,7 +97,184 @@ class SocieteController extends Controller
             'cnss'           => $societe['cnss'],
         ]);
 
+        $societe['rib'] = Crypto::decrypt($societe['rib']);
+
+        $title = 'Infos ' . $societe['raison_sociale'] . ' ' . $societe['forme_juridique'] . ' — ICE: ' . $societe['ice'];
+        $actions = '
+            <a href="/paie-me/societes/' . $id . '/edit" class="btn btn-secondary btn-sm" style="font-size:0.75rem;">Modifier</a>
+            <a href="/paie-me/societes/' . $id . '/delete" class="btn btn-danger btn-sm" style="font-size:0.75rem;" onclick="return confirm(\'Supprimer cette société ?\')">Supprimer</a>
+        ';
+
+        $this->render('societes/show.php', [
+            'title'        => $title,
+            'browserTitle' => 'Infos — ' . $societe['raison_sociale'],
+            'actions'      => $actions,
+            'societe'      => $societe,
+        ]);
+    }
+
+    public function salaries(int $id): void
+    {
+        $userId = Session::get('user_id');
+        $societe = $this->db->query("SELECT * FROM societes WHERE id = $id AND user_id = $userId")->fetch();
+
+        if (!$societe) {
+            Session::setFlash('error', 'Société introuvable.');
+            $this->redirect('/paie-me/societes');
+        }
+
+        Session::set('societe_context', [
+            'id'             => $societe['id'],
+            'raison_sociale' => $societe['raison_sociale'],
+            'ice'            => $societe['ice'],
+            'cnss'           => $societe['cnss'],
+        ]);
+
         $salaries = $this->db->query("SELECT s.*, f.nom as fonction_nom FROM salaries s LEFT JOIN fonctions f ON s.fonction_id = f.id WHERE s.societe_id = $id AND s.actif = 1 ORDER BY s.nom_famille, s.prenom")->fetchAll();
+
+        $title = 'Salariés ' . $societe['raison_sociale'] . ' ' . $societe['forme_juridique'] . ' — ICE: ' . $societe['ice'];
+        $actions = '
+            <a href="/paie-me/societes/' . $id . '/edit" class="btn btn-secondary btn-sm" style="font-size:0.75rem;">Modifier</a>
+            <a href="/paie-me/societes/' . $id . '/delete" class="btn btn-danger btn-sm" style="font-size:0.75rem;" onclick="return confirm(\'Supprimer cette société ?\')">Supprimer</a>
+        ';
+
+        $this->render('societes/salaries_list.php', [
+            'title'        => $title,
+            'browserTitle' => 'Salariés — ' . $societe['raison_sociale'],
+            'actions'      => $actions,
+            'societe'      => $societe,
+            'salaries'     => $salaries,
+        ]);
+    }
+
+    public function paies(int $id): void
+    {
+        $userId = Session::get('user_id');
+        $societe = $this->db->query("SELECT * FROM societes WHERE id = $id AND user_id = $userId")->fetch();
+
+        if (!$societe) {
+            Session::setFlash('error', 'Société introuvable.');
+            $this->redirect('/paie-me/societes');
+        }
+
+        Session::set('societe_context', [
+            'id'             => $societe['id'],
+            'raison_sociale' => $societe['raison_sociale'],
+            'ice'            => $societe['ice'],
+            'cnss'           => $societe['cnss'],
+        ]);
+
+        $periodes = $this->db->query("SELECT p.*, (SELECT COUNT(*) FROM paies WHERE periode_id = p.id) as nb_paies FROM periodes p WHERE p.societe_id = $id ORDER BY p.annee DESC, p.mois DESC")->fetchAll();
+
+        $title = 'Paies ' . $societe['raison_sociale'] . ' ' . $societe['forme_juridique'] . ' — ICE: ' . $societe['ice'];
+        $actions = '
+            <a href="/paie-me/societes/' . $id . '/edit" class="btn btn-secondary btn-sm" style="font-size:0.75rem;">Modifier</a>
+            <a href="/paie-me/societes/' . $id . '/delete" class="btn btn-danger btn-sm" style="font-size:0.75rem;" onclick="return confirm(\'Supprimer cette société ?\')">Supprimer</a>
+        ';
+
+        $this->render('societes/paies_list.php', [
+            'title'        => $title,
+            'browserTitle' => 'Paies — ' . $societe['raison_sociale'],
+            'actions'      => $actions,
+            'societe'      => $societe,
+            'periodes'     => $periodes,
+        ]);
+    }
+
+    public function bulletins(int $id): void
+    {
+        $userId = Session::get('user_id');
+        $societe = $this->db->query("SELECT * FROM societes WHERE id = $id AND user_id = $userId")->fetch();
+
+        if (!$societe) {
+            Session::setFlash('error', 'Société introuvable.');
+            $this->redirect('/paie-me/societes');
+        }
+
+        Session::set('societe_context', [
+            'id'             => $societe['id'],
+            'raison_sociale' => $societe['raison_sociale'],
+            'ice'            => $societe['ice'],
+            'cnss'           => $societe['cnss'],
+        ]);
+
+        $bulletins = $this->db->query("
+            SELECT b.*, pa.salaire_brut, pa.net_a_payer, pa.ir, s.nom_famille, s.prenom, p.mois, p.annee
+            FROM bulletins b
+            JOIN paies pa ON b.paie_id = pa.id
+            JOIN salaries s ON pa.salarie_id = s.id
+            JOIN periodes p ON pa.periode_id = p.id
+            WHERE pa.societe_id = $id
+            ORDER BY p.annee DESC, p.mois DESC, s.nom_famille
+        ")->fetchAll();
+
+        $title = 'Bulletins ' . $societe['raison_sociale'] . ' ' . $societe['forme_juridique'] . ' — ICE: ' . $societe['ice'];
+        $actions = '
+            <a href="/paie-me/societes/' . $id . '/edit" class="btn btn-secondary btn-sm" style="font-size:0.75rem;">Modifier</a>
+            <a href="/paie-me/societes/' . $id . '/delete" class="btn btn-danger btn-sm" style="font-size:0.75rem;" onclick="return confirm(\'Supprimer cette société ?\')">Supprimer</a>
+        ';
+
+        $this->render('societes/bulletins_list.php', [
+            'title'        => $title,
+            'browserTitle' => 'Bulletins — ' . $societe['raison_sociale'],
+            'actions'      => $actions,
+            'societe'      => $societe,
+            'bulletins'    => $bulletins,
+        ]);
+    }
+
+    public function cnss(int $id): void
+    {
+        $userId = Session::get('user_id');
+        $societe = $this->db->query("SELECT * FROM societes WHERE id = $id AND user_id = $userId")->fetch();
+
+        if (!$societe) {
+            Session::setFlash('error', 'Société introuvable.');
+            $this->redirect('/paie-me/societes');
+        }
+
+        Session::set('societe_context', [
+            'id'             => $societe['id'],
+            'raison_sociale' => $societe['raison_sociale'],
+            'ice'            => $societe['ice'],
+            'cnss'           => $societe['cnss'],
+        ]);
+
+        $periodes = $this->db->query("SELECT p.*, (SELECT COUNT(*) FROM paies WHERE periode_id = p.id) as nb_paies FROM periodes p WHERE p.societe_id = $id ORDER BY p.annee DESC, p.mois DESC")->fetchAll();
+        $societe['rib'] = Crypto::decrypt($societe['rib']);
+
+        $title = 'CNSS / Damancom ' . $societe['raison_sociale'] . ' ' . $societe['forme_juridique'] . ' — ICE: ' . $societe['ice'];
+        $actions = '
+            <a href="/paie-me/societes/' . $id . '/edit" class="btn btn-secondary btn-sm" style="font-size:0.75rem;">Modifier</a>
+            <a href="/paie-me/societes/' . $id . '/delete" class="btn btn-danger btn-sm" style="font-size:0.75rem;" onclick="return confirm(\'Supprimer cette société ?\')">Supprimer</a>
+        ';
+
+        $this->render('societes/cnss.php', [
+            'title'        => $title,
+            'browserTitle' => 'CNSS / Damancom — ' . $societe['raison_sociale'],
+            'actions'      => $actions,
+            'societe'      => $societe,
+            'periodes'     => $periodes,
+        ]);
+    }
+
+    public function ir(int $id): void
+    {
+        $userId = Session::get('user_id');
+        $societe = $this->db->query("SELECT * FROM societes WHERE id = $id AND user_id = $userId")->fetch();
+
+        if (!$societe) {
+            Session::setFlash('error', 'Société introuvable.');
+            $this->redirect('/paie-me/societes');
+        }
+
+        Session::set('societe_context', [
+            'id'             => $societe['id'],
+            'raison_sociale' => $societe['raison_sociale'],
+            'ice'            => $societe['ice'],
+            'cnss'           => $societe['cnss'],
+        ]);
+
         $periodes = $this->db->query("SELECT p.*, (SELECT COUNT(*) FROM paies WHERE periode_id = p.id) as nb_paies FROM periodes p WHERE p.societe_id = $id ORDER BY p.annee DESC, p.mois DESC")->fetchAll();
         $bulletins = $this->db->query("
             SELECT b.*, pa.salaire_brut, pa.net_a_payer, pa.ir, s.nom_famille, s.prenom, p.mois, p.annee
@@ -109,32 +286,19 @@ class SocieteController extends Controller
             ORDER BY p.annee DESC, p.mois DESC, s.nom_famille
         ")->fetchAll();
 
-        $societe['rib'] = Crypto::decrypt($societe['rib']);
-
-        $tabLabels = [
-            'infos'     => 'Infos',
-            'salaries'  => 'Salariés',
-            'paies'     => 'Paies',
-            'bulletins' => 'Bulletins',
-            'cnss'      => 'CNSS / Damancom',
-            'ir'        => 'IR / SIMPL',
-        ];
-        $tab = $_GET['tab'] ?? 'infos';
-        $title = ($tabLabels[$tab] ?? 'Infos') . ' ' . $societe['raison_sociale'] . ' ' . $societe['forme_juridique'] . ' — ICE: ' . $societe['ice'];
+        $title = 'IR / SIMPL ' . $societe['raison_sociale'] . ' ' . $societe['forme_juridique'] . ' — ICE: ' . $societe['ice'];
         $actions = '
             <a href="/paie-me/societes/' . $id . '/edit" class="btn btn-secondary btn-sm" style="font-size:0.75rem;">Modifier</a>
             <a href="/paie-me/societes/' . $id . '/delete" class="btn btn-danger btn-sm" style="font-size:0.75rem;" onclick="return confirm(\'Supprimer cette société ?\')">Supprimer</a>
         ';
 
-        $this->render('societes/show.php', [
-            'title'         => $title,
-            'browserTitle'  => $tabLabels[$tab] . ' — ' . $societe['raison_sociale'],
-            'actions'       => $actions,
-            'societe'   => $societe,
-            'salaries'  => $salaries,
-            'periodes'  => $periodes,
-            'bulletins' => $bulletins,
-            'societeId' => $id,
+        $this->render('societes/ir.php', [
+            'title'        => $title,
+            'browserTitle' => 'IR / SIMPL — ' . $societe['raison_sociale'],
+            'actions'      => $actions,
+            'societe'      => $societe,
+            'periodes'     => $periodes,
+            'bulletins'    => $bulletins,
         ]);
     }
 
@@ -299,7 +463,7 @@ class SocieteController extends Controller
                         ]);
                         Session::setFlash('success', 'Pénalités mises à jour.');
                     }
-                    $this->redirect('/paie-me/societes/' . $id . '?tab=cnss');
+                    $this->redirect('/paie-me/societes/' . $id . '/cnss');
                     return;
             } elseif ($sousTab === 'calcul_penalites') {
                 $periodeId = (int) ($_POST['periode_id'] ?? 0);
@@ -325,7 +489,7 @@ class SocieteController extends Controller
                     $stmt->execute([round($penaliteCNSS, 2), round($penaliteTFP, 2), round($penaliteAMO, 2), $periodeId, $id]);
                     Session::setFlash('success', 'Pénalités calculées automatiquement.');
                 }
-                $this->redirect('/paie-me/societes/' . $id . '?tab=cnss');
+                $this->redirect('/paie-me/societes/' . $id . '/cnss');
                 return;
             } elseif ($sousTab === 'services') {
                 if (!empty($_POST['service_nom'])) {

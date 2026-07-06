@@ -86,7 +86,7 @@ class SalarieController extends Controller
 
             Session::setFlash('success', 'Salarié ajouté avec succès.');
             $redirectId = $fromSociete ?: ($ctx ? $ctx['id'] : null);
-            $this->redirect($redirectId ? '/paie-me/societes/' . $redirectId . '?tab=salaries' : '/paie-me/salaries');
+            $this->redirect($redirectId ? '/paie-me/societes/' . $redirectId . '/salaries' : '/paie-me/salaries');
         }
 
         $societeId = $fromSociete ?? ($ctx ? $ctx['id'] : null);
@@ -151,7 +151,7 @@ class SalarieController extends Controller
 
             Session::setFlash('success', 'Salarié mis à jour.');
             $societeId = $data['societe_id'] ?? $salarie['societe_id'];
-            $this->redirect('/paie-me/societes/' . $societeId . '?tab=salaries');
+            $this->redirect('/paie-me/societes/' . $societeId . '/salaries');
         }
 
         $fromSociete = isset($_GET['from_societe']) ? (int) $_GET['from_societe'] : null;

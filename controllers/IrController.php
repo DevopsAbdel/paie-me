@@ -48,7 +48,7 @@ class IrController extends Controller
             $ctx = Session::get('societe_context');
             Session::setFlash('error', 'Période non spécifiée.');
             if ($ctx) {
-                $this->redirect('/paie-me/societes/' . $ctx['id'] . '?tab=ir');
+                $this->redirect('/paie-me/societes/' . $ctx['id'] . '/ir');
             }
             $this->redirect('/paie-me/ir');
         }

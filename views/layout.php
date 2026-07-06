@@ -30,37 +30,37 @@
     <ul class="sidebar-nav">
         <?php if ($ctx): ?>
         <li>
-            <a href="/paie-me/societes/<?= $ctx['id'] ?>?tab=infos" class="<?= str_contains($_SERVER['REQUEST_URI'], '/societes/'.$ctx['id']) && !str_contains($_SERVER['REQUEST_URI'], 'tab=') ? 'active' : '' ?>">
+            <a href="/paie-me/societes/<?= $ctx['id'] ?>" class="<?= (parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) === '/paie-me/societes/'.$ctx['id']) ? 'active' : '' ?>">
                 <span class="icon" data-lucide="info"></span>
                 <span>Infos société</span>
             </a>
         </li>
         <li>
-            <a href="/paie-me/societes/<?= $ctx['id'] ?>?tab=salaries">
+            <a href="/paie-me/societes/<?= $ctx['id'] ?>/salaries" class="<?= str_contains($_SERVER['REQUEST_URI'], '/salaries') && !str_contains($_SERVER['REQUEST_URI'], 'create') && !str_contains($_SERVER['REQUEST_URI'], 'edit') ? 'active' : '' ?>">
                 <span class="icon" data-lucide="users"></span>
                 <span>Salariés</span>
             </a>
         </li>
         <li>
-            <a href="/paie-me/societes/<?= $ctx['id'] ?>?tab=paies">
+            <a href="/paie-me/societes/<?= $ctx['id'] ?>/paies" class="<?= str_contains($_SERVER['REQUEST_URI'], '/paies') && !str_contains($_SERVER['REQUEST_URI'], 'create') && !str_contains($_SERVER['REQUEST_URI'], 'edit') ? 'active' : '' ?>">
                 <span class="icon" data-lucide="wallet"></span>
                 <span>Paies</span>
             </a>
         </li>
         <li>
-            <a href="/paie-me/societes/<?= $ctx['id'] ?>?tab=bulletins">
+            <a href="/paie-me/societes/<?= $ctx['id'] ?>/bulletins" class="<?= str_contains($_SERVER['REQUEST_URI'], '/bulletins') && !str_contains($_SERVER['REQUEST_URI'], 'show') && !str_contains($_SERVER['REQUEST_URI'], 'pdf') ? 'active' : '' ?>">
                 <span class="icon" data-lucide="file-text"></span>
                 <span>Bulletins</span>
             </a>
         </li>
         <li>
-            <a href="/paie-me/societes/<?= $ctx['id'] ?>?tab=cnss">
+            <a href="/paie-me/societes/<?= $ctx['id'] ?>/cnss" class="<?= str_contains($_SERVER['REQUEST_URI'], '/cnss') ? 'active' : '' ?>">
                 <span class="icon" data-lucide="shield-check"></span>
                 <span>CNSS / Damancom</span>
             </a>
         </li>
         <li>
-            <a href="/paie-me/societes/<?= $ctx['id'] ?>?tab=ir">
+            <a href="/paie-me/societes/<?= $ctx['id'] ?>/ir" class="<?= str_contains($_SERVER['REQUEST_URI'], '/ir') && !str_contains($_SERVER['REQUEST_URI'], '/export') ? 'active' : '' ?>">
                 <span class="icon" data-lucide="calculator"></span>
                 <span>IR / SIMPL</span>
             </a>
