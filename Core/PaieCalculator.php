@@ -115,11 +115,11 @@ class PaieCalculator
 
         $ir = $this->calculateIr(max($sni, 0));
 
-        $nbEnfants = (int) ($s['nb_enfants'] ?? 0);
-        $persACharge = (int) ($s['personnes_a_charge'] ?? 0);
-        $nbCharges = $persACharge > 0
-            ? $persACharge
-            : $nbEnfants + (($s['situation_familiale'] ?? 'celibataire') === 'marie' ? 1 : 0);
+        $nbCharges = (int) ($s['personnes_a_charge'] ?? 0);
+        if ($nbCharges === 0) {
+            $nbEnfants = (int) ($s['nb_enfants'] ?? 0);
+            $nbCharges = $nbEnfants + (($s['situation_familiale'] ?? 'celibataire') === 'marie' ? 1 : 0);
+        }
         $deductionsFamiliales = round(min($nbCharges, 6) * 50, 2);
 
         $irNet = round(max($ir - $deductionsFamiliales, 0), 2);

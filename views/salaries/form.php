@@ -33,9 +33,26 @@
             </div>
             <div class="form-group">
                 <label>Personnes à charge</label>
-                <input type="number" name="personnes_a_charge" class="form-control" value="<?= $salarie['personnes_a_charge'] ?? 0 ?>" min="0">
+                <input type="number" name="personnes_a_charge" class="form-control" id="personnes_a_charge" readonly value="<?= $salarie['personnes_a_charge'] ?? 0 ?>" min="0" style="cursor:not-allowed; opacity:0.7;">
             </div>
         </div>
+        <script>
+        (function() {
+            var sitEl = document.querySelector('select[name="situation_familiale"]');
+            var enfEl = document.querySelector('input[name="nb_enfants"]');
+            var pacEl = document.getElementById('personnes_a_charge');
+
+            function calc() {
+                var enf = parseInt(enfEl.value) || 0;
+                var conj = sitEl.value === 'marie' ? 1 : 0;
+                pacEl.value = enf + conj;
+            }
+
+            sitEl.addEventListener('change', calc);
+            enfEl.addEventListener('input', calc);
+            calc();
+        })();
+        </script>
 
         <h4 class="form-section-title">Immatriculation</h4>
         <hr class="form-section-sep">
