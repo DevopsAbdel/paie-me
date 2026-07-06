@@ -11,10 +11,11 @@
         </div>
     <?php else: ?>
         <div class="table-wrapper">
+            <?php $afficheSociete = !\Core\Session::get('societe_context'); ?>
             <table>
                 <thead>
                     <tr>
-                        <th>Société</th>
+                        <?php if ($afficheSociete): ?><th>Société</th><?php endif; ?>
                         <th>Période</th>
                         <th>Du</th>
                         <th>Au</th>
@@ -26,7 +27,7 @@
                 <tbody>
                     <?php foreach ($periodes as $p): ?>
                     <tr>
-                        <td><?= htmlspecialchars($p['raison_sociale']) ?></td>
+                        <?php if ($afficheSociete): ?><td><?= htmlspecialchars($p['raison_sociale']) ?></td><?php endif; ?>
                         <td><?= str_pad($p['mois'], 2, '0', STR_PAD_LEFT) . '/' . $p['annee'] ?></td>
                         <td><?= $p['date_debut'] ?></td>
                         <td><?= $p['date_fin'] ?></td>
