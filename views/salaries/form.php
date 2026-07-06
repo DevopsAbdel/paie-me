@@ -28,8 +28,13 @@
                 </select>
             </div>
             <div class="form-group">
-                <label>Nombre d'enfants</label>
+                <label>Nb enfants (total)</label>
                 <input type="number" name="nb_enfants" class="form-control" value="<?= $salarie['nb_enfants'] ?? 0 ?>" min="0">
+            </div>
+            <div class="form-group">
+                <label>Enfants à charge</label>
+                <input type="number" name="enfants_a_charge" class="form-control" id="enfants_a_charge" value="<?= $salarie['enfants_a_charge'] ?? 0 ?>" min="0">
+                <small style="color:var(--text-muted); font-size:0.7rem;">&lt;18 ans / &le;21 ans étudiant / &le;25 ans études sup.</small>
             </div>
             <div class="form-group">
                 <label>Personnes à charge</label>
@@ -39,7 +44,7 @@
         <script>
         (function() {
             var sitEl = document.querySelector('select[name="situation_familiale"]');
-            var enfEl = document.querySelector('input[name="nb_enfants"]');
+            var enfEl = document.querySelector('input[name="enfants_a_charge"]');
             var pacEl = document.getElementById('personnes_a_charge');
 
             function calc() {

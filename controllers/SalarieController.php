@@ -52,13 +52,13 @@ class SalarieController extends Controller
             $data['cin'] = Crypto::encrypt($data['cin']);
             $services = $this->db->query("SELECT * FROM services WHERE societe_id = " . (int)$data['societe_id'] . " ORDER BY nom")->fetchAll();
             $stmt = $this->db->prepare("
-                INSERT INTO salaries (societe_id, service_id, fonction_id, matricule, nom_famille, prenom, adresse, date_naissance, date_embauche, cin, cnss, situation_familiale, nb_enfants, personnes_a_charge, poste, type_contrat, salaire_base, type_salaire, frequence_paiement, mode_paiement, rib, indemnite_transport, indemnite_panier, indemnite_representation, avantage_logement, avances_salaire, mutuelle)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO salaries (societe_id, service_id, fonction_id, matricule, nom_famille, prenom, adresse, date_naissance, date_embauche, cin, cnss, situation_familiale, nb_enfants, enfants_a_charge, personnes_a_charge, poste, type_contrat, salaire_base, type_salaire, frequence_paiement, mode_paiement, rib, indemnite_transport, indemnite_panier, indemnite_representation, avantage_logement, avances_salaire, mutuelle)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ");
             $stmt->execute([
                 $data['societe_id'], $data['service_id'], $data['fonction_id'], $data['matricule'], $data['nom_famille'], $data['prenom'],
                 $data['adresse'], $data['date_naissance'], $data['date_embauche'], $data['cin'],
-                $data['cnss'], $data['situation_familiale'], $data['nb_enfants'], $data['personnes_a_charge'], $data['poste'],
+                $data['cnss'], $data['situation_familiale'], $data['nb_enfants'], $data['enfants_a_charge'], $data['personnes_a_charge'], $data['poste'],
                 $data['type_contrat'], $data['salaire_base'], $data['type_salaire'],
                 $data['frequence_paiement'], $data['mode_paiement'], $data['rib'],
                 $data['indemnite_transport'], $data['indemnite_panier'],
@@ -106,13 +106,13 @@ class SalarieController extends Controller
             $data['rib'] = Crypto::encrypt($data['rib']);
             $data['cin'] = Crypto::encrypt($data['cin']);
             $stmt = $this->db->prepare("
-                UPDATE salaries SET societe_id=?, service_id=?, fonction_id=?, matricule=?, nom_famille=?, prenom=?, adresse=?, date_naissance=?, date_embauche=?, cin=?, cnss=?, situation_familiale=?, nb_enfants=?, personnes_a_charge=?, poste=?, type_contrat=?, salaire_base=?, type_salaire=?, frequence_paiement=?, mode_paiement=?, rib=?, indemnite_transport=?, indemnite_panier=?, indemnite_representation=?, avantage_logement=?, avances_salaire=?, mutuelle=?
+                UPDATE salaries SET societe_id=?, service_id=?, fonction_id=?, matricule=?, nom_famille=?, prenom=?, adresse=?, date_naissance=?, date_embauche=?, cin=?, cnss=?, situation_familiale=?, nb_enfants=?, enfants_a_charge=?, personnes_a_charge=?, poste=?, type_contrat=?, salaire_base=?, type_salaire=?, frequence_paiement=?, mode_paiement=?, rib=?, indemnite_transport=?, indemnite_panier=?, indemnite_representation=?, avantage_logement=?, avances_salaire=?, mutuelle=?
                 WHERE id = ?
             ");
             $stmt->execute([
                 $data['societe_id'], $data['service_id'], $data['fonction_id'], $data['matricule'], $data['nom_famille'], $data['prenom'],
                 $data['adresse'], $data['date_naissance'], $data['date_embauche'], $data['cin'],
-                $data['cnss'], $data['situation_familiale'], $data['nb_enfants'], $data['personnes_a_charge'], $data['poste'],
+                $data['cnss'], $data['situation_familiale'], $data['nb_enfants'], $data['enfants_a_charge'], $data['personnes_a_charge'], $data['poste'],
                 $data['type_contrat'], $data['salaire_base'], $data['type_salaire'],
                 $data['frequence_paiement'], $data['mode_paiement'], $data['rib'],
                 $data['indemnite_transport'], $data['indemnite_panier'],
