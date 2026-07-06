@@ -71,6 +71,7 @@ CREATE TABLE IF NOT EXISTS salaries (
     cnss                VARCHAR(20),
     situation_familiale ENUM('celibataire', 'marie', 'divorce', 'veuf') NOT NULL DEFAULT 'celibataire',
     nb_enfants          TINYINT UNSIGNED    NOT NULL DEFAULT 0,
+    personnes_a_charge  TINYINT UNSIGNED    NOT NULL DEFAULT 0,
     poste               VARCHAR(150),
     type_contrat        ENUM('CDI', 'CDD', 'stage', 'interim') NOT NULL DEFAULT 'CDI',
     salaire_base        DECIMAL(10,2)       NOT NULL DEFAULT 0.00,
@@ -323,6 +324,7 @@ ALTER TABLE salaries
     ADD COLUMN avances_salaire   DECIMAL(10,2)   NOT NULL DEFAULT 0.00 AFTER avantage_logement,
     ADD COLUMN mutuelle          DECIMAL(10,2)   NOT NULL DEFAULT 0.00 AFTER avances_salaire,
     ADD COLUMN date_sortie       DATE            DEFAULT NULL AFTER date_embauche,
+    ADD COLUMN personnes_a_charge TINYINT UNSIGNED NOT NULL DEFAULT 0 AFTER nb_enfants,
     ADD FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE SET NULL,
     ADD FOREIGN KEY (fonction_id) REFERENCES fonctions(id) ON DELETE SET NULL;
 

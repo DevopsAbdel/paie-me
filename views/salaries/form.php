@@ -31,6 +31,10 @@
                 <label>Nombre d'enfants</label>
                 <input type="number" name="nb_enfants" class="form-control" value="<?= $salarie['nb_enfants'] ?? 0 ?>" min="0">
             </div>
+            <div class="form-group">
+                <label>Personnes à charge</label>
+                <input type="number" name="personnes_a_charge" class="form-control" value="<?= $salarie['personnes_a_charge'] ?? 0 ?>" min="0">
+            </div>
         </div>
 
         <h4 class="form-section-title">Immatriculation</h4>
