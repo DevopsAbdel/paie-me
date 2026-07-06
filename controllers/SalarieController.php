@@ -251,6 +251,8 @@ class SalarieController extends Controller
             'cnss'                   => $_POST['cnss'] ?? '',
             'situation_familiale'    => $_POST['situation_familiale'] ?? 'celibataire',
             'nb_enfants'             => $_POST['nb_enfants'] ?? 0,
+            'enfants_a_charge'       => $_POST['enfants_a_charge'] ?? 0,
+            'personnes_a_charge'     => $_POST['personnes_a_charge'] ?? 0,
             'poste'                  => $_POST['poste'] ?? '',
             'type_contrat'           => $_POST['type_contrat'] ?? 'CDI',
             'salaire_base'           => $_POST['salaire_base'] ?? 0,
