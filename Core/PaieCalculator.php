@@ -39,7 +39,7 @@ class PaieCalculator
         return 0;
     }
 
-    public function calculerPaie(array $s, array $cnssParams, string $dateFin, float $heuresSup = 0, array $gains = [], array $retenues = [], string $dateDebut = ''): array
+    public function calculerPaie(array $s, array $cnssParams, string $dateFin, float $heuresSup = 0, array $gains = [], array $retenues = [], string $dateDebut = '', array $baremeHS = []): array
     {
         $salaireBase = (float) $s['salaire_base'];
 
@@ -64,7 +64,17 @@ class PaieCalculator
 
         $montantHeuresSup = 0;
         if ($heuresSup > 0 && $salaireBase > 0) {
-            $montantHeuresSup = round($heuresSup * ($salaireBase / 191) * 1.25, 2);
+            $tauxNormal = (float) ($baremeHS['taux_normal'] ?? 25);
+            $tauxMajore = (float) ($baremeHS['taux_majore'] ?? 50);
+            $seuil = (int) ($baremeHS['seuil_heures'] ?? 8);
+            $tauxHoraire = $salaireBase / 191;
+            $nbNormal = min($heuresSup, $seuil);
+            $nbMajore = max(0, $heuresSup - $seuil);
+            $montantHeuresSup = round(
+                ($nbNormal * $tauxHoraire * $tauxNormal / 100)
+                + ($nbMajore * $tauxHoraire * $tauxMajore / 100),
+                2
+            );
         }
 
         $salaireBaseProrata = round($salaireBase * $prorata, 2);

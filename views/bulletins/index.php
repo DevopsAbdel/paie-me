@@ -15,7 +15,7 @@
                     <tr>
                         <th>N° Bulletin</th>
                         <th>Salarié</th>
-                        <th>Société</th>
+                        <?php if (empty($ctx)): ?><th>Société</th><?php endif; ?>
                         <th>Période</th>
                         <th>Salaire brut</th>
                         <th>Net à payer</th>
@@ -28,7 +28,7 @@
                     <tr>
                         <td><?= htmlspecialchars($b['numero']) ?></td>
                         <td><?= htmlspecialchars($b['nom_famille'] . ' ' . $b['prenom']) ?></td>
-                        <td><?= htmlspecialchars($b['raison_sociale']) ?></td>
+                        <?php if (empty($ctx)): ?><td><?= htmlspecialchars($b['raison_sociale']) ?></td><?php endif; ?>
                         <td><?= str_pad($b['mois'], 2, '0', STR_PAD_LEFT) . '/' . $b['annee'] ?></td>
                         <td><?= number_format($b['salaire_brut'], 2, ',', ' ') ?></td>
                         <td><strong><?= number_format($b['net_a_payer'], 2, ',', ' ') ?></strong></td>

@@ -41,6 +41,7 @@ class SalarieController extends Controller
         $this->render('salaries/index.php', [
             'title'    => 'Salariés',
             'salaries' => $salaries,
+            'ctx'      => $ctx,
         ]);
     }
 

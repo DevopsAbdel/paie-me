@@ -20,7 +20,7 @@
                         <th>CIN</th>
                         <th>CNSS</th>
                         <th>Poste</th>
-                        <th>Société</th>
+                        <?php if (empty($ctx)): ?><th>Société</th><?php endif; ?>
                         <th>Salaire base</th>
                         <th>Actions</th>
                     </tr>
@@ -34,7 +34,7 @@
                         <td><?= htmlspecialchars($s['cin']) ?></td>
                         <td><?= htmlspecialchars($s['cnss']) ?></td>
                         <td><?= htmlspecialchars($s['fonction_nom'] ?? $s['poste']) ?></td>
-                        <td><?= htmlspecialchars($s['raison_sociale']) ?></td>
+                        <?php if (empty($ctx)): ?><td><?= htmlspecialchars($s['raison_sociale']) ?></td><?php endif; ?>
                         <td><?= number_format($s['salaire_base'], 2, ',', ' ') ?></td>
                         <td>
                             <div class="table-actions">

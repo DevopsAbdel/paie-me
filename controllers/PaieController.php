@@ -142,6 +142,7 @@ class PaieController extends Controller
         $dateDebut = $periode['date_debut'];
         $dateFin = $periode['date_fin'];
         $cnssParams = $this->db->query("SELECT * FROM parametres_cnss_amo WHERE societe_id = $societeId")->fetch() ?: [];
+        $baremeHS = $this->db->query("SELECT * FROM bareme_heures_sup WHERE societe_id = $societeId")->fetch() ?: [];
         $gains = $this->mergeRubriques('rubriques_gains', $societeId);
         $retenues = $this->mergeRubriques('rubriques_retenues', $societeId);
 
@@ -149,7 +150,7 @@ class PaieController extends Controller
 
         foreach ($salaries as $s) {
             $heuresSup = $heuresSupMap[(int) $s['id']] ?? 0;
-            $c = $this->calculator->calculerPaie($s, $cnssParams, $dateFin, $heuresSup, $gains, $retenues, $dateDebut);
+            $c = $this->calculator->calculerPaie($s, $cnssParams, $dateFin, $heuresSup, $gains, $retenues, $dateDebut, $baremeHS);
 
             $stmtPaie = $this->db->prepare("
                 INSERT INTO paies (periode_id, salarie_id, societe_id, jours_travailles, salaire_brut, sbi, prime_anciennete, salaire_plafonne_cnss, indemnite_transport, indemnite_panier, indemnite_representation, avantage_logement, total_gains, heures_supplementaires, montant_heures_sup, cnss_salariale, amo_salariale, mutuelle, sni, ir, deductions_familiales, autres_retenues, net_avant_retenues, net_a_payer, cnss_patronale, amo_patronale, frais_professionnels)
@@ -307,6 +308,7 @@ class PaieController extends Controller
         $dateDebut = $periode['date_debut'];
         $dateFin = $periode['date_fin'];
         $cnssParams = $this->db->query("SELECT * FROM parametres_cnss_amo WHERE societe_id = $societeId")->fetch() ?: [];
+        $baremeHS = $this->db->query("SELECT * FROM bareme_heures_sup WHERE societe_id = $societeId")->fetch() ?: [];
         $gains = $this->mergeRubriques('rubriques_gains', $societeId);
         $retenues = $this->mergeRubriques('rubriques_retenues', $societeId);
 
@@ -341,7 +343,7 @@ class PaieController extends Controller
 
         $compteur = 0;
         foreach ($salaries as $s) {
-            $c = $this->calculator->calculerPaie($s, $cnssParams, $dateFin, 0, $gains, $retenues, $dateDebut);
+            $c = $this->calculator->calculerPaie($s, $cnssParams, $dateFin, 0, $gains, $retenues, $dateDebut, $baremeHS);
 
             $stmtPaie = $this->db->prepare("
                 INSERT INTO paies (periode_id, salarie_id, societe_id, jours_travailles, salaire_brut, sbi, prime_anciennete, salaire_plafonne_cnss, indemnite_transport, indemnite_panier, indemnite_representation, avantage_logement, total_gains, heures_supplementaires, montant_heures_sup, cnss_salariale, amo_salariale, mutuelle, sni, ir, deductions_familiales, autres_retenues, net_avant_retenues, net_a_payer, cnss_patronale, amo_patronale, frais_professionnels)

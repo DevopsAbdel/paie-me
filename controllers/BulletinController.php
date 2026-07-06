@@ -43,6 +43,7 @@ class BulletinController extends Controller
         $this->render('bulletins/index.php', [
             'title'     => 'Bulletins de paie',
             'bulletins' => $bulletins,
+            'ctx'       => $ctx,
         ]);
     }
 
