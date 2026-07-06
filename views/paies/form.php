@@ -35,13 +35,33 @@
         <div class="form-row">
             <div class="form-group">
                 <label>Date début</label>
-                <input type="date" name="date_debut" class="form-control">
+                <input type="date" name="date_debut" class="form-control" id="date_debut">
             </div>
             <div class="form-group">
                 <label>Date fin</label>
-                <input type="date" name="date_fin" class="form-control">
+                <input type="date" name="date_fin" class="form-control" id="date_fin">
             </div>
         </div>
+        <script>
+        (function() {
+            var moisEl = document.querySelector('select[name="mois"]');
+            var anneeEl = document.querySelector('select[name="annee"]');
+            var debutEl = document.getElementById('date_debut');
+            var finEl = document.getElementById('date_fin');
+
+            function remplirDates() {
+                var mois = parseInt(moisEl.value, 10);
+                var annee = parseInt(anneeEl.value, 10);
+                if (!mois || !annee) return;
+                debutEl.value = annee + '-' + String(mois).padStart(2, '0') + '-01';
+                finEl.value = annee + '-' + String(mois).padStart(2, '0') + '-' + String(new Date(annee, mois, 0).getDate()).padStart(2, '0');
+            }
+
+            moisEl.addEventListener('change', remplirDates);
+            anneeEl.addEventListener('change', remplirDates);
+            remplirDates();
+        })();
+        </script>
         <div style="display:flex; gap:0.75rem; margin-top:1rem;">
             <button type="submit" class="btn btn-primary">Créer et calculer</button>
             <a href="/paie-me/paies" class="btn btn-secondary">Annuler</a>
