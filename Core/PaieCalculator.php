@@ -105,8 +105,11 @@ class PaieCalculator
         $cnss = round($plafonne * (float) ($cnssParams['taux_cnss_salarial'] ?? 4.48) / 100, 2);
         $amo  = round($sb * (float) ($cnssParams['taux_amo_salarial'] ?? 2.26) / 100, 2);
 
-        $tauxFraisPro = ($sbi * 12 <= 78000) ? 0.35 : 0.25;
-        $fraisPro = round(min($sbi * $tauxFraisPro, 2500), 2);
+        if ($sbi * 12 <= 78000) {
+            $fraisPro = round($sbi * 0.35, 2);
+        } else {
+            $fraisPro = round(min($sbi * 0.25, 2916.70), 2);
+        }
 
         $sni = round($sbi - ($cnss + $amo) - $fraisPro, 2);
 
@@ -136,3 +139,4 @@ class PaieCalculator
         ) + ['ir' => $ir, 'irNet' => $irNet];
     }
 }
+
