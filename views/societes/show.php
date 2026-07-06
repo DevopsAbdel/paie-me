@@ -126,7 +126,7 @@ $baseUrl = '/paie-me/societes/' . $societe['id'];
 <?php elseif ($tab === 'paies'): ?>
 <div class="card">
     <div class="card-header">
-        <h3>Paies — <?= htmlspecialchars($societe['raison_sociale']) ?></h3>
+        <h3>Périodes de paie</h3>
         <a href="/paie-me/paies/create?from_societe=<?= $societe['id'] ?>" class="btn btn-primary btn-sm">+ Nouvelle période</a>
     </div>
     <?php if (empty($periodes)): ?>
@@ -162,7 +162,7 @@ $baseUrl = '/paie-me/societes/' . $societe['id'];
 <?php elseif ($tab === 'bulletins'): ?>
 <div class="card">
     <div class="card-header">
-        <h3>Bulletins de paie — <?= htmlspecialchars($societe['raison_sociale']) ?></h3>
+        <h3>Bulletins de paie</h3>
     </div>
     <?php if (empty($bulletins)): ?>
         <div class="empty-state"><p>Aucun bulletin généré pour cette société.</p></div>

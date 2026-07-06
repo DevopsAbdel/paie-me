@@ -111,8 +111,19 @@ class SocieteController extends Controller
 
         $societe['rib'] = Crypto::decrypt($societe['rib']);
 
+        $tabLabels = [
+            'infos'     => 'Infos',
+            'salaries'  => 'Salariés',
+            'paies'     => 'Paies',
+            'bulletins' => 'Bulletins',
+            'cnss'      => 'CNSS / Damancom',
+            'ir'        => 'IR / SIMPL',
+        ];
+        $tab = $_GET['tab'] ?? 'infos';
+        $title = $tabLabels[$tab] ?? 'Infos';
+
         $this->render('societes/show.php', [
-            'title'     => $societe['raison_sociale'],
+            'title'     => $title,
             'societe'   => $societe,
             'salaries'  => $salaries,
             'periodes'  => $periodes,
