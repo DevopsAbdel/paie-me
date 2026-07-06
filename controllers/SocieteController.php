@@ -531,6 +531,16 @@ class SocieteController extends Controller
                 }
             }
 
+            if ($sousTab === 'heures_sup') {
+                $stmt = $this->db->prepare("
+                    INSERT INTO bareme_heures_sup (societe_id, taux_normal, taux_majore, taux_jour_ferie, seuil_heures)
+                    VALUES (?, ?, ?, ?, ?)
+                    ON DUPLICATE KEY UPDATE taux_normal=VALUES(taux_normal), taux_majore=VALUES(taux_majore), taux_jour_ferie=VALUES(taux_jour_ferie), seuil_heures=VALUES(seuil_heures)
+                ");
+                $stmt->execute([$id, $_POST['taux_normal'] ?? 25, $_POST['taux_majore'] ?? 50, $_POST['taux_jour_ferie'] ?? 100, $_POST['seuil_heures'] ?? 8]);
+                Session::setFlash('success', 'Barème heures sup mis à jour.');
+            }
+
             $this->redirect('/paie-me/societes/' . $id . '/baremes/' . $sousTab);
         }
 
@@ -539,12 +549,14 @@ class SocieteController extends Controller
         $anciennete    = $this->db->query("SELECT * FROM bareme_anciennete WHERE societe_id = $id ORDER BY annees_min")->fetchAll();
         $conge         = $this->db->query("SELECT * FROM conge_annuel WHERE societe_id = $id")->fetch();
         $joursFeries   = $this->db->query("SELECT * FROM jours_feries WHERE societe_id = $id ORDER BY mois, jour")->fetchAll();
+        $heuresSup     = $this->db->query("SELECT * FROM bareme_heures_sup WHERE societe_id = $id")->fetch();
 
         $titles = [
             'anciennete'    => 'Barème d\'ancienneté',
             'conge_annuel'  => 'Congé annuel',
             'jours_feries'  => 'Jours fériés',
             'impot_revenu'  => 'Impôt sur le revenu',
+            'heures_sup'    => 'Heures supplémentaires',
         ];
         $subView = in_array($sous_tab, array_keys($titles)) ? $sous_tab : 'anciennete';
         $baseUrl = '/paie-me/societes/' . $id . '/baremes';
@@ -558,6 +570,7 @@ class SocieteController extends Controller
             'anciennete'   => $anciennete,
             'conge'        => $conge,
             'joursFeries'  => $joursFeries,
+            'heuresSup'    => $heuresSup,
         ]);
     }
 

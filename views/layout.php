@@ -83,6 +83,7 @@
                 <li><a href="<?= $baseB ?>conge_annuel" style="display:block; padding:0.3rem 0.5rem; color:<?= str_contains($uri, '/conge_annuel')?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">Congé annuel</a></li>
                 <li><a href="<?= $baseB ?>jours_feries" style="display:block; padding:0.3rem 0.5rem; color:<?= str_contains($uri, '/jours_feries')?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">Jours fériés</a></li>
                 <li><a href="<?= $baseB ?>impot_revenu" style="display:block; padding:0.3rem 0.5rem; color:<?= str_contains($uri, '/impot_revenu')?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">Impôt sur le revenu</a></li>
+                <li><a href="<?= $baseB ?>heures_sup" style="display:block; padding:0.3rem 0.5rem; color:<?= str_contains($uri, '/heures_sup')?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">Heures sup</a></li>
             </ul>
             <?php endif; ?>
         </li>

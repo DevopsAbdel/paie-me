@@ -498,6 +498,21 @@ INSERT INTO jours_feries (societe_id, nom, jour, mois, type, actif) VALUES
     (1, 'Aïd al-Mawlid (Anniversaire du Prophète)', 1, 1, 'variable', 1);
 
 -- -----------------------------------------------------------
+-- Barème heures supplémentaires (par société)
+-- -----------------------------------------------------------
+CREATE TABLE IF NOT EXISTS bareme_heures_sup (
+    id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    societe_id      INT UNSIGNED        NOT NULL UNIQUE,
+    taux_normal     DECIMAL(5,2)        NOT NULL DEFAULT 25.00,
+    taux_majore     DECIMAL(5,2)        NOT NULL DEFAULT 50.00,
+    taux_jour_ferie DECIMAL(5,2)        NOT NULL DEFAULT 100.00,
+    seuil_heures    TINYINT UNSIGNED    NOT NULL DEFAULT 8,
+    created_at      DATETIME            NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at      DATETIME            NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (societe_id) REFERENCES societes(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- -----------------------------------------------------------
 -- Sources légales (lois, décrets, arrêtés, notes, etc.)
 -- -----------------------------------------------------------
 CREATE TABLE IF NOT EXISTS sources_legales (
