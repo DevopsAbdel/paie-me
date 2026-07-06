@@ -39,7 +39,7 @@ class PaieCalculator
         return 0;
     }
 
-    public function calculerPaie(array $s, array $cnssParams, string $dateFin, float $heuresSup = 0, array $gains = [], array $retenues = [], string $dateDebut = '', array $baremeHS = []): array
+    public function calculerPaie(array $s, array $cnssParams, string $dateFin, float $heuresSup25 = 0, float $heuresSup50 = 0, float $heuresSup100 = 0, array $gains = [], array $retenues = [], string $dateDebut = '', array $baremeHS = []): array
     {
         $salaireBase = (float) $s['salaire_base'];
 
@@ -62,20 +62,16 @@ class PaieCalculator
             $primeAnciennete = round($salaireBase * $this->calcAnciennete($s['date_embauche'], $dateFin), 2) * $prorata;
         }
 
-        $montantHeuresSup = 0;
-        if ($heuresSup > 0 && $salaireBase > 0) {
-            $tauxNormal = (float) ($baremeHS['taux_normal'] ?? 25);
-            $tauxMajore = (float) ($baremeHS['taux_majore'] ?? 50);
-            $seuil = (int) ($baremeHS['seuil_heures'] ?? 8);
-            $tauxHoraire = $salaireBase / 191;
-            $nbNormal = min($heuresSup, $seuil);
-            $nbMajore = max(0, $heuresSup - $seuil);
-            $montantHeuresSup = round(
-                ($nbNormal * $tauxHoraire * $tauxNormal / 100)
-                + ($nbMajore * $tauxHoraire * $tauxMajore / 100),
-                2
-            );
-        }
+        $tauxHoraire = $salaireBase > 0 ? $salaireBase / 191 : 0;
+        $taux25 = (float) ($baremeHS['taux_normal'] ?? 25);
+        $taux50 = (float) ($baremeHS['taux_majore'] ?? 50);
+        $taux100 = (float) ($baremeHS['taux_jour_ferie'] ?? 100);
+
+        $montantHS25 = round($heuresSup25 * $tauxHoraire * $taux25 / 100, 2);
+        $montantHS50 = round($heuresSup50 * $tauxHoraire * $taux50 / 100, 2);
+        $montantHS100 = round($heuresSup100 * $tauxHoraire * $taux100 / 100, 2);
+        $montantHeuresSup = $montantHS25 + $montantHS50 + $montantHS100;
+        $heuresSup = $heuresSup25 + $heuresSup50 + $heuresSup100;
 
         $salaireBaseProrata = round($salaireBase * $prorata, 2);
 
@@ -145,9 +141,10 @@ class PaieCalculator
         $amoPatronale  = round($sb * (float) ($cnssParams['taux_amo_patronal'] ?? 4.11) / 100, 2);
 
         return compact(
-            'joursTravailles', 'primeAnciennete', 'heuresSup', 'montantHeuresSup', 'transport', 'panier',
-            'representation', 'logement', 'totalGains', 'sb', 'sbi', 'plafonne', 'cnss', 'amo',
-            'fraisPro', 'sni', 'deductionsFamiliales', 'avances',
+            'joursTravailles', 'primeAnciennete', 'heuresSup25', 'heuresSup50', 'heuresSup100',
+            'heuresSup', 'montantHeuresSup', 'montantHS25', 'montantHS50', 'montantHS100',
+            'transport', 'panier', 'representation', 'logement', 'totalGains', 'sb', 'sbi', 'plafonne',
+            'cnss', 'amo', 'fraisPro', 'sni', 'deductionsFamiliales', 'avances',
             'mutuelle', 'autresRetenues', 'netAvant', 'net', 'cnssPatronale', 'amoPatronale'
         ) + ['ir' => $ir, 'irNet' => $irNet];
     }

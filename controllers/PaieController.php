@@ -128,14 +128,18 @@ class PaieController extends Controller
             $this->redirect('/paie-me/paies');
         }
 
-        $existingPaies = $this->db->query("SELECT id, salarie_id, heures_supplementaires, indemnite_transport, indemnite_panier, indemnite_representation, avantage_logement FROM paies WHERE periode_id = $id")->fetchAll();
-        $heuresSupMap = [];
+        $existingPaies = $this->db->query("SELECT id, salarie_id, heures_supplementaires, heures_sup_25, heures_sup_50, heures_sup_100, indemnite_transport, indemnite_panier, indemnite_representation, avantage_logement FROM paies WHERE periode_id = $id")->fetchAll();
+        $heuresSup25Map = [];
+        $heuresSup50Map = [];
+        $heuresSup100Map = [];
         $gainsOverridesMap = [];
         $indemnitesMap = [];
         $retenuesOverridesMap = [];
         foreach ($existingPaies as $ep) {
             $sId = (int) $ep['salarie_id'];
-            $heuresSupMap[$sId] = (float) $ep['heures_supplementaires'];
+            $heuresSup25Map[$sId] = (float) ($ep['heures_sup_25'] ?? 0);
+            $heuresSup50Map[$sId] = (float) ($ep['heures_sup_50'] ?? 0);
+            $heuresSup100Map[$sId] = (float) ($ep['heures_sup_100'] ?? 0);
             $indemnitesMap[$sId] = [
                 'indemnite_transport' => (float) $ep['indemnite_transport'],
                 'indemnite_panier' => (float) $ep['indemnite_panier'],
@@ -171,7 +175,9 @@ class PaieController extends Controller
         $salaries = $this->db->query("SELECT id, salaire_base, date_embauche, date_sortie, situation_familiale, indemnite_transport, indemnite_panier, indemnite_representation, avantage_logement, nb_enfants, avances_salaire, mutuelle FROM salaries WHERE societe_id = $societeId AND actif = 1")->fetchAll();
 
         foreach ($salaries as $s) {
-            $heuresSup = $heuresSupMap[(int) $s['id']] ?? 0;
+            $hs25 = $heuresSup25Map[(int) $s['id']] ?? 0;
+            $hs50 = $heuresSup50Map[(int) $s['id']] ?? 0;
+            $hs100 = $heuresSup100Map[(int) $s['id']] ?? 0;
             $indemnOverrides = $indemnitesMap[(int) $s['id']] ?? [];
             if ($indemnOverrides) {
                 $s['indemnite_transport'] = $indemnOverrides['indemnite_transport'];
@@ -179,11 +185,11 @@ class PaieController extends Controller
                 $s['indemnite_representation'] = $indemnOverrides['indemnite_representation'];
                 $s['avantage_logement'] = $indemnOverrides['avantage_logement'];
             }
-            $c = $this->calculator->calculerPaie($s, $cnssParams, $dateFin, $heuresSup, $gains, $retenues, $dateDebut, $baremeHS);
+            $c = $this->calculator->calculerPaie($s, $cnssParams, $dateFin, $hs25, $hs50, $hs100, $gains, $retenues, $dateDebut, $baremeHS);
 
             $stmtPaie = $this->db->prepare("
-                INSERT INTO paies (periode_id, salarie_id, societe_id, jours_travailles, salaire_brut, sbi, prime_anciennete, salaire_plafonne_cnss, indemnite_transport, indemnite_panier, indemnite_representation, avantage_logement, total_gains, heures_supplementaires, montant_heures_sup, cnss_salariale, amo_salariale, mutuelle, sni, ir, deductions_familiales, autres_retenues, net_avant_retenues, net_a_payer, cnss_patronale, amo_patronale, frais_professionnels)
-                VALUES (?, ?, ?, 30, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO paies (periode_id, salarie_id, societe_id, jours_travailles, salaire_brut, sbi, prime_anciennete, salaire_plafonne_cnss, indemnite_transport, indemnite_panier, indemnite_representation, avantage_logement, total_gains, heures_supplementaires, montant_heures_sup, heures_sup_25, heures_sup_50, heures_sup_100, cnss_salariale, amo_salariale, mutuelle, sni, ir, deductions_familiales, autres_retenues, net_avant_retenues, net_a_payer, cnss_patronale, amo_patronale, frais_professionnels)
+                VALUES (?, ?, ?, 30, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ");
             $stmtPaie->execute([
                 $id, $s['id'], $societeId,
@@ -191,6 +197,7 @@ class PaieController extends Controller
                 $c['transport'], $c['panier'], $c['representation'], $c['logement'],
                 $c['totalGains'],
                 $c['heuresSup'], $c['montantHeuresSup'],
+                $c['heuresSup25'], $c['heuresSup50'], $c['heuresSup100'],
                 $c['cnss'], $c['amo'], $c['mutuelle'], $c['sni'], $c['ir'], $c['deductionsFamiliales'],
                 $c['autresRetenues'], $c['netAvant'], $c['net'],
                 $c['cnssPatronale'], $c['amoPatronale'], $c['fraisPro'],
@@ -321,12 +328,26 @@ class PaieController extends Controller
 
         $societeId = (int) $paie['societe_id'];
         $paieRetenues = $this->db->query("SELECT id, libelle, montant FROM paie_retenues WHERE paie_id = $id ORDER BY id")->fetchAll();
+        $paieGains = $this->db->query("
+            SELECT pg.montant, rg.code, rg.libelle, rg.type_montant, rg.valeur_defaut, rg.imposable
+            FROM paie_gains pg
+            JOIN rubriques_gains rg ON pg.rubrique_id = rg.id
+            WHERE pg.paie_id = $id
+            ORDER BY rg.code
+        ")->fetchAll();
+        $baremeHS = $this->db->query("SELECT * FROM bareme_heures_sup WHERE societe_id = $societeId")->fetch() ?: [];
 
         if ($this->isPost()) {
             $this->checkCsrf();
+            $hs25 = (float) ($_POST['heures_sup_25'] ?? 0);
+            $hs50 = (float) ($_POST['heures_sup_50'] ?? 0);
+            $hs100 = (float) ($_POST['heures_sup_100'] ?? 0);
             $stmt = $this->db->prepare("
                 UPDATE paies SET
                     heures_supplementaires = ?,
+                    heures_sup_25 = ?,
+                    heures_sup_50 = ?,
+                    heures_sup_100 = ?,
                     indemnite_transport = ?,
                     indemnite_panier = ?,
                     indemnite_representation = ?,
@@ -334,7 +355,8 @@ class PaieController extends Controller
                 WHERE id = ?
             ");
             $stmt->execute([
-                (float) ($_POST['heures_supplementaires'] ?? 0),
+                $hs25 + $hs50 + $hs100,
+                $hs25, $hs50, $hs100,
                 (float) ($_POST['indemnite_transport'] ?? 0),
                 (float) ($_POST['indemnite_panier'] ?? 0),
                 (float) ($_POST['indemnite_representation'] ?? 0),
@@ -383,6 +405,8 @@ class PaieController extends Controller
             'title'        => 'Modifier la paie — ' . $paie['nom_famille'] . ' ' . $paie['prenom'],
             'paie'         => $paie,
             'paieRetenues' => $paieRetenues,
+            'paieGains'    => $paieGains,
+            'baremeHS'     => $baremeHS,
         ]);
     }
 
@@ -444,11 +468,11 @@ class PaieController extends Controller
 
         $compteur = 0;
         foreach ($salaries as $s) {
-            $c = $this->calculator->calculerPaie($s, $cnssParams, $dateFin, 0, $gains, $retenues, $dateDebut, $baremeHS);
+            $c = $this->calculator->calculerPaie($s, $cnssParams, $dateFin, 0, 0, 0, $gains, $retenues, $dateDebut, $baremeHS);
 
             $stmtPaie = $this->db->prepare("
-                INSERT INTO paies (periode_id, salarie_id, societe_id, jours_travailles, salaire_brut, sbi, prime_anciennete, salaire_plafonne_cnss, indemnite_transport, indemnite_panier, indemnite_representation, avantage_logement, total_gains, heures_supplementaires, montant_heures_sup, cnss_salariale, amo_salariale, mutuelle, sni, ir, deductions_familiales, autres_retenues, net_avant_retenues, net_a_payer, cnss_patronale, amo_patronale, frais_professionnels)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO paies (periode_id, salarie_id, societe_id, jours_travailles, salaire_brut, sbi, prime_anciennete, salaire_plafonne_cnss, indemnite_transport, indemnite_panier, indemnite_representation, avantage_logement, total_gains, heures_supplementaires, montant_heures_sup, heures_sup_25, heures_sup_50, heures_sup_100, cnss_salariale, amo_salariale, mutuelle, sni, ir, deductions_familiales, autres_retenues, net_avant_retenues, net_a_payer, cnss_patronale, amo_patronale, frais_professionnels)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ");
             $stmtPaie->execute([
                 $id, $s['id'], $societeId,
@@ -457,6 +481,7 @@ class PaieController extends Controller
                 $c['transport'], $c['panier'], $c['representation'], $c['logement'],
                 $c['totalGains'],
                 $c['heuresSup'], $c['montantHeuresSup'],
+                $c['heuresSup25'], $c['heuresSup50'], $c['heuresSup100'],
                 $c['cnss'], $c['amo'], $c['mutuelle'], $c['sni'], $c['ir'], $c['deductionsFamiliales'],
                 $c['autresRetenues'], $c['netAvant'], $c['net'],
                 $c['cnssPatronale'], $c['amoPatronale'], $c['fraisPro'],

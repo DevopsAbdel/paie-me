@@ -405,6 +405,13 @@ $p->exec("CREATE TABLE IF NOT EXISTS conge_annuel (
 ) ENGINE=InnoDB");
 echo "   + table conge_annuel\n";
 
+// === Heures supplémentaires 25%/50%/100% dans paies ===
+addCol($p, 'paies', 'heures_sup_25 DECIMAL(10,2) NOT NULL DEFAULT 0.00 AFTER montant_heures_sup');
+addCol($p, 'paies', 'heures_sup_50 DECIMAL(10,2) NOT NULL DEFAULT 0.00 AFTER heures_sup_25');
+addCol($p, 'paies', 'heures_sup_100 DECIMAL(10,2) NOT NULL DEFAULT 0.00 AFTER heures_sup_50');
+$p->exec("UPDATE paies SET heures_sup_25 = heures_supplementaires WHERE heures_sup_25 = 0 AND heures_supplementaires > 0");
+if ($p->rowCount() > 0) echo "   + anciennes heures_supplementaires copiées vers heures_sup_25\n";
+
 // === Table des retenues personnalisées par paie ===
 $p->exec("CREATE TABLE IF NOT EXISTS paie_retenues (
     id             INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
