@@ -72,26 +72,51 @@
             </a>
         </li>
         <li>
+            <a href="/paie-me/societes/<?= $ctx['id'] ?>/baremes" class="<?= str_contains($_SERVER['REQUEST_URI'], '/baremes') ? 'active' : '' ?>" style="<?= str_contains($_SERVER['REQUEST_URI'], '/baremes') ? 'border-left:3px solid var(--accent);' : '' ?>">
+                <span class="icon" data-lucide="ruler"></span>
+                <span>Barèmes</span>
+            </a>
+            <?php if (str_contains($_SERVER['REQUEST_URI'], '/baremes')): ?>
+            <ul style="list-style:none; padding:0; margin:0.25rem 0 0 1.5rem; font-size:0.8125rem;">
+                <?php $baseB = '/paie-me/societes/' . $ctx['id'] . '/baremes/'; $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH); ?>
+                <li><a href="<?= $baseB ?>anciennete" style="display:block; padding:0.3rem 0.5rem; color:<?= str_contains($uri, '/anciennete')?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">Ancienneté</a></li>
+                <li><a href="<?= $baseB ?>conge_annuel" style="display:block; padding:0.3rem 0.5rem; color:<?= str_contains($uri, '/conge_annuel')?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">Congé annuel</a></li>
+                <li><a href="<?= $baseB ?>jours_feries" style="display:block; padding:0.3rem 0.5rem; color:<?= str_contains($uri, '/jours_feries')?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">Jours fériés</a></li>
+                <li><a href="<?= $baseB ?>impot_revenu" style="display:block; padding:0.3rem 0.5rem; color:<?= str_contains($uri, '/impot_revenu')?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">Impôt sur le revenu</a></li>
+            </ul>
+            <?php endif; ?>
+        </li>
+        <li>
+            <a href="/paie-me/societes/<?= $ctx['id'] ?>/reglages" class="<?= str_contains($_SERVER['REQUEST_URI'], '/reglages') ? 'active' : '' ?>" style="<?= str_contains($_SERVER['REQUEST_URI'], '/reglages') ? 'border-left:3px solid var(--accent);' : '' ?>">
+                <span class="icon" data-lucide="sliders"></span>
+                <span>Réglages</span>
+            </a>
+            <?php if (str_contains($_SERVER['REQUEST_URI'], '/reglages')): ?>
+            <ul style="list-style:none; padding:0; margin:0.25rem 0 0 1.5rem; font-size:0.8125rem;">
+                <?php $baseR = '/paie-me/societes/' . $ctx['id'] . '/reglages/'; $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH); ?>
+                <li><a href="<?= $baseR ?>cnss_amo" style="display:block; padding:0.3rem 0.5rem; color:<?= str_contains($uri, '/cnss_amo')?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">CNSS et AMO</a></li>
+                <li><a href="<?= $baseR ?>organismes_sociaux" style="display:block; padding:0.3rem 0.5rem; color:<?= str_contains($uri, '/organismes_sociaux')?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">Organismes Sociaux</a></li>
+            </ul>
+            <?php endif; ?>
+        </li>
+        <li>
             <a href="/paie-me/societes/<?= $ctx['id'] ?>/parametres" class="<?= str_contains($_SERVER['REQUEST_URI'], '/parametres') ? 'active' : '' ?>" style="<?= str_contains($_SERVER['REQUEST_URI'], '/parametres') ? 'border-left:3px solid var(--accent);' : '' ?>">
                 <span class="icon" data-lucide="settings"></span>
                 <span>Paramètres</span>
             </a>
             <?php if (str_contains($_SERVER['REQUEST_URI'], '/parametres')): ?>
             <ul style="list-style:none; padding:0; margin:0.25rem 0 0 1.5rem; font-size:0.8125rem;">
-                <?php $base = '/paie-me/societes/' . $ctx['id'] . '/parametres/'; $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH); $tab = basename($uri); if ($tab === 'parametres') $tab = 'banque'; ?>
-                <li><a href="<?= $base ?>general" style="display:block; padding:0.3rem 0.5rem; color:<?= str_contains($uri, '/parametres/general')?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">Général</a></li>
-                <li><a href="<?= $base ?>banque" style="display:block; padding:0.3rem 0.5rem; color:<?= $tab==='banque'?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">Banque</a></li>
-                <li><a href="<?= $base ?>teleservices" style="display:block; padding:0.3rem 0.5rem; color:<?= str_contains($uri, '/teleservices')?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">Téléservices</a></li>
-                <li><a href="<?= $base ?>bareme" style="display:block; padding:0.3rem 0.5rem; color:<?= str_contains($uri, '/bareme')?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">Barème IR</a></li>
-                <li><a href="<?= $base ?>cnss_amo" style="display:block; padding:0.3rem 0.5rem; color:<?= str_contains($uri, '/cnss_amo')?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">CNSS / AMO</a></li>
-                <li><a href="<?= $base ?>bcp" style="display:block; padding:0.3rem 0.5rem; color:<?= str_contains($uri, '/bcp')?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">BCP</a></li>
-                <li><a href="<?= $base ?>services" style="display:block; padding:0.3rem 0.5rem; color:<?= str_contains($uri, '/services')?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">Services</a></li>
-                <li><a href="<?= $base ?>gains" style="display:block; padding:0.3rem 0.5rem; color:<?= str_contains($uri, '/gains')?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">Gains</a></li>
-                <li><a href="<?= $base ?>retenues" style="display:block; padding:0.3rem 0.5rem; color:<?= str_contains($uri, '/retenues')?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">Retenues</a></li>
-                <li><a href="<?= $base ?>organismes" style="display:block; padding:0.3rem 0.5rem; color:<?= str_contains($uri, '/organismes')?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">Organismes</a></li>
-                <li><a href="<?= $base ?>attestations" style="display:block; padding:0.3rem 0.5rem; color:<?= str_contains($uri, '/attestations')?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">Attestations</a></li>
-                <li><a href="<?= $base ?>codification" style="display:block; padding:0.3rem 0.5rem; color:<?= str_contains($uri, '/codification')?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">Codification</a></li>
-                <li><a href="<?= $base ?>journal" style="display:block; padding:0.3rem 0.5rem; color:<?= str_contains($uri, '/journal')?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">Journal comptable</a></li>
+                <?php $baseP = '/paie-me/societes/' . $ctx['id'] . '/parametres/'; $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH); $tab = basename($uri); if ($tab === 'parametres') $tab = 'banque'; ?>
+                <li><a href="<?= $baseP ?>general" style="display:block; padding:0.3rem 0.5rem; color:<?= str_contains($uri, '/parametres/general')?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">Général</a></li>
+                <li><a href="<?= $baseP ?>banque" style="display:block; padding:0.3rem 0.5rem; color:<?= $tab==='banque'?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">Banque</a></li>
+                <li><a href="<?= $baseP ?>teleservices" style="display:block; padding:0.3rem 0.5rem; color:<?= str_contains($uri, '/teleservices')?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">Téléservices</a></li>
+                <li><a href="<?= $baseP ?>bcp" style="display:block; padding:0.3rem 0.5rem; color:<?= str_contains($uri, '/bcp')?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">BCP</a></li>
+                <li><a href="<?= $baseP ?>services" style="display:block; padding:0.3rem 0.5rem; color:<?= str_contains($uri, '/services')?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">Services</a></li>
+                <li><a href="<?= $baseP ?>gains" style="display:block; padding:0.3rem 0.5rem; color:<?= str_contains($uri, '/gains')?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">Gains</a></li>
+                <li><a href="<?= $baseP ?>retenues" style="display:block; padding:0.3rem 0.5rem; color:<?= str_contains($uri, '/retenues')?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">Retenues</a></li>
+                <li><a href="<?= $baseP ?>attestations" style="display:block; padding:0.3rem 0.5rem; color:<?= str_contains($uri, '/attestations')?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">Attestations</a></li>
+                <li><a href="<?= $baseP ?>codification" style="display:block; padding:0.3rem 0.5rem; color:<?= str_contains($uri, '/codification')?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">Codification</a></li>
+                <li><a href="<?= $baseP ?>journal" style="display:block; padding:0.3rem 0.5rem; color:<?= str_contains($uri, '/journal')?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">Journal comptable</a></li>
             </ul>
             <?php endif; ?>
         </li>

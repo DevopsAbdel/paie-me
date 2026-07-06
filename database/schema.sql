@@ -443,6 +443,61 @@ INSERT INTO rubriques_retenues (societe_id, is_global, code, libelle, type_monta
     (NULL, 1, 'SAISIE_ARRET',    'Saisie-arrêt',         'fixe', 0);
 
 -- -----------------------------------------------------------
+-- Barème d'ancienneté (par société)
+-- -----------------------------------------------------------
+CREATE TABLE IF NOT EXISTS bareme_anciennete (
+    id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    societe_id      INT UNSIGNED        NOT NULL,
+    annees_min      TINYINT UNSIGNED    NOT NULL,
+    annees_max      TINYINT UNSIGNED    NOT NULL,
+    taux            DECIMAL(5,2)        NOT NULL,
+    created_at      DATETIME            NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (societe_id) REFERENCES societes(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- -----------------------------------------------------------
+-- Configuration congé annuel (par société)
+-- -----------------------------------------------------------
+CREATE TABLE IF NOT EXISTS conge_annuel (
+    id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    societe_id      INT UNSIGNED        NOT NULL UNIQUE,
+    jours_par_mois  DECIMAL(4,2)        NOT NULL DEFAULT 1.50,
+    report_autorise TINYINT(1)          NOT NULL DEFAULT 1,
+    report_max      TINYINT UNSIGNED    NOT NULL DEFAULT 15,
+    created_at      DATETIME            NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at      DATETIME            NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (societe_id) REFERENCES societes(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- -----------------------------------------------------------
+-- Jours fériés (par société)
+-- -----------------------------------------------------------
+CREATE TABLE IF NOT EXISTS jours_feries (
+    id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    societe_id      INT UNSIGNED        NOT NULL,
+    nom             VARCHAR(100)        NOT NULL,
+    jour            TINYINT UNSIGNED    NOT NULL,
+    mois            TINYINT UNSIGNED    NOT NULL,
+    type            ENUM('fixe','variable') NOT NULL DEFAULT 'fixe',
+    actif           TINYINT(1)          NOT NULL DEFAULT 1,
+    created_at      DATETIME            NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (societe_id) REFERENCES societes(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+INSERT INTO jours_feries (societe_id, nom, jour, mois, type, actif) VALUES
+    (1, 'Jour de l''an', 1, 1, 'fixe', 1),
+    (1, 'Fête du Trône', 30, 7, 'fixe', 1),
+    (1, 'Fête de la révolution du Roi et du peuple', 20, 8, 'fixe', 1),
+    (1, 'Anniversaire du Roi Mohammed VI', 21, 8, 'fixe', 1),
+    (1, 'Fête de la Marche Verte', 6, 11, 'fixe', 1),
+    (1, 'Fête de l''Indépendance', 18, 11, 'fixe', 1),
+    (1, 'Fête du Travail', 1, 5, 'fixe', 1),
+    (1, 'Aïd el-Fitr', 1, 1, 'variable', 1),
+    (1, 'Aïd el-Adha', 1, 1, 'variable', 1),
+    (1, '1er Moharram (Nouvel An islamique)', 1, 1, 'variable', 1),
+    (1, 'Aïd al-Mawlid (Anniversaire du Prophète)', 1, 1, 'variable', 1);
+
+-- -----------------------------------------------------------
 -- Sources légales (lois, décrets, arrêtés, notes, etc.)
 -- -----------------------------------------------------------
 CREATE TABLE IF NOT EXISTS sources_legales (

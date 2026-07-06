@@ -32,6 +32,16 @@ Router::get('/societes/{id}/parametres/{sous_tab}', [SocieteController::class, '
 Router::post('/societes/{id}/parametres', [SocieteController::class, 'parametres']);
 Router::post('/societes/{id}/parametres/{sous_tab}', [SocieteController::class, 'parametres']);
 
+Router::get('/societes/{id}/baremes', [SocieteController::class, 'baremes']);
+Router::get('/societes/{id}/baremes/{sous_tab}', [SocieteController::class, 'baremes']);
+Router::post('/societes/{id}/baremes', [SocieteController::class, 'baremes']);
+Router::post('/societes/{id}/baremes/{sous_tab}', [SocieteController::class, 'baremes']);
+
+Router::get('/societes/{id}/reglages', [SocieteController::class, 'reglages']);
+Router::get('/societes/{id}/reglages/{sous_tab}', [SocieteController::class, 'reglages']);
+Router::post('/societes/{id}/reglages', [SocieteController::class, 'reglages']);
+Router::post('/societes/{id}/reglages/{sous_tab}', [SocieteController::class, 'reglages']);
+
 Router::get('/salaries',               [SalarieController::class, 'index']);
 Router::get('/salaries/create',        [SalarieController::class, 'create']);
 Router::post('/salaries/create',       [SalarieController::class, 'create']);

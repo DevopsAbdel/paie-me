@@ -1,6 +1,6 @@
-<form method="post" action="<?= $baseUrl ?>/bareme">
+<form method="post" action="<?= $baseUrl ?>/impot_revenu">
 <?= \Core\Session::csrfField() ?>
-<input type="hidden" name="sous_tab" value="bareme">
+<input type="hidden" name="sous_tab" value="impot_revenu">
 <?php $types = [['key'=>'mensuel','label'=>'Mensuel','data'=>$bareme], ['key'=>'annuel','label'=>'Annuel','data'=>$baremeAnnuel]]; ?>
 <?php foreach ($types as $t): ?>
 <div class="card" style="<?= $t['key'] === 'annuel' ? 'margin-top:1.5rem;' : '' ?>">

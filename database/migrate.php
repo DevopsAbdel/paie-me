@@ -381,4 +381,62 @@ if (!$existing) {
     echo "   + articles par rubrique insérés\n";
 }
 
+// === Tables Barèmes et Réglages ===
+$p->exec("CREATE TABLE IF NOT EXISTS bareme_anciennete (
+    id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    societe_id      INT UNSIGNED        NOT NULL,
+    annees_min      TINYINT UNSIGNED    NOT NULL,
+    annees_max      TINYINT UNSIGNED    NOT NULL,
+    taux            DECIMAL(5,2)        NOT NULL,
+    created_at      DATETIME            NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (societe_id) REFERENCES societes(id) ON DELETE CASCADE
+) ENGINE=InnoDB");
+echo "   + table bareme_anciennete\n";
+
+$p->exec("CREATE TABLE IF NOT EXISTS conge_annuel (
+    id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    societe_id      INT UNSIGNED        NOT NULL UNIQUE,
+    jours_par_mois  DECIMAL(4,2)        NOT NULL DEFAULT 1.50,
+    report_autorise TINYINT(1)          NOT NULL DEFAULT 1,
+    report_max      TINYINT UNSIGNED    NOT NULL DEFAULT 15,
+    created_at      DATETIME            NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at      DATETIME            NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (societe_id) REFERENCES societes(id) ON DELETE CASCADE
+) ENGINE=InnoDB");
+echo "   + table conge_annuel\n";
+
+$p->exec("CREATE TABLE IF NOT EXISTS jours_feries (
+    id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    societe_id      INT UNSIGNED        NOT NULL,
+    nom             VARCHAR(100)        NOT NULL,
+    jour            TINYINT UNSIGNED    NOT NULL,
+    mois            TINYINT UNSIGNED    NOT NULL,
+    type            ENUM('fixe','variable') NOT NULL DEFAULT 'fixe',
+    actif           TINYINT(1)          NOT NULL DEFAULT 1,
+    created_at      DATETIME            NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (societe_id) REFERENCES societes(id) ON DELETE CASCADE
+) ENGINE=InnoDB");
+echo "   + table jours_feries\n";
+
+// Insérer les jours fériés par défaut pour chaque société existante
+$existingJf = $p->query("SELECT COUNT(*) FROM jours_feries")->fetchColumn();
+if (!$existingJf) {
+    $societes = $p->query("SELECT id FROM societes")->fetchAll(PDO::FETCH_COLUMN);
+    foreach ($societes as $sid) {
+        $p->exec("INSERT IGNORE INTO jours_feries (societe_id, nom, jour, mois, type, actif) VALUES
+            ($sid, 'Jour de l''an', 1, 1, 'fixe', 1),
+            ($sid, 'Fête du Trône', 30, 7, 'fixe', 1),
+            ($sid, 'Fête de la révolution du Roi et du peuple', 20, 8, 'fixe', 1),
+            ($sid, 'Anniversaire du Roi Mohammed VI', 21, 8, 'fixe', 1),
+            ($sid, 'Fête de la Marche Verte', 6, 11, 'fixe', 1),
+            ($sid, 'Fête de l''Indépendance', 18, 11, 'fixe', 1),
+            ($sid, 'Fête du Travail', 1, 5, 'fixe', 1),
+            ($sid, 'Aïd el-Fitr', 1, 1, 'variable', 1),
+            ($sid, 'Aïd el-Adha', 1, 1, 'variable', 1),
+            ($sid, '1er Moharram (Nouvel An islamique)', 1, 1, 'variable', 1),
+            ($sid, 'Aïd al-Mawlid (Anniversaire du Prophète)', 1, 1, 'variable', 1)");
+    }
+    echo "   + jours fériés par défaut pour " . count($societes) . " société(s)\n";
+}
+
 echo "\nMigrations terminées.\n";
