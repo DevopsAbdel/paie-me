@@ -3,19 +3,6 @@ $tab = $_GET['tab'] ?? 'infos';
 $baseUrl = '/paie-me/societes/' . $societe['id'];
 ?>
 
-<div style="display:flex; gap:2rem; margin-bottom:1.5rem; align-items:center;">
-    <div>
-        <h2 style="color:var(--accent); margin:0;"><?= htmlspecialchars($societe['raison_sociale']) ?></h2>
-        <p style="color:var(--text-muted); font-size:0.875rem; margin:0.25rem 0 0 0;">
-            <?= $societe['forme_juridique'] ?> — ICE: <?= htmlspecialchars($societe['ice']) ?>
-        </p>
-    </div>
-    <div style="margin-left:auto; display:flex; gap:0.5rem;">
-        <a href="/paie-me/societes/<?= $societe['id'] ?>/edit" class="btn btn-secondary btn-sm">Modifier</a>
-        <a href="/paie-me/societes/<?= $societe['id'] ?>/delete" class="btn btn-danger btn-sm" onclick="return confirm('Supprimer cette société ?')">Supprimer</a>
-    </div>
-</div>
-
 <div style="display:flex; gap:0; border-bottom:2px solid var(--border); margin-bottom:1.5rem;">
     <a href="<?= $baseUrl ?>?tab=infos" style="padding:0.75rem 1.25rem; color:<?= $tab === 'infos' ? 'var(--accent)' : 'var(--text-muted)' ?>; border-bottom:2px solid <?= $tab === 'infos' ? 'var(--accent)' : 'transparent' ?>; margin-bottom:-2px; font-weight:<?= $tab === 'infos' ? '600' : '400' ?>; text-decoration:none; transition:all 0.2s;">
         Infos société

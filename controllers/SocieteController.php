@@ -120,10 +120,16 @@ class SocieteController extends Controller
             'ir'        => 'IR / SIMPL',
         ];
         $tab = $_GET['tab'] ?? 'infos';
-        $title = $tabLabels[$tab] ?? 'Infos';
+        $title = ($tabLabels[$tab] ?? 'Infos') . ' ' . $societe['raison_sociale'] . ' ' . $societe['forme_juridique'] . ' — ICE: ' . $societe['ice'];
+        $actions = '
+            <a href="/paie-me/societes/' . $id . '/edit" class="btn btn-secondary btn-sm" style="font-size:0.75rem;">Modifier</a>
+            <a href="/paie-me/societes/' . $id . '/delete" class="btn btn-danger btn-sm" style="font-size:0.75rem;" onclick="return confirm(\'Supprimer cette société ?\')">Supprimer</a>
+        ';
 
         $this->render('societes/show.php', [
-            'title'     => $title,
+            'title'         => $title,
+            'browserTitle'  => $tabLabels[$tab] . ' — ' . $societe['raison_sociale'],
+            'actions'       => $actions,
             'societe'   => $societe,
             'salaries'  => $salaries,
             'periodes'  => $periodes,
