@@ -45,16 +45,20 @@
         (function() {
             var sitEl = document.querySelector('select[name="situation_familiale"]');
             var enfEl = document.querySelector('input[name="enfants_a_charge"]');
+            var nbEl = document.querySelector('input[name="nb_enfants"]');
             var pacEl = document.getElementById('personnes_a_charge');
 
             function calc() {
+                var nb = parseInt(nbEl.value) || 0;
                 var enf = parseInt(enfEl.value) || 0;
+                if (enf > nb) { enf = nb; enfEl.value = nb; }
                 var conj = sitEl.value === 'marie' ? 1 : 0;
                 pacEl.value = enf + conj;
             }
 
             sitEl.addEventListener('change', calc);
             enfEl.addEventListener('input', calc);
+            nbEl.addEventListener('input', calc);
             calc();
         })();
         </script>
