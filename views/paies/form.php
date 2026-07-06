@@ -63,7 +63,7 @@
         })();
         </script>
         <div style="display:flex; gap:0.75rem; margin-top:1rem;">
-            <button type="submit" class="btn btn-primary">Créer et calculer</button>
+            <button type="submit" class="btn btn-primary">Créer la période</button>
             <a href="/paie-me/paies" class="btn btn-secondary">Annuler</a>
         </div>
     </form>

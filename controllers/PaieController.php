@@ -85,38 +85,10 @@ class PaieController extends Controller
             $stmt->execute([$societeId, $mois, $annee, $dateDebut, $dateFin]);
             $periodeId = $this->db->lastInsertId();
 
-            $cnssParams = $this->db->query("SELECT * FROM parametres_cnss_amo WHERE societe_id = $societeId")->fetch() ?: [];
-            $gains = $this->mergeRubriques('rubriques_gains', $societeId);
-            $retenues = $this->mergeRubriques('rubriques_retenues', $societeId);
-
-            $salaries = $this->db->query("SELECT id, salaire_base, date_embauche, date_sortie, situation_familiale, indemnite_transport, indemnite_panier, indemnite_representation, avantage_logement, nb_enfants, avances_salaire, mutuelle FROM salaries WHERE societe_id = $societeId AND actif = 1")->fetchAll();
-
-            foreach ($salaries as $s) {
-                $c = $this->calculator->calculerPaie($s, $cnssParams, $dateFin, 0, $gains, $retenues, $dateDebut);
-
-                $stmtPaie = $this->db->prepare("
-                    INSERT INTO paies (periode_id, salarie_id, societe_id, jours_travailles, salaire_brut, sbi, prime_anciennete, salaire_plafonne_cnss, indemnite_transport, indemnite_panier, indemnite_representation, avantage_logement, total_gains, heures_supplementaires, montant_heures_sup, cnss_salariale, amo_salariale, mutuelle, sni, ir, deductions_familiales, autres_retenues, net_avant_retenues, net_a_payer, cnss_patronale, amo_patronale, frais_professionnels)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                ");
-                $stmtPaie->execute([
-                    $periodeId, $s['id'], $societeId,
-                    $c['joursTravailles'],
-                    $c['sb'], $c['sbi'], $c['primeAnciennete'], $c['plafonne'],
-                    $c['transport'], $c['panier'], $c['representation'], $c['logement'],
-                    $c['totalGains'],
-                    $c['heuresSup'], $c['montantHeuresSup'],
-                    $c['cnss'], $c['amo'], $c['mutuelle'], $c['sni'], $c['ir'], $c['deductionsFamiliales'],
-                    $c['autresRetenues'], $c['netAvant'], $c['net'],
-                    $c['cnssPatronale'], $c['amoPatronale'], $c['fraisPro'],
-                ]);
-            }
-
-            $nbBulletins = BulletinController::genererPourPeriode((int) $periodeId, $this->db);
-
             Audit::log($this->db, 'create', 'periode', (int) $periodeId, 'Création période: ' . $mois . '/' . $annee);
 
-            Session::setFlash('success', 'Période créée et paies calculées pour ' . count($salaries) . ' salariés. ' . $nbBulletins . ' bulletins générés.');
-            $this->redirect('/paie-me/paies');
+            Session::setFlash('success', 'Période créée avec succès.');
+            $this->redirect('/paie-me/paies/' . $periodeId . '/lignes');
         }
 
         $this->render('paies/form.php', [
@@ -245,10 +217,22 @@ class PaieController extends Controller
             ORDER BY s.nom_famille, s.prenom
         ")->fetchAll();
 
+        $disponibles = $this->db->prepare("
+            SELECT s.id, s.matricule, s.nom_famille, s.prenom, s.salaire_base
+            FROM salaries s
+            WHERE s.societe_id = (SELECT societe_id FROM periodes WHERE id = ?)
+            AND s.actif = 1
+            AND s.id NOT IN (SELECT salarie_id FROM paies WHERE periode_id = ?)
+            ORDER BY s.nom_famille, s.prenom
+        ");
+        $disponibles->execute([$id, $id]);
+        $disponibles = $disponibles->fetchAll();
+
         $this->render('paies/lignes.php', [
-            'title'   => 'Paies — ' . $periode['raison_sociale'] . ' ' . str_pad($periode['mois'], 2, '0', STR_PAD_LEFT) . '/' . $periode['annee'],
-            'periode' => $periode,
-            'paies'   => $paies,
+            'title'       => 'Paies — ' . $periode['raison_sociale'] . ' ' . str_pad($periode['mois'], 2, '0', STR_PAD_LEFT) . '/' . $periode['annee'],
+            'periode'     => $periode,
+            'paies'       => $paies,
+            'disponibles' => $disponibles,
         ]);
     }
 
@@ -287,6 +271,91 @@ class PaieController extends Controller
             'title' => 'Modifier la paie — ' . $paie['nom_famille'] . ' ' . $paie['prenom'],
             'paie'  => $paie,
         ]);
+    }
+
+    public function ajouterSalaries(int $id): void
+    {
+        $userId = Session::get('user_id');
+        $periode = $this->db->query("
+            SELECT p.*, so.raison_sociale FROM periodes p
+            JOIN societes so ON p.societe_id = so.id
+            WHERE p.id = $id AND so.user_id = $userId
+        ")->fetch();
+
+        if (!$periode) {
+            Session::setFlash('error', 'Période introuvable.');
+            $this->redirect('/paie-me/paies');
+        }
+
+        if (!empty($periode['cloturee'])) {
+            Session::setFlash('error', 'Cette période est clôturée.');
+            $this->redirect('/paie-me/paies/' . $id . '/lignes');
+        }
+
+        $societeId = $periode['societe_id'];
+        $dateDebut = $periode['date_debut'];
+        $dateFin = $periode['date_fin'];
+        $cnssParams = $this->db->query("SELECT * FROM parametres_cnss_amo WHERE societe_id = $societeId")->fetch() ?: [];
+        $gains = $this->mergeRubriques('rubriques_gains', $societeId);
+        $retenues = $this->mergeRubriques('rubriques_retenues', $societeId);
+
+        if (!empty($_POST['all'])) {
+            $salaries = $this->db->query("
+                SELECT id, salaire_base, date_embauche, date_sortie, situation_familiale,
+                       indemnite_transport, indemnite_panier, indemnite_representation,
+                       avantage_logement, nb_enfants, avances_salaire, mutuelle
+                FROM salaries
+                WHERE societe_id = $societeId AND actif = 1
+                AND id NOT IN (SELECT salarie_id FROM paies WHERE periode_id = $id)
+            ")->fetchAll();
+        } else {
+            $ids = $_POST['salarie_ids'] ?? [];
+            if (empty($ids) || !is_array($ids)) {
+                Session::setFlash('error', 'Aucun salarié sélectionné.');
+                $this->redirect('/paie-me/paies/' . $id . '/lignes');
+            }
+            $placeholders = implode(',', array_fill(0, count($ids), '?'));
+            $stmt = $this->db->prepare("
+                SELECT id, salaire_base, date_embauche, date_sortie, situation_familiale,
+                       indemnite_transport, indemnite_panier, indemnite_representation,
+                       avantage_logement, nb_enfants, avances_salaire, mutuelle
+                FROM salaries
+                WHERE societe_id = $societeId AND actif = 1
+                AND id IN ($placeholders)
+                AND id NOT IN (SELECT salarie_id FROM paies WHERE periode_id = $id)
+            ");
+            $stmt->execute($ids);
+            $salaries = $stmt->fetchAll();
+        }
+
+        $compteur = 0;
+        foreach ($salaries as $s) {
+            $c = $this->calculator->calculerPaie($s, $cnssParams, $dateFin, 0, $gains, $retenues, $dateDebut);
+
+            $stmtPaie = $this->db->prepare("
+                INSERT INTO paies (periode_id, salarie_id, societe_id, jours_travailles, salaire_brut, sbi, prime_anciennete, salaire_plafonne_cnss, indemnite_transport, indemnite_panier, indemnite_representation, avantage_logement, total_gains, heures_supplementaires, montant_heures_sup, cnss_salariale, amo_salariale, mutuelle, sni, ir, deductions_familiales, autres_retenues, net_avant_retenues, net_a_payer, cnss_patronale, amo_patronale, frais_professionnels)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ");
+            $stmtPaie->execute([
+                $id, $s['id'], $societeId,
+                $c['joursTravailles'],
+                $c['sb'], $c['sbi'], $c['primeAnciennete'], $c['plafonne'],
+                $c['transport'], $c['panier'], $c['representation'], $c['logement'],
+                $c['totalGains'],
+                $c['heuresSup'], $c['montantHeuresSup'],
+                $c['cnss'], $c['amo'], $c['mutuelle'], $c['sni'], $c['ir'], $c['deductionsFamiliales'],
+                $c['autresRetenues'], $c['netAvant'], $c['net'],
+                $c['cnssPatronale'], $c['amoPatronale'], $c['fraisPro'],
+            ]);
+            $compteur++;
+        }
+
+        $nbBulletins = BulletinController::genererPourPeriode($id, $this->db);
+
+        Audit::log($this->db, 'ajouter-salaries', 'periode', $id, 'Ajout de ' . $compteur . ' salariés à la période');
+
+        Session::setFlash('success', $compteur . ' salarié(s) ajouté(s) à la période. ' . $nbBulletins . ' bulletin(s) généré(s).');
+        $this->redirect('/paie-me/paies/' . $id . '/lignes');
     }
 
     public function journal(int $id): void

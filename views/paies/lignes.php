@@ -7,6 +7,31 @@
         </div>
     </div>
 
+    <?php if (!$periode['cloturee'] && !empty($disponibles)): ?>
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3>Ajouter des salariés</h3>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="/paie-me/paies/<?= $periode['id'] ?>/ajouter-salaries">
+                <div class="checkbox-grid">
+                    <?php foreach ($disponibles as $s): ?>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="salarie_ids[]" value="<?= $s['id'] ?>">
+                        <?= htmlspecialchars($s['matricule']) ?> — <?= htmlspecialchars($s['nom_famille'] . ' ' . $s['prenom']) ?>
+                        <span class="text-muted"><?= number_format($s['salaire_base'], 2, ',', ' ') ?> DH</span>
+                    </label>
+                    <?php endforeach; ?>
+                </div>
+                <div class="form-actions mt-2" style="display:flex; gap:0.5rem;">
+                    <button type="submit" class="btn btn-primary" id="btn-ajouter-selection">Ajouter la sélection</button>
+                    <button type="submit" class="btn btn-secondary" name="all" value="1">Ajouter tous</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <?php endif; ?>
+
     <?php if (empty($paies)): ?>
         <div class="empty-state">
             <p>Aucune paie pour cette période.</p>

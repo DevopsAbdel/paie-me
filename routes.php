@@ -57,6 +57,7 @@ Router::post('/paies/create',          [PaieController::class, 'create']);
 Router::get('/paies/{id}/calculate',   [PaieController::class, 'calculate']);
 Router::get('/paies/{id}/cloturer',    [PaieController::class, 'cloturer']);
 Router::get('/paies/{id}/lignes',      [PaieController::class, 'lignes']);
+Router::post('/paies/{id}/ajouter-salaries', [PaieController::class, 'ajouterSalaries']);
 Router::get('/paies/{id}/journal',     [PaieController::class, 'journal']);
 Router::get('/paies/paie/{id}/edit',  [PaieController::class, 'editPaie']);
 Router::post('/paies/paie/{id}/edit', [PaieController::class, 'editPaie']);
