@@ -23,7 +23,8 @@ class BulletinController extends Controller
     public function index(): void
     {
         $userId = Session::get('user_id');
-        $bulletins = $this->db->query("
+        $ctx = Session::get('societe_context');
+        $sql = "
             SELECT b.*, pa.salaire_brut, pa.net_a_payer, pa.cnss_salariale, pa.amo_salariale, pa.ir,
                    s.nom_famille, s.prenom, so.raison_sociale, p.mois, p.annee
             FROM bulletins b
@@ -32,8 +33,12 @@ class BulletinController extends Controller
             JOIN periodes p ON pa.periode_id = p.id
             JOIN societes so ON pa.societe_id = so.id
             WHERE so.user_id = $userId
-            ORDER BY p.annee DESC, p.mois DESC, s.nom_famille
-        ")->fetchAll();
+        ";
+        if ($ctx) {
+            $sql .= " AND pa.societe_id = " . (int)$ctx['id'];
+        }
+        $sql .= " ORDER BY p.annee DESC, p.mois DESC, s.nom_famille";
+        $bulletins = $this->db->query($sql)->fetchAll();
 
         $this->render('bulletins/index.php', [
             'title'     => 'Bulletins de paie',

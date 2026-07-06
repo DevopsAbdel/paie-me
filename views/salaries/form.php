@@ -92,12 +92,17 @@
         <div class="form-row">
             <div class="form-group">
                 <label>Société *</label>
+                <?php if ($societeContext ?? null): ?>
+                <input type="hidden" name="societe_id" value="<?= (int)$societeContext['id'] ?>">
+                <p class="form-text" style="color:var(--text-muted); padding:0.625rem 0.75rem; background:var(--bg-surface); border:1px solid var(--border); border-radius:6px;"><?= htmlspecialchars($societeContext['raison_sociale']) ?></p>
+                <?php else: ?>
                 <select name="societe_id" class="form-control" required onchange="var s=document.getElementById('service_group'),f=document.getElementById('fonction_group');s.style.display=this.value?'block':'none';f.style.display=this.value?'block':'none'">
                     <option value="">— Sélectionner —</option>
                     <?php foreach ($societes as $so): ?>
                     <option value="<?= $so['id'] ?>" <?= ($fromSociete ?? $salarie['societe_id'] ?? '') == $so['id'] ? 'selected' : '' ?>><?= htmlspecialchars($so['raison_sociale']) ?></option>
                     <?php endforeach; ?>
                 </select>
+                <?php endif; ?>
             </div>
             <div class="form-group" id="service_group" style="display:<?= ($salarie['societe_id'] ?? $fromSociete) ? 'block' : 'none' ?>">
                 <label>Service</label>

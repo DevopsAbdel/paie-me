@@ -6,12 +6,17 @@
         <?= \Core\Session::csrfField() ?>
         <div class="form-group">
             <label>Société *</label>
+            <?php $ctx = \Core\Session::get('societe_context'); if ($ctx): ?>
+            <input type="hidden" name="societe_id" value="<?= (int)$ctx['id'] ?>">
+            <p class="form-text" style="color:var(--text-muted); padding:0.625rem 0.75rem; background:var(--bg-surface); border:1px solid var(--border); border-radius:6px;"><?= htmlspecialchars($ctx['raison_sociale']) ?></p>
+            <?php else: ?>
             <select name="societe_id" class="form-control" required>
                 <option value="">— Sélectionner —</option>
                 <?php foreach ($societes as $so): ?>
                 <option value="<?= $so['id'] ?>" <?= ($fromSociete ?? '') == $so['id'] ? 'selected' : '' ?>><?= htmlspecialchars($so['raison_sociale']) ?></option>
                 <?php endforeach; ?>
             </select>
+            <?php endif; ?>
         </div>
         <div class="form-row">
             <div class="form-group">

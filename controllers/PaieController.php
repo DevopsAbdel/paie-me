@@ -27,14 +27,19 @@ class PaieController extends Controller
     public function index(): void
     {
         $userId = Session::get('user_id');
-        $periodes = $this->db->query("
+        $ctx = Session::get('societe_context');
+        $sql = "
             SELECT p.*, so.raison_sociale,
                 (SELECT COUNT(*) FROM paies WHERE periode_id = p.id) as nb_paies
             FROM periodes p
             JOIN societes so ON p.societe_id = so.id
             WHERE so.user_id = $userId
-            ORDER BY p.annee DESC, p.mois DESC
-        ")->fetchAll();
+        ";
+        if ($ctx) {
+            $sql .= " AND p.societe_id = " . (int)$ctx['id'];
+        }
+        $sql .= " ORDER BY p.annee DESC, p.mois DESC";
+        $periodes = $this->db->query($sql)->fetchAll();
 
         $this->render('paies/index.php', [
             'title'    => 'Paies',
@@ -45,9 +50,15 @@ class PaieController extends Controller
     public function create(): void
     {
         $userId = Session::get('user_id');
-        $societes = $this->db->query("SELECT id, raison_sociale FROM societes WHERE user_id = $userId ORDER BY raison_sociale")->fetchAll();
+        $ctx = Session::get('societe_context');
 
-        $fromSociete = isset($_GET['from_societe']) ? (int) $_GET['from_societe'] : null;
+        if ($ctx) {
+            $fromSociete = (int)$ctx['id'];
+            $societes = [$ctx];
+        } else {
+            $societes = $this->db->query("SELECT id, raison_sociale FROM societes WHERE user_id = $userId ORDER BY raison_sociale")->fetchAll();
+            $fromSociete = isset($_GET['from_societe']) ? (int) $_GET['from_societe'] : null;
+        }
 
         if ($this->isPost()) {
             $this->checkCsrf();
@@ -65,7 +76,7 @@ class PaieController extends Controller
                 $this->redirect('/paie-me/paies/create');
             }
 
-            $societeId  = (int) $_POST['societe_id'];
+            $societeId  = $ctx ? (int)$ctx['id'] : (int) $_POST['societe_id'];
             $mois       = (int) $_POST['mois'];
             $annee      = (int) $_POST['annee'];
             $dateDebut  = $_POST['date_debut'];

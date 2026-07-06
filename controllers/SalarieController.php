@@ -24,14 +24,19 @@ class SalarieController extends Controller
     public function index(): void
     {
         $userId = Session::get('user_id');
-        $salaries = $this->db->query("
+        $ctx = Session::get('societe_context');
+        $sql = "
             SELECT s.*, so.raison_sociale, f.nom as fonction_nom
             FROM salaries s
             JOIN societes so ON s.societe_id = so.id
             LEFT JOIN fonctions f ON s.fonction_id = f.id
             WHERE so.user_id = $userId
-            ORDER BY s.nom_famille, s.prenom
-        ")->fetchAll();
+        ";
+        if ($ctx) {
+            $sql .= " AND s.societe_id = " . (int)$ctx['id'];
+        }
+        $sql .= " ORDER BY s.nom_famille, s.prenom";
+        $salaries = $this->db->query($sql)->fetchAll();
 
         $this->render('salaries/index.php', [
             'title'    => 'Salariés',
@@ -42,12 +47,22 @@ class SalarieController extends Controller
     public function create(): void
     {
         $userId = Session::get('user_id');
-        $societes = $this->db->query("SELECT id, raison_sociale FROM societes WHERE user_id = $userId ORDER BY raison_sociale")->fetchAll();
-        $fromSociete = isset($_GET['from_societe']) ? (int) $_GET['from_societe'] : null;
+        $ctx = Session::get('societe_context');
+
+        if ($ctx) {
+            $fromSociete = (int)$ctx['id'];
+            $societes = [$ctx];
+        } else {
+            $societes = $this->db->query("SELECT id, raison_sociale FROM societes WHERE user_id = $userId ORDER BY raison_sociale")->fetchAll();
+            $fromSociete = isset($_GET['from_societe']) ? (int) $_GET['from_societe'] : null;
+        }
 
         if ($this->isPost()) {
             $this->checkCsrf();
             $data = $this->getPostData();
+            if ($ctx) {
+                $data['societe_id'] = (int)$ctx['id'];
+            }
             $data['rib'] = Crypto::encrypt($data['rib']);
             $data['cin'] = Crypto::encrypt($data['cin']);
             $services = $this->db->query("SELECT * FROM services WHERE societe_id = " . (int)$data['societe_id'] . " ORDER BY nom")->fetchAll();
@@ -69,11 +84,13 @@ class SalarieController extends Controller
             Audit::log($this->db, 'create', 'salarie', (int) $this->db->lastInsertId(), 'Création salarié: ' . $data['nom_famille'] . ' ' . $data['prenom']);
 
             Session::setFlash('success', 'Salarié ajouté avec succès.');
-            $this->redirect($fromSociete ? '/paie-me/societes/' . $fromSociete . '?tab=salaries' : '/paie-me/salaries');
+            $redirectId = $fromSociete ?: ($ctx ? $ctx['id'] : null);
+            $this->redirect($redirectId ? '/paie-me/societes/' . $redirectId . '?tab=salaries' : '/paie-me/salaries');
         }
 
-        $services = $fromSociete ? $this->db->query("SELECT * FROM services WHERE societe_id = $fromSociete ORDER BY nom")->fetchAll() : [];
-        $fonctions = $fromSociete ? $this->db->query("SELECT * FROM fonctions WHERE societe_id = $fromSociete ORDER BY nom")->fetchAll() : [];
+        $societeId = $fromSociete ?? ($ctx ? $ctx['id'] : null);
+        $services = $societeId ? $this->db->query("SELECT * FROM services WHERE societe_id = $societeId ORDER BY nom")->fetchAll() : [];
+        $fonctions = $societeId ? $this->db->query("SELECT * FROM fonctions WHERE societe_id = $societeId ORDER BY nom")->fetchAll() : [];
         $this->render('salaries/form.php', [
             'title'       => 'Nouveau salarié',
             'salarie'     => null,
@@ -81,12 +98,14 @@ class SalarieController extends Controller
             'services'    => $services,
             'fonctions'   => $fonctions,
             'fromSociete' => $fromSociete,
+            'societeContext' => $ctx,
         ]);
     }
 
     public function edit(int $id): void
     {
         $userId = Session::get('user_id');
+        $ctx = Session::get('societe_context');
         $salarie = $this->db->query("
             SELECT s.* FROM salaries s
             JOIN societes so ON s.societe_id = so.id
@@ -98,11 +117,18 @@ class SalarieController extends Controller
             $this->redirect('/paie-me/salaries');
         }
 
-        $societes = $this->db->query("SELECT id, raison_sociale FROM societes WHERE user_id = $userId ORDER BY raison_sociale")->fetchAll();
+        if ($ctx) {
+            $societes = [$ctx];
+        } else {
+            $societes = $this->db->query("SELECT id, raison_sociale FROM societes WHERE user_id = $userId ORDER BY raison_sociale")->fetchAll();
+        }
 
         if ($this->isPost()) {
             $this->checkCsrf();
             $data = $this->getPostData();
+            if ($ctx) {
+                $data['societe_id'] = (int)$ctx['id'];
+            }
             $data['rib'] = Crypto::encrypt($data['rib']);
             $data['cin'] = Crypto::encrypt($data['cin']);
             $stmt = $this->db->prepare("
@@ -136,12 +162,13 @@ class SalarieController extends Controller
         $salarie['cin'] = Crypto::decrypt($salarie['cin']);
 
         $this->render('salaries/form.php', [
-            'title'       => 'Modifier salarié',
-            'salarie'     => $salarie,
-            'societes'    => $societes,
-            'services'    => $services,
-            'fonctions'   => $fonctions,
-            'fromSociete' => $fromSociete,
+            'title'           => 'Modifier salarié',
+            'salarie'         => $salarie,
+            'societes'        => $societes,
+            'services'        => $services,
+            'fonctions'       => $fonctions,
+            'fromSociete'     => $fromSociete,
+            'societeContext'  => $ctx,
         ]);
     }
 
