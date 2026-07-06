@@ -252,10 +252,12 @@ class PaieController extends Controller
     {
         $userId = Session::get('user_id');
         $paie = $this->db->query("
-            SELECT pa.*, s.nom_famille, s.prenom, s.salaire_base, so.raison_sociale
+            SELECT pa.*, s.nom_famille, s.prenom, s.salaire_base, so.raison_sociale,
+                   p.mois, p.annee, p.id as periode_id
             FROM paies pa
             JOIN salaries s ON pa.salarie_id = s.id
             JOIN societes so ON pa.societe_id = so.id
+            JOIN periodes p ON pa.periode_id = p.id
             WHERE pa.id = $id AND so.user_id = $userId
         ")->fetch();
 

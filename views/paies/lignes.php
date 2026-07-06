@@ -75,7 +75,7 @@
                         <td><strong><?= number_format($pa['net_a_payer'], 2, ',', ' ') ?></strong></td>
                         <td>
                             <div class="table-actions">
-                                <a href="/paie-me/paies/paie/<?= $pa['id'] ?>/edit" class="btn btn-secondary btn-sm">HS</a>
+                                <a href="/paie-me/paies/paie/<?= $pa['id'] ?>/edit" class="btn btn-secondary btn-sm">Modifier</a>
                             </div>
                         </td>
                     </tr>
