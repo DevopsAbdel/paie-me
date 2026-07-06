@@ -128,15 +128,37 @@ class PaieController extends Controller
             $this->redirect('/paie-me/paies');
         }
 
-        $existingPaies = $this->db->query("SELECT salarie_id, heures_supplementaires FROM paies WHERE periode_id = $id")->fetchAll();
+        $existingPaies = $this->db->query("SELECT id, salarie_id, heures_supplementaires, indemnite_transport, indemnite_panier, indemnite_representation, avantage_logement FROM paies WHERE periode_id = $id")->fetchAll();
         $heuresSupMap = [];
+        $gainsOverridesMap = [];
+        $indemnitesMap = [];
+        $retenuesOverridesMap = [];
         foreach ($existingPaies as $ep) {
-            $heuresSupMap[(int) $ep['salarie_id']] = (float) $ep['heures_supplementaires'];
+            $sId = (int) $ep['salarie_id'];
+            $heuresSupMap[$sId] = (float) $ep['heures_supplementaires'];
+            $indemnitesMap[$sId] = [
+                'indemnite_transport' => (float) $ep['indemnite_transport'],
+                'indemnite_panier' => (float) $ep['indemnite_panier'],
+                'indemnite_representation' => (float) $ep['indemnite_representation'],
+                'avantage_logement' => (float) $ep['avantage_logement'],
+            ];
+            $pId = (int) $ep['id'];
+            $pgs = $this->db->query("SELECT rubrique_id, montant FROM paie_gains WHERE paie_id = $pId")->fetchAll();
+            foreach ($pgs as $pg) {
+                $gainsOverridesMap[$sId][(int) $pg['rubrique_id']] = (float) $pg['montant'];
+            }
+            $prs = $this->db->query("SELECT libelle, montant FROM paie_retenues WHERE paie_id = $pId")->fetchAll();
+            if (!empty($prs)) {
+                $retenuesOverridesMap[$sId] = $prs;
+            }
         }
 
         if (count($existingPaies) > 0) {
             $this->db->exec("DELETE FROM paies WHERE periode_id = $id");
         }
+
+        $insertGain = null;
+        $insertRet = null;
 
         $societeId = $periode['societe_id'];
         $dateDebut = $periode['date_debut'];
@@ -150,6 +172,13 @@ class PaieController extends Controller
 
         foreach ($salaries as $s) {
             $heuresSup = $heuresSupMap[(int) $s['id']] ?? 0;
+            $indemnOverrides = $indemnitesMap[(int) $s['id']] ?? [];
+            if ($indemnOverrides) {
+                $s['indemnite_transport'] = $indemnOverrides['indemnite_transport'];
+                $s['indemnite_panier'] = $indemnOverrides['indemnite_panier'];
+                $s['indemnite_representation'] = $indemnOverrides['indemnite_representation'];
+                $s['avantage_logement'] = $indemnOverrides['avantage_logement'];
+            }
             $c = $this->calculator->calculerPaie($s, $cnssParams, $dateFin, $heuresSup, $gains, $retenues, $dateDebut, $baremeHS);
 
             $stmtPaie = $this->db->prepare("
@@ -166,6 +195,24 @@ class PaieController extends Controller
                 $c['autresRetenues'], $c['netAvant'], $c['net'],
                 $c['cnssPatronale'], $c['amoPatronale'], $c['fraisPro'],
             ]);
+
+            $newPaieId = $this->db->lastInsertId();
+            if (!empty($gainsOverridesMap[(int) $s['id']])) {
+                if (!$insertGain) {
+                    $insertGain = $this->db->prepare("INSERT INTO paie_gains (paie_id, rubrique_id, montant) VALUES (?, ?, ?)");
+                }
+                foreach ($gainsOverridesMap[(int) $s['id']] as $rId => $montant) {
+                    $insertGain->execute([$newPaieId, $rId, $montant]);
+                }
+            }
+            if (!empty($retenuesOverridesMap[(int) $s['id']])) {
+                if (!$insertRet) {
+                    $insertRet = $this->db->prepare("INSERT INTO paie_retenues (paie_id, libelle, montant) VALUES (?, ?, ?)");
+                }
+                foreach ($retenuesOverridesMap[(int) $s['id']] as $r) {
+                    $insertRet->execute([$newPaieId, $r['libelle'], $r['montant']]);
+                }
+            }
         }
 
         $nbBulletins = BulletinController::genererPourPeriode($id, $this->db);
@@ -253,7 +300,7 @@ class PaieController extends Controller
         $userId = Session::get('user_id');
         $paie = $this->db->query("
             SELECT pa.*, s.nom_famille, s.prenom, s.salaire_base, so.raison_sociale,
-                   p.mois, p.annee, p.id as periode_id
+                   p.mois, p.annee, p.id as periode_id, p.societe_id
             FROM paies pa
             JOIN salaries s ON pa.salarie_id = s.id
             JOIN societes so ON pa.societe_id = so.id
@@ -272,18 +319,70 @@ class PaieController extends Controller
             $this->redirect('/paie-me/paies');
         }
 
+        $societeId = (int) $paie['societe_id'];
+        $paieRetenues = $this->db->query("SELECT id, libelle, montant FROM paie_retenues WHERE paie_id = $id ORDER BY id")->fetchAll();
+
         if ($this->isPost()) {
             $this->checkCsrf();
-            $heuresSup = (float) ($_POST['heures_supplementaires'] ?? 0);
-            $stmt = $this->db->prepare("UPDATE paies SET heures_supplementaires = ? WHERE id = ?");
-            $stmt->execute([$heuresSup, $id]);
-            Session::setFlash('success', 'Heures supplémentaires enregistrées. Recalculez la période pour appliquer.');
+            $stmt = $this->db->prepare("
+                UPDATE paies SET
+                    heures_supplementaires = ?,
+                    indemnite_transport = ?,
+                    indemnite_panier = ?,
+                    indemnite_representation = ?,
+                    avantage_logement = ?
+                WHERE id = ?
+            ");
+            $stmt->execute([
+                (float) ($_POST['heures_supplementaires'] ?? 0),
+                (float) ($_POST['indemnite_transport'] ?? 0),
+                (float) ($_POST['indemnite_panier'] ?? 0),
+                (float) ($_POST['indemnite_representation'] ?? 0),
+                (float) ($_POST['avantage_logement'] ?? 0),
+                $id,
+            ]);
+
+            $this->db->exec("DELETE FROM paie_gains WHERE paie_id = $id");
+            $insertGain = $this->db->prepare("INSERT INTO paie_gains (paie_id, rubrique_id, montant) VALUES (?, ?, ?)");
+
+            if (!empty($_POST['gain_custom_libelle'])) {
+                $rubInsert = $this->db->prepare("INSERT INTO rubriques_gains (societe_id, code, libelle, type_montant, valeur_defaut, actif) VALUES (?, ?, ?, 'fixe', 0, 1)");
+                foreach ($_POST['gain_custom_libelle'] as $idx => $libelle) {
+                    $libelle = trim($libelle);
+                    if ($libelle === '' || empty($_POST['gain_custom_actif'][$idx])) continue;
+                    $montant = (float) ($_POST['gain_custom_montant'][$idx] ?? 0);
+                    $code = 'CUST_' . bin2hex(random_bytes(4));
+                    $rubInsert->execute([$societeId, $code, $libelle]);
+                    $newRubId = $this->db->lastInsertId();
+                    if ($montant > 0) {
+                        $insertGain->execute([$id, $newRubId, $montant]);
+                    }
+                }
+            }
+
+            $this->db->exec("DELETE FROM paie_retenues WHERE paie_id = $id");
+            if (!empty($_POST['retenue_libelle'])) {
+                $insertRet = $this->db->prepare("INSERT INTO paie_retenues (paie_id, libelle, montant) VALUES (?, ?, ?)");
+                foreach ($_POST['retenue_libelle'] as $idx => $libelle) {
+                    $libelle = trim($libelle);
+                    if ($libelle === '') continue;
+                    $montant = (float) ($_POST['retenue_montant'][$idx] ?? 0);
+                    if ($montant > 0) {
+                        $insertRet->execute([$id, $libelle, $montant]);
+                    }
+                }
+            }
+
+            Audit::log($this->db, 'update', 'paie', $id, 'Modification paie: ' . $paie['nom_famille'] . ' ' . $paie['prenom']);
+
+            Session::setFlash('success', 'Paie mise à jour. Recalculez la période pour recalculer les totaux.');
             $this->redirect('/paie-me/paies/paie/' . $id . '/edit');
         }
 
         $this->render('paies/edit.php', [
-            'title' => 'Modifier la paie — ' . $paie['nom_famille'] . ' ' . $paie['prenom'],
-            'paie'  => $paie,
+            'title'        => 'Modifier la paie — ' . $paie['nom_famille'] . ' ' . $paie['prenom'],
+            'paie'         => $paie,
+            'paieRetenues' => $paieRetenues,
         ]);
     }
 

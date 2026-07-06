@@ -369,6 +369,27 @@ CREATE TABLE IF NOT EXISTS audit_log (
 ) ENGINE=InnoDB;
 
 -- -----------------------------------------------------------
+-- Paie gains (overrides par salarié/période)
+-- -----------------------------------------------------------
+CREATE TABLE IF NOT EXISTS paie_gains (
+    id             INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    paie_id        INT UNSIGNED NOT NULL,
+    rubrique_id    INT UNSIGNED NOT NULL,
+    montant        DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+    FOREIGN KEY (paie_id) REFERENCES paies(id) ON DELETE CASCADE,
+    FOREIGN KEY (rubrique_id) REFERENCES rubriques_gains(id) ON DELETE CASCADE,
+    UNIQUE KEY unique_paie_rubrique (paie_id, rubrique_id)
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS paie_retenues (
+    id             INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    paie_id        INT UNSIGNED NOT NULL,
+    libelle        VARCHAR(200) NOT NULL,
+    montant        DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+    FOREIGN KEY (paie_id) REFERENCES paies(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- -----------------------------------------------------------
 -- Index utilisateur par défaut (password: admin123)
 -- -----------------------------------------------------------
 INSERT INTO users (nom, email, password, role)

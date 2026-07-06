@@ -99,14 +99,12 @@ Net  = salaire - (CNSS + AMO + IR)
 ## Progress (current session)
 
 ### Done
-- Confirmed via web: "Décret n° 2-24-130" was wrong — correct source is **Arrêté n° 1314-25 du 19 mai 2025** (BO n° 7443, effective 1er octobre 2025), issued under décret n° 2-25-266
-- Replaced all "Décret n° 2-24-130" → "Arrêté n° 1314-25" in migrate.php, schema.sql, markdown docs
-- Added `source_maj DATE DEFAULT NULL` column to `rubriques_gains` table (schema.sql CREATE TABLE + ALTER TABLE)
-- Added `source_maj` to migrate.php: column list, all INSERT values (`'2025-10-01'`), all UPDATE SET clauses
-- Added display column "MAJ Source" in gains.php table header + data cell
-- Added `source_maj` date input field in the gains modal form
-- Added `setVal('f_source_maj', ...)` in gains.js `fillForm()`
-- Added `'source_maj' => $p('source_maj')` in SocieteController::parametres() POST handler
+- **Indemnités et gains modifiables dans la page d'édition** : 
+  - `edit.php` affiche 4 champs indemnités (transport, panier, représentation, logement) éditables + tableau des rubriques de gains avec checkbox/montant
+  - `editPaie()` POST sauvegarde indemnités dans `paies` + gains dans nouvelle table `paie_gains`
+  - Récupération des overrides dans `calculate()` pour préserver indemnités + gains pendant recalcul
+- Créé table `paie_gains` (paie_id, rubrique_id, montant) dans schema.sql + migrate.php
+- `calculate()` mémorise et restore les overrides de 4 indemnités + paie_gains + heures_sup pendant DELETE/INSERT
 
 ### Pending
 - (none)
@@ -114,9 +112,7 @@ Net  = salaire - (CNSS + AMO + IR)
 ### Key changes
 | File | Change |
 |------|--------|
-| `database/migrate.php` | source name corrected, `source_maj` added to all INSERT/UPDATE |
-| `database/schema.sql` | added `compte`, `source`, `source_maj`, `nature_edi`, `base_anciennete`, `au_prorata` cols + ALTER TABLE |
-| `views/societes/parametres/gains.php` | "MAJ Source" column in table + date input in modal |
-| `assets/js/gains.js` | fills `source_maj` from data |
-| `controllers/SocieteController.php` | saves `source_maj` from POST |
-| `docs-paie-me/*.md`, `database/update_rubriques_from_md.sql` | source name corrected |
+| `database/migrate.php` | + table paie_gains |
+| `database/schema.sql` | + table paie_gains |
+| `views/paies/edit.php` | indemnités éditables + gains checkbox/input |
+| `controllers/PaieController.php` | editPaie() sauvegarde indemnités+gains ; calculate() préserve 4 indemnités + gains overrides |

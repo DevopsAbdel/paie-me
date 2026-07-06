@@ -405,6 +405,16 @@ $p->exec("CREATE TABLE IF NOT EXISTS conge_annuel (
 ) ENGINE=InnoDB");
 echo "   + table conge_annuel\n";
 
+// === Table des retenues personnalisées par paie ===
+$p->exec("CREATE TABLE IF NOT EXISTS paie_retenues (
+    id             INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    paie_id        INT UNSIGNED NOT NULL,
+    libelle        VARCHAR(200) NOT NULL,
+    montant        DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+    FOREIGN KEY (paie_id) REFERENCES paies(id) ON DELETE CASCADE
+) ENGINE=InnoDB");
+echo "   + table paie_retenues créée\n";
+
 $p->exec("CREATE TABLE IF NOT EXISTS jours_feries (
     id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     societe_id      INT UNSIGNED        NOT NULL,
@@ -452,5 +462,17 @@ $p->exec("CREATE TABLE IF NOT EXISTS bareme_heures_sup (
     FOREIGN KEY (societe_id) REFERENCES societes(id) ON DELETE CASCADE
 ) ENGINE=InnoDB");
 echo "   + table bareme_heures_sup\n";
+
+// === Paie gains ===
+$p->exec("CREATE TABLE IF NOT EXISTS paie_gains (
+    id             INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    paie_id        INT UNSIGNED NOT NULL,
+    rubrique_id    INT UNSIGNED NOT NULL,
+    montant        DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+    FOREIGN KEY (paie_id) REFERENCES paies(id) ON DELETE CASCADE,
+    FOREIGN KEY (rubrique_id) REFERENCES rubriques_gains(id) ON DELETE CASCADE,
+    UNIQUE KEY unique_paie_rubrique (paie_id, rubrique_id)
+) ENGINE=InnoDB");
+echo "   + table paie_gains\n";
 
 echo "\nMigrations terminées.\n";
