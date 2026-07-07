@@ -121,16 +121,16 @@ function overLimit(?float $valeur, ?float $plafond): bool
                         <td></td>
                     </tr>
 
-                    <?php $baseHS25 = round($th * $hs25, 2); ?>
                     <tr>
                         <td class="code">201</td>
                         <td>
                             <span class="info" title="Taux horaire <?= number_format($th, 2, ',', ' ') ?> MAD/h">ⓘ</span>
                             HS <?= $t25 ?>%
-                            <input type="number" step="0.5" min="0" name="heures_sup_25" class="form-control-inline" value="<?= $hs25 ?>" style="width:40px;">h
                         </td>
-                        <td class="montant"><?= number_format($baseHS25, 2, ',', ' ') ?></td>
-                        <td class="unite">DH</td>
+                        <td>
+                            <input type="number" step="0.5" min="0" name="heures_sup_25" class="form-control-inline" value="<?= $hs25 ?>" style="width:50px;">
+                        </td>
+                        <td class="unite">Heure</td>
                         <td class="taux"><?= $t25 ?>%</td>
                         <td class="montant"><?= number_format($mHS25, 2, ',', ' ') ?></td>
                         <td></td>
@@ -139,16 +139,16 @@ function overLimit(?float $valeur, ?float $plafond): bool
                         <td></td>
                     </tr>
 
-                    <?php $baseHS50 = round($th * $hs50, 2); ?>
                     <tr>
                         <td class="code">202</td>
                         <td>
                             <span class="info" title="Taux horaire <?= number_format($th, 2, ',', ' ') ?> MAD/h">ⓘ</span>
                             HS <?= $t50 ?>%
-                            <input type="number" step="0.5" min="0" name="heures_sup_50" class="form-control-inline" value="<?= $hs50 ?>" style="width:40px;">h
                         </td>
-                        <td class="montant"><?= number_format($baseHS50, 2, ',', ' ') ?></td>
-                        <td class="unite">DH</td>
+                        <td>
+                            <input type="number" step="0.5" min="0" name="heures_sup_50" class="form-control-inline" value="<?= $hs50 ?>" style="width:50px;">
+                        </td>
+                        <td class="unite">Heure</td>
                         <td class="taux"><?= $t50 ?>%</td>
                         <td class="montant"><?= number_format($mHS50, 2, ',', ' ') ?></td>
                         <td></td>
@@ -157,16 +157,16 @@ function overLimit(?float $valeur, ?float $plafond): bool
                         <td></td>
                     </tr>
 
-                    <?php $baseHS100 = round($th * $hs100, 2); ?>
                     <tr>
                         <td class="code">203</td>
                         <td>
                             <span class="info" title="Taux horaire <?= number_format($th, 2, ',', ' ') ?> MAD/h">ⓘ</span>
                             HS <?= $t100 ?>%
-                            <input type="number" step="0.5" min="0" name="heures_sup_100" class="form-control-inline" value="<?= $hs100 ?>" style="width:40px;">h
                         </td>
-                        <td class="montant"><?= number_format($baseHS100, 2, ',', ' ') ?></td>
-                        <td class="unite">DH</td>
+                        <td>
+                            <input type="number" step="0.5" min="0" name="heures_sup_100" class="form-control-inline" value="<?= $hs100 ?>" style="width:50px;">
+                        </td>
+                        <td class="unite">Heure</td>
                         <td class="taux"><?= $t100 ?>%</td>
                         <td class="montant"><?= number_format($mHS100, 2, ',', ' ') ?></td>
                         <td></td>
