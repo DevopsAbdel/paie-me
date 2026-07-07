@@ -500,25 +500,42 @@ function overLimit(?float $valeur, ?float $plafond): bool
 
     <!-- Modale Retenue -->
     <div class="custom-modal-overlay" id="retenueModal" style="display:none;">
-        <div class="custom-modal" style="max-width:520px;">
+        <div class="custom-modal" style="max-width:780px;">
             <div class="custom-modal-header">
                 <h4 style="margin:0;">Ajouter une retenue</h4>
                 <button type="button" class="btn btn-sm btn-secondary" onclick="document.getElementById('retenueModal').style.display='none'" style="padding:0.2rem 0.5rem;">✕</button>
             </div>
             <div class="custom-modal-body">
-                <div class="form-group">
-                    <label>Rubrique</label>
-                    <select id="retenue_rubrique_select" class="form-select" style="width:100%;">
-                        <option value="">— Choisir une rubrique —</option>
-                        <?php foreach ($rubriquesRetenues as $rr): ?>
-                        <option value="<?= $rr['id'] ?>" data-code="<?= htmlspecialchars($rr['code']) ?>" data-libelle="<?= htmlspecialchars($rr['libelle']) ?>">
-                            [<?= htmlspecialchars($rr['code']) ?>] <?= htmlspecialchars(mb_substr($rr['libelle'], 0, 60)) ?>
-                        </option>
-                        <?php endforeach; ?>
-                    </select>
+                <div style="margin-bottom:0.75rem;">
+                    <input type="text" id="retenue_search" class="form-control" placeholder="Rechercher par code ou libellé..." onkeyup="filterRetenues()" style="width:100%;">
                 </div>
-                <div class="form-group" style="margin-top:0.5rem;">
-                    <label>Montant (DH)</label>
+                <div style="max-height:280px;overflow-y:auto;border:1px solid var(--border);border-radius:6px;">
+                    <table class="edit-paie-table" style="border:none;margin:0;">
+                        <thead>
+                            <tr>
+                                <th style="width:8%;">Code</th>
+                                <th style="width:40%;">Libellé</th>
+                                <th style="width:10%;">Type</th>
+                                <th style="width:20%;">Valeur défaut</th>
+                                <th style="width:22%;"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="retenue_table_body">
+                            <?php foreach ($rubriquesRetenues as $rr): ?>
+                            <tr class="retenue-row" data-id="<?= $rr['id'] ?>" data-code="<?= htmlspecialchars($rr['code']) ?>" data-libelle="<?= htmlspecialchars($rr['libelle']) ?>" onclick="selectRetenueRow(this)">
+                                <td class="code"><?= htmlspecialchars($rr['code']) ?></td>
+                                <td><?= htmlspecialchars($rr['libelle']) ?></td>
+                                <td style="text-align:center;font-size:0.72rem;"><?= htmlspecialchars($rr['type_montant'] ?? 'fixe') ?></td>
+                                <td style="text-align:right;font-size:0.72rem;color:var(--text-muted);"><?= htmlspecialchars($rr['valeur_defaut'] ?? '—') ?></td>
+                                <td style="text-align:center;"><button type="button" class="btn btn-sm btn-secondary" onclick="event.stopPropagation();selectRetenueRow(this.closest('tr'))" style="font-size:0.68rem;padding:0.15rem 0.5rem;">Choisir</button></td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="retenue_info" style="margin-top:0.4rem;font-size:0.72rem;color:var(--text-muted);min-height:1.2rem;"></div>
+                <div style="margin-top:0.75rem;display:flex;align-items:center;gap:0.75rem;">
+                    <label style="font-size:0.8rem;white-space:nowrap;">Montant (DH)</label>
                     <input type="number" step="0.01" min="0" id="retenue_montant_input" class="form-control" value="0" style="width:150px;">
                 </div>
             </div>
@@ -567,6 +584,10 @@ function overLimit(?float $valeur, ?float $plafond): bool
 .gain-row:hover { background:var(--bg-hover); }
 .gain-row.selected { background:rgba(59,130,246,0.15); }
 .gain-row.selected td { color:var(--accent); font-weight:500; }
+.retenue-row { cursor:pointer; }
+.retenue-row:hover { background:var(--bg-hover); }
+.retenue-row.selected { background:rgba(59,130,246,0.15); }
+.retenue-row.selected td { color:var(--accent); font-weight:500; }
 .custom-modal-footer { display:flex; justify-content:flex-end; gap:0.5rem; padding:0.75rem 1rem; border-top:1px solid var(--border); }
 </style>
 
@@ -634,23 +655,42 @@ function ajouterGainDepuisModal() {
 }
 
 let retenueIdx = <?= count($paieRetenues) ?>;
+let retenueSelected = null;
+
+function filterRetenues() {
+    const q = document.getElementById('retenue_search').value.toLowerCase();
+    document.querySelectorAll('.retenue-row').forEach(r => {
+        const code = r.dataset.code.toLowerCase();
+        const libelle = r.dataset.libelle.toLowerCase();
+        r.style.display = (code.includes(q) || libelle.includes(q)) ? '' : 'none';
+    });
+}
+
+function selectRetenueRow(row) {
+    document.querySelectorAll('.retenue-row').forEach(r => r.classList.remove('selected'));
+    row.classList.add('selected');
+    retenueSelected = {
+        id: row.dataset.id,
+        code: row.dataset.code,
+        libelle: row.dataset.libelle,
+    };
+    document.getElementById('retenue_info').textContent = 'Rubrique sélectionnée : ' + retenueSelected.code + ' — ' + retenueSelected.libelle;
+}
 
 function ajouterRetenueDepuisModal() {
-    const sel = document.getElementById('retenue_rubrique_select');
-    const opt = sel.options[sel.selectedIndex];
-    if (!opt || !opt.value) { alert('Veuillez sélectionner une rubrique.'); return; }
+    if (!retenueSelected) { alert('Veuillez sélectionner une rubrique.'); return; }
     const montant = parseFloat(document.getElementById('retenue_montant_input').value) || 0;
     retenueIdx++;
     const tr = document.createElement('tr');
     tr.innerHTML = `
-        <td class="code">900</td>
-        <td>${opt.dataset.libelle}</td>
+        <td class="code">${retenueSelected.code}</td>
+        <td>${retenueSelected.libelle}</td>
         <td></td>
         <td class="unite">DH</td>
         <td class="taux">—</td>
         <td></td>
         <td class="montant">
-            <input type="hidden" name="retenue_new_rubrique_id[${retenueIdx}]" value="${opt.value}">
+            <input type="hidden" name="retenue_new_rubrique_id[${retenueIdx}]" value="${retenueSelected.id}">
             <input type="number" step="0.01" min="0" name="retenue_new_montant[${retenueIdx}]" class="form-control-inline" style="width:80px;" value="${montant.toFixed(2)}">
         </td>
         <td></td>
@@ -661,7 +701,11 @@ function ajouterRetenueDepuisModal() {
     `;
     document.getElementById('retenues-container').before(tr);
     document.getElementById('retenueModal').style.display = 'none';
-    sel.value = '';
+    retenueSelected = null;
+    document.querySelectorAll('.retenue-row').forEach(r => r.classList.remove('selected'));
+    document.getElementById('retenue_search').value = '';
     document.getElementById('retenue_montant_input').value = 0;
+    document.getElementById('retenue_info').textContent = '';
+    document.querySelectorAll('.retenue-row').forEach(r => r.style.display = '');
 }
 </script>
