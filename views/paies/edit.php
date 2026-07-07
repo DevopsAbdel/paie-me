@@ -9,6 +9,21 @@ $hs100 = (float) ($paie['heures_sup_100'] ?? 0);
 $mHS25 = round($hs25 * $th * $t25 / 100, 2);
 $mHS50 = round($hs50 * $th * $t50 / 100, 2);
 $mHS100 = round($hs100 * $th * $t100 / 100, 2);
+
+function getPlafondDgi(string $code, array $plafonds, float $salaireBase): ?float
+{
+    if (isset($plafonds[$code]) && $plafonds[$code]['plafond_dgi_actif']) {
+        return (float) $plafonds[$code]['plafond_dgi_valeur'];
+    }
+    if ($code === '331') return round($salaireBase * 0.10, 2);
+    if ($code === '346') return 780.0;
+    return null;
+}
+
+function overLimit(?float $valeur, ?float $plafond): bool
+{
+    return $plafond !== null && $valeur !== null && $valeur > $plafond;
+}
 ?>
 <div class="card">
     <div class="card-header">
@@ -92,34 +107,46 @@ $mHS100 = round($hs100 * $th * $t100 / 100, 2);
                         <td></td>
                     </tr>
 
-                    <tr>
+                    <?php $pt330 = getPlafondDgi('330', $plafonds, (float) $paie['salaire_base']); $ov330 = overLimit((float) $paie['indemnite_transport'], $pt330); ?>
+                    <tr<?= $ov330 ? ' class="row-over-limit"' : '' ?>>
                         <td class="code">330</td>
-                        <td><span class="info" title="Exonérée IR/CNSS jusqu'à 500 MAD/mois (Arrêté 1314-25)">ⓘ</span> Indemnité transport</td>
+                        <td><span class="info" title="Exonérée IR/CNSS — Plafond : 500 MAD/mois (Arrêté 1314-25)">ⓘ</span> Indemnité transport</td>
                         <td></td>
                         <td class="taux">—</td>
-                        <td class="montant"><input type="number" step="0.01" min="0" name="indemnite_transport" class="form-control-inline" value="<?= $paie['indemnite_transport'] ?>"></td>
+                        <td class="montant">
+                            <input type="number" step="0.01" min="0" name="indemnite_transport" class="form-control-inline<?= $ov330 ? ' over-limit' : '' ?>" value="<?= $paie['indemnite_transport'] ?>">
+                            <?php if ($pt330 !== null): ?><span class="plafond-label">max <?= number_format($pt330, 2, ',', ' ') ?></span><?php endif; ?>
+                        </td>
                         <td></td>
                         <td></td>
                         <td></td>
                     </tr>
 
-                    <tr>
+                    <?php $pt346 = getPlafondDgi('346', $plafonds, (float) $paie['salaire_base']); $ov346 = overLimit((float) $paie['indemnite_panier'], $pt346); ?>
+                    <tr<?= $ov346 ? ' class="row-over-limit"' : '' ?>>
                         <td class="code">346</td>
                         <td><span class="info" title="Exonérée IR/CNSS jusqu'à 780 MAD/mois (Arrêté 1314-25)">ⓘ</span> Indemnité panier</td>
                         <td></td>
                         <td class="taux">—</td>
-                        <td class="montant"><input type="number" step="0.01" min="0" name="indemnite_panier" class="form-control-inline" value="<?= $paie['indemnite_panier'] ?>"></td>
+                        <td class="montant">
+                            <input type="number" step="0.01" min="0" name="indemnite_panier" class="form-control-inline<?= $ov346 ? ' over-limit' : '' ?>" value="<?= $paie['indemnite_panier'] ?>">
+                            <?php if ($pt346 !== null): ?><span class="plafond-label">max <?= number_format($pt346, 2, ',', ' ') ?></span><?php endif; ?>
+                        </td>
                         <td></td>
                         <td></td>
                         <td></td>
                     </tr>
 
-                    <tr>
+                    <?php $pt331 = getPlafondDgi('331', $plafonds, (float) $paie['salaire_base']); $ov331 = overLimit((float) $paie['indemnite_representation'], $pt331); ?>
+                    <tr<?= $ov331 ? ' class="row-over-limit"' : '' ?>>
                         <td class="code">331</td>
-                        <td><span class="info" title="Arrêté 1314-25">ⓘ</span> Indemnité représentation</td>
+                        <td><span class="info" title="10% du salaire de base (Arrêté 1314-25)">ⓘ</span> Indemnité représentation</td>
                         <td></td>
                         <td class="taux">—</td>
-                        <td class="montant"><input type="number" step="0.01" min="0" name="indemnite_representation" class="form-control-inline" value="<?= $paie['indemnite_representation'] ?>"></td>
+                        <td class="montant">
+                            <input type="number" step="0.01" min="0" name="indemnite_representation" class="form-control-inline<?= $ov331 ? ' over-limit' : '' ?>" value="<?= $paie['indemnite_representation'] ?>">
+                            <?php if ($pt331 !== null): ?><span class="plafond-label">max <?= number_format($pt331, 2, ',', ' ') ?></span><?php endif; ?>
+                        </td>
                         <td></td>
                         <td></td>
                         <td></td>
@@ -136,13 +163,18 @@ $mHS100 = round($hs100 * $th * $t100 / 100, 2);
                         <td></td>
                     </tr>
 
-                    <?php foreach ($paieGains as $g): ?>
-                    <tr>
+                    <?php foreach ($paieGains as $g):
+                        $ptG = getPlafondDgi($g['code'], $plafonds, (float) $paie['salaire_base']);
+                        $ovG = overLimit((float) $g['montant'], $ptG);
+                    ?>
+                    <tr<?= $ovG ? ' class="row-over-limit"' : '' ?>>
                         <td class="code"><?= htmlspecialchars($g['code']) ?></td>
                         <td><?= htmlspecialchars($g['libelle']) ?></td>
                         <td></td>
                         <td class="taux">—</td>
-                        <td class="montant"><?= number_format($g['montant'], 2, ',', ' ') ?></td>
+                        <td class="montant<?= $ovG ? ' over-limit' : '' ?>"><?= number_format($g['montant'], 2, ',', ' ') ?>
+                            <?php if ($ptG !== null): ?><span class="plafond-label">max <?= number_format($ptG, 2, ',', ' ') ?></span><?php endif; ?>
+                        </td>
                         <td></td>
                         <td></td>
                         <td></td>
@@ -360,6 +392,10 @@ $mHS100 = round($hs100 * $th * $t100 / 100, 2);
 .edit-paie-table .total-row td { padding:0.4rem 0.5rem; border-top:1px solid var(--border); font-weight:600; }
 .form-control-inline { width:60px; padding:0.2rem 0.3rem; font-size:0.75rem; background:var(--surface); border:1px solid var(--border); border-radius:3px; color:var(--text); text-align:right; }
 .form-control-inline:focus { border-color:var(--accent); outline:none; }
+.form-control-inline.over-limit { border-color:#ef4444; background:rgba(239,68,68,0.12); color:#fca5a5; }
+.row-over-limit td { background:rgba(239,68,68,0.06); }
+.montant.over-limit { color:#fca5a5; font-weight:600; }
+.plafond-label { display:block; font-size:0.6rem; color:var(--text-muted); white-space:nowrap; margin-top:0.1rem; }
 .info { cursor:help; font-size:0.7rem; color:var(--text-muted); margin-right:0.15rem; position:relative; }
 .info:hover { color:var(--accent); }
 </style>

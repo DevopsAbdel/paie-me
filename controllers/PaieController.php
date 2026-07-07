@@ -261,6 +261,52 @@ class PaieController extends Controller
         $this->redirect('/paie-me/paies');
     }
 
+    public function rouvrir(int $id): void
+    {
+        $userId = Session::get('user_id');
+        $periode = $this->db->query("
+            SELECT p.* FROM periodes p
+            JOIN societes so ON p.societe_id = so.id
+            WHERE p.id = $id AND so.user_id = $userId
+        ")->fetch();
+
+        if (!$periode) {
+            Session::setFlash('error', 'Période introuvable.');
+            $this->redirect('/paie-me/paies');
+        }
+
+        if (empty($periode['cloturee'])) {
+            Session::setFlash('error', 'Cette période n\'est pas clôturée.');
+            $this->redirect('/paie-me/paies');
+        }
+
+        $this->db->exec("UPDATE periodes SET cloturee = 0 WHERE id = $id");
+        Audit::log($this->db, 'rouvrir', 'periode', $id, 'Réouverture période');
+        Session::setFlash('success', 'Période réouverte avec succès.');
+        $this->redirect('/paie-me/paies');
+    }
+
+    public function supprimerPeriode(int $id): void
+    {
+        $userId = Session::get('user_id');
+        $periode = $this->db->query("
+            SELECT p.* FROM periodes p
+            JOIN societes so ON p.societe_id = so.id
+            WHERE p.id = $id AND so.user_id = $userId
+        ")->fetch();
+
+        if (!$periode) {
+            Session::setFlash('error', 'Période introuvable.');
+            $this->redirect('/paie-me/paies');
+        }
+
+        $mois = str_pad($periode['mois'], 2, '0', STR_PAD_LEFT);
+        $this->db->exec("DELETE FROM periodes WHERE id = $id");
+        Audit::log($this->db, 'supprimer', 'periode', $id, 'Suppression période: ' . $mois . '/' . $periode['annee']);
+        Session::setFlash('success', 'Période supprimée avec succès.');
+        $this->redirect('/paie-me/paies');
+    }
+
     public function lignes(int $id): void
     {
         $userId = Session::get('user_id');
@@ -276,7 +322,7 @@ class PaieController extends Controller
         }
 
         $paies = $this->db->query("
-            SELECT pa.*, s.nom_famille, s.prenom, s.matricule
+            SELECT pa.*, s.nom_famille, s.prenom, s.matricule, s.cnss
             FROM paies pa
             JOIN salaries s ON pa.salarie_id = s.id
             WHERE pa.periode_id = $id
@@ -284,7 +330,7 @@ class PaieController extends Controller
         ")->fetchAll();
 
         $disponibles = $this->db->prepare("
-            SELECT s.id, s.matricule, s.nom_famille, s.prenom, s.salaire_base
+            SELECT s.id, s.matricule, s.cnss, s.nom_famille, s.prenom, s.salaire_base
             FROM salaries s
             WHERE s.societe_id = (SELECT societe_id FROM periodes WHERE id = ?)
             AND s.actif = 1
@@ -336,6 +382,19 @@ class PaieController extends Controller
             ORDER BY rg.code
         ")->fetchAll();
         $baremeHS = $this->db->query("SELECT * FROM bareme_heures_sup WHERE societe_id = $societeId")->fetch() ?: [];
+
+        $codesIndemnites = ['330', '331', '340', '346'];
+        $codesGains = array_unique(array_column($paieGains, 'code'));
+        $codes = array_unique(array_merge($codesIndemnites, $codesGains));
+        $plafonds = [];
+        if (!empty($codes)) {
+            $ph = implode(',', array_fill(0, count($codes), '?'));
+            $s = $this->db->prepare("SELECT code, plafond_dgi_actif, plafond_dgi_valeur, plafond_dgi_type, plafond_cnss_actif, plafond_cnss_valeur, plafond_cnss_type, plafond_dgi_desc, plafond_cnss_desc FROM rubriques_gains WHERE code IN ($ph)");
+            $s->execute(array_values($codes));
+            foreach ($s->fetchAll() as $row) {
+                $plafonds[$row['code']] = $row;
+            }
+        }
 
         if ($this->isPost()) {
             $this->checkCsrf();
@@ -407,7 +466,43 @@ class PaieController extends Controller
             'paieRetenues' => $paieRetenues,
             'paieGains'    => $paieGains,
             'baremeHS'     => $baremeHS,
+            'plafonds'     => $plafonds,
         ]);
+    }
+
+    public function supprimerPaie(int $id): void
+    {
+        $userId = Session::get('user_id');
+        $paie = $this->db->query("
+            SELECT pa.*, so.user_id, p.cloturee, s.nom_famille, s.prenom
+            FROM paies pa
+            JOIN salaries s ON pa.salarie_id = s.id
+            JOIN societes so ON pa.societe_id = so.id
+            JOIN periodes p ON pa.periode_id = p.id
+            WHERE pa.id = $id AND so.user_id = $userId
+        ")->fetch();
+
+        if (!$paie) {
+            Session::setFlash('error', 'Paie introuvable.');
+            $this->redirect('/paie-me/paies');
+        }
+
+        if (!empty($paie['cloturee'])) {
+            Session::setFlash('error', 'Cette période est clôturée.');
+            $this->redirect('/paie-me/paies/' . $paie['periode_id'] . '/lignes');
+        }
+
+        $periodeId = (int) $paie['periode_id'];
+        $nom = $paie['nom_famille'] . ' ' . $paie['prenom'];
+
+        $this->db->exec("DELETE FROM bulletins WHERE paie_id = $id");
+        $this->db->exec("DELETE FROM paie_gains WHERE paie_id = $id");
+        $this->db->exec("DELETE FROM paie_retenues WHERE paie_id = $id");
+        $this->db->exec("DELETE FROM paies WHERE id = $id");
+
+        Audit::log($this->db, 'supprimer', 'paie', $id, 'Suppression paie: ' . $nom);
+        Session::setFlash('success', 'Paie de ' . $nom . ' supprimée.');
+        $this->redirect('/paie-me/paies/' . $periodeId . '/lignes');
     }
 
     public function ajouterSalaries(int $id): void

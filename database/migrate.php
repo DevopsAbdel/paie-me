@@ -409,8 +409,8 @@ echo "   + table conge_annuel\n";
 addCol($p, 'paies', 'heures_sup_25 DECIMAL(10,2) NOT NULL DEFAULT 0.00 AFTER montant_heures_sup');
 addCol($p, 'paies', 'heures_sup_50 DECIMAL(10,2) NOT NULL DEFAULT 0.00 AFTER heures_sup_25');
 addCol($p, 'paies', 'heures_sup_100 DECIMAL(10,2) NOT NULL DEFAULT 0.00 AFTER heures_sup_50');
-$p->exec("UPDATE paies SET heures_sup_25 = heures_supplementaires WHERE heures_sup_25 = 0 AND heures_supplementaires > 0");
-if ($p->rowCount() > 0) echo "   + anciennes heures_supplementaires copiées vers heures_sup_25\n";
+$affected = $p->exec("UPDATE paies SET heures_sup_25 = heures_supplementaires WHERE heures_sup_25 = 0 AND heures_supplementaires > 0");
+if ($affected > 0) echo "   + anciennes heures_supplementaires copiées vers heures_sup_25\n";
 
 // === Table des retenues personnalisées par paie ===
 $p->exec("CREATE TABLE IF NOT EXISTS paie_retenues (
@@ -481,5 +481,20 @@ $p->exec("CREATE TABLE IF NOT EXISTS paie_gains (
     UNIQUE KEY unique_paie_rubrique (paie_id, rubrique_id)
 ) ENGINE=InnoDB");
 echo "   + table paie_gains\n";
+
+// === Barème SMIG / SMAG ===
+$p->exec("CREATE TABLE IF NOT EXISTS bareme_smig_smag (
+    id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    societe_id      INT UNSIGNED        NOT NULL,
+    annee           INT                 NOT NULL,
+    type            ENUM('SMIG','SMAG') NOT NULL,
+    horaire         DECIMAL(10,2)       NOT NULL DEFAULT 0.00,
+    mensuel         DECIMAL(10,2)       NOT NULL DEFAULT 0.00,
+    date_effet      DATE                DEFAULT NULL,
+    updated_at      DATETIME            NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (societe_id) REFERENCES societes(id) ON DELETE CASCADE,
+    UNIQUE KEY unique_societe_annee_type (societe_id, annee, type)
+) ENGINE=InnoDB");
+echo "   + table bareme_smig_smag\n";
 
 echo "\nMigrations terminées.\n";

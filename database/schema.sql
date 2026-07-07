@@ -674,3 +674,19 @@ CROSS JOIN (SELECT 'CGI' AS c, 'Art. 57-1°' AS article, '330' AS code UNION ALL
             SELECT 'A1314', 'Titre VII', '377') AS a
 JOIN sources_legales s ON s.code = a.c
 WHERE r.code = a.code AND r.societe_id IS NULL;
+
+-- -----------------------------------------------------------
+-- Barème SMIG / SMAG (par société, par année)
+-- -----------------------------------------------------------
+CREATE TABLE IF NOT EXISTS bareme_smig_smag (
+    id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    societe_id      INT UNSIGNED        NOT NULL,
+    annee           INT                 NOT NULL,
+    type            ENUM('SMIG','SMAG') NOT NULL,
+    horaire         DECIMAL(10,2)       NOT NULL DEFAULT 0.00,
+    mensuel         DECIMAL(10,2)       NOT NULL DEFAULT 0.00,
+    date_effet      DATE                DEFAULT NULL,
+    updated_at      DATETIME            NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (societe_id) REFERENCES societes(id) ON DELETE CASCADE,
+    UNIQUE KEY unique_societe_annee_type (societe_id, annee, type)
+) ENGINE=InnoDB;

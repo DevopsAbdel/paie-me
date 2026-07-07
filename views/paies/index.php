@@ -43,10 +43,13 @@
                             <div class="table-actions">
                                 <a href="/paie-me/paies/<?= $p['id'] ?>/lignes" class="btn btn-secondary btn-sm">Détail</a>
                                 <a href="/paie-me/paies/<?= $p['id'] ?>/journal" class="btn btn-secondary btn-sm">Journal</a>
-                                <?php if (!$p['cloturee']): ?>
+                                <?php if ($p['cloturee']): ?>
+                                    <a href="/paie-me/paies/<?= $p['id'] ?>/rouvrir" class="btn btn-secondary btn-sm" onclick="return confirm('Réouvrir cette période ? Les modifications seront à nouveau autorisées.')">Réouvrir</a>
+                                <?php else: ?>
                                     <a href="/paie-me/paies/<?= $p['id'] ?>/calculate" class="btn btn-secondary btn-sm" onclick="return confirm('Recalculer les paies pour cette période ?')">Recalculer</a>
                                     <a href="/paie-me/paies/<?= $p['id'] ?>/cloturer" class="btn btn-danger btn-sm" onclick="return confirm('Clôturer cette période ? Cette action est irréversible.')">Clôturer</a>
                                 <?php endif; ?>
+                                <a href="/paie-me/paies/<?= $p['id'] ?>/supprimer" class="btn btn-danger btn-sm" onclick="return confirm('Supprimer définitivement cette période et toutes les paies associées ? Cette action est irréversible.')">Supprimer</a>
                             </div>
                         </td>
                     </tr>

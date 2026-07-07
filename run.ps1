@@ -87,7 +87,7 @@ if (-not $NoBrowser) {
 </form>
 <script>document.getElementById('f').submit()</script>
 </body></html>
-"@ | Out-File -Encoding utf8NoBOM -FilePath $loginHtml
+"@ | Out-File -Encoding UTF8NoBOM -FilePath $loginHtml
     $chrome = Get-ChildItem -Path @("$env:ProgramFiles\Google\Chrome\Application\chrome.exe", "${env:ProgramFiles(x86)}\Google\Chrome\Application\chrome.exe", "$env:LOCALAPPDATA\Google\Chrome\Application\chrome.exe") -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty FullName
     if ($chrome) {
         Start-Process -FilePath $chrome -ArgumentList "--new-window `"$loginHtml`" --window-size=1366,768"

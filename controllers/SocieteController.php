@@ -400,6 +400,7 @@ class SocieteController extends Controller
             'delete_retenue'    => ['table' => 'rubriques_retenues',   'tab' => 'retenues'],
             'delete_organisme'  => ['table' => 'organismes',           'tab' => 'organismes'],
             'delete_attestation' => ['table' => 'modeles_attestation', 'tab' => 'attestations'],
+            'delete_bareme'     => ['table' => 'bareme_smig_smag',    'tab' => 'bareme_salaire'],
         ];
         foreach ($deleteActions as $param => $cfg) {
             if (isset($_GET[$param])) {
@@ -571,6 +572,23 @@ class SocieteController extends Controller
                     $stmt->execute([$id, $_POST['titre'], $_POST['contenu'] ?? '']);
                     Session::setFlash('success', 'Modèle d\'attestation ajouté.');
                 }
+            } elseif ($sousTab === 'bareme_salaire') {
+                if (!empty($_POST['bareme_id'])) {
+                    $upd = $this->db->prepare("UPDATE bareme_smig_smag SET horaire=?, mensuel=?, date_effet=? WHERE id=? AND societe_id=?");
+                    foreach ($_POST['bareme_id'] as $idx => $bid) {
+                        $horaire = (float) ($_POST['horaire'][$idx] ?? 0);
+                        $mensuel = (float) ($_POST['mensuel'][$idx] ?? 0);
+                        $dateEffet = !empty($_POST['date_effet'][$idx]) ? $_POST['date_effet'][$idx] : null;
+                        $upd->execute([$horaire, $mensuel, $dateEffet, $bid, $id]);
+                    }
+                }
+                $anneeNew = (int) ($_POST['nouvelle_annee'] ?? 0);
+                $typeNew = $_POST['nouveau_type'] ?? '';
+                if ($anneeNew > 0 && in_array($typeNew, ['SMIG', 'SMAG'])) {
+                    $ins = $this->db->prepare("INSERT INTO bareme_smig_smag (societe_id, annee, type, horaire, mensuel) VALUES (?, ?, ?, ?, ?)");
+                    $ins->execute([$id, $anneeNew, $typeNew, $_POST['nouveau_horaire'] ?? 0, $_POST['nouveau_mensuel'] ?? 0]);
+                }
+                Session::setFlash('success', 'Barème SMIG/SMAG mis à jour.');
             } else {
                 $stmt = $this->db->prepare("
                     UPDATE societes SET banque=?, agence=?, rib=?, damancom_login=?, damancom_password=?, simpl_login=?, simpl_password=?, cimr_login=?, cimr_password=?
@@ -605,20 +623,22 @@ class SocieteController extends Controller
         $retenues = $this->db->query("SELECT * FROM rubriques_retenues WHERE (societe_id IS NULL OR societe_id = $id) ORDER BY is_global DESC, code")->fetchAll();
         $organismes = $this->db->query("SELECT * FROM organismes WHERE societe_id = $id ORDER BY nom")->fetchAll();
         $attestations = $this->db->query("SELECT * FROM modeles_attestation WHERE societe_id = $id ORDER BY titre")->fetchAll();
+        $baremeSmigSmag = $this->db->query("SELECT * FROM bareme_smig_smag WHERE societe_id = $id ORDER BY annee DESC, type")->fetchAll();
 
         $societe['rib'] = Crypto::decrypt($societe['rib']);
 
         $titles = [
-            'general'      => 'Informations générales',
-            'banque'       => 'Coordonnées bancaires',
-            'teleservices' => 'Accès téléservices',
-            'codification' => 'Codification & numérotation',
-            'bcp'          => 'BCP — Bordereau de Cotisations et Paiement',
-            'services'     => 'Services',
-            'gains'        => 'Rubriques de gains',
-            'retenues'     => 'Rubriques de retenues',
-            'attestations' => 'Modèles d\'attestation',
-            'journal'      => 'Journal de comptabilisation',
+            'general'        => 'Informations générales',
+            'banque'         => 'Coordonnées bancaires',
+            'teleservices'   => 'Accès téléservices',
+            'codification'   => 'Codification & numérotation',
+            'bcp'            => 'BCP — Bordereau de Cotisations et Paiement',
+            'services'       => 'Services',
+            'gains'          => 'Rubriques de gains',
+            'retenues'       => 'Rubriques de retenues',
+            'attestations'   => 'Modèles d\'attestation',
+            'journal'        => 'Journal de comptabilisation',
+            'bareme_salaire' => 'Barème SMIG & SMAG',
         ];
         $subView = 'banque';
         if (in_array($sous_tab, array_keys($titles))) {
@@ -640,6 +660,7 @@ class SocieteController extends Controller
             'retenues'      => $retenues,
             'organismes'    => $organismes,
             'attestations'  => $attestations,
+            'baremeSmigSmag' => $baremeSmigSmag,
         ]);
     }
 
