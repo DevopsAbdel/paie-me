@@ -172,7 +172,7 @@ class PaieController extends Controller
         $dateFin = $periode['date_fin'];
         $cnssParams = $this->db->query("SELECT * FROM parametres_cnss_amo WHERE societe_id = $societeId")->fetch() ?: [];
         $baremeHS = $this->db->query("SELECT * FROM bareme_heures_sup WHERE societe_id = $societeId")->fetch() ?: [];
-        $gains = $this->mergeRubriques('rubriques_gains', $societeId);
+        $gains = $this->gainsAuto($societeId);
         $retenues = $this->mergeRubriques('rubriques_retenues', $societeId);
 
         $salaries = $this->db->query("SELECT id, salaire_base, date_embauche, date_sortie, situation_familiale, indemnite_transport, indemnite_panier, indemnite_representation, avantage_logement, nb_enfants, avances_salaire, mutuelle FROM salaries WHERE societe_id = $societeId AND actif = 1")->fetchAll();
@@ -568,7 +568,7 @@ class PaieController extends Controller
         $dateFin = $periode['date_fin'];
         $cnssParams = $this->db->query("SELECT * FROM parametres_cnss_amo WHERE societe_id = $societeId")->fetch() ?: [];
         $baremeHS = $this->db->query("SELECT * FROM bareme_heures_sup WHERE societe_id = $societeId")->fetch() ?: [];
-        $gains = $this->mergeRubriques('rubriques_gains', $societeId);
+        $gains = $this->gainsAuto($societeId);
         $retenues = $this->mergeRubriques('rubriques_retenues', $societeId);
 
         if (!empty($_POST['all'])) {
@@ -700,7 +700,7 @@ class PaieController extends Controller
         $societeId = $paie['societe_id'];
         $cnssParams = $this->db->query("SELECT * FROM parametres_cnss_amo WHERE societe_id = $societeId")->fetch() ?: [];
         $baremeHS = $this->db->query("SELECT * FROM bareme_heures_sup WHERE societe_id = $societeId")->fetch() ?: [];
-        $gains = $this->mergeRubriques('rubriques_gains', $societeId);
+        $gains = $this->gainsAuto($societeId);
         $retenues = $this->mergeRubriques('rubriques_retenues', $societeId);
 
         $hs25 = (float) ($paie['heures_sup_25'] ?? 0);
@@ -737,6 +737,14 @@ class PaieController extends Controller
         ]);
 
         BulletinController::genererPourPeriode($paie['periode_id'], $this->db);
+    }
+
+    private function gainsAuto(int $societeId): array
+    {
+        return array_values(array_filter(
+            $this->mergeRubriques('rubriques_gains', $societeId),
+            fn($g) => ($g['categorie'] ?? '') === 'Gain standard'
+        ));
     }
 
     private function mergeRubriques(string $table, int $societeId): array
