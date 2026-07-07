@@ -39,21 +39,25 @@ class PaieCalculator
         return 0;
     }
 
-    public function calculerPaie(array $s, array $cnssParams, string $dateFin, float $heuresSup25 = 0, float $heuresSup50 = 0, float $heuresSup100 = 0, array $gains = [], array $retenues = [], string $dateDebut = '', array $baremeHS = []): array
+    public function calculerPaie(array $s, array $cnssParams, string $dateFin, float $heuresSup25 = 0, float $heuresSup50 = 0, float $heuresSup100 = 0, array $gains = [], array $retenues = [], string $dateDebut = '', array $baremeHS = [], ?int $joursTravailleOverride = null): array
     {
         $salaireBase = (float) $s['salaire_base'];
 
-        $joursTravailles = 26;
-        if ($dateDebut && !empty($s['date_embauche'])) {
-            $embauche = new \DateTime($s['date_embauche']);
-            $debut = new \DateTime($dateDebut);
-            $fin = new \DateTime($dateFin);
-            $dateSortie = !empty($s['date_sortie']) ? new \DateTime($s['date_sortie']) : null;
+        if ($joursTravailleOverride !== null) {
+            $joursTravailles = max(min($joursTravailleOverride, 26), 0);
+        } else {
+            $joursTravailles = 26;
+            if ($dateDebut && !empty($s['date_embauche'])) {
+                $embauche = new \DateTime($s['date_embauche']);
+                $debut = new \DateTime($dateDebut);
+                $fin = new \DateTime($dateFin);
+                $dateSortie = !empty($s['date_sortie']) ? new \DateTime($s['date_sortie']) : null;
 
-            $debutPeriode = $embauche > $debut ? $embauche : $debut;
-            $finPeriode = ($dateSortie && $dateSortie < $fin) ? $dateSortie : $fin;
-            $diff = (int) $debutPeriode->diff($finPeriode)->format('%a') + 1;
-            $joursTravailles = max(min($diff, 26), 0);
+                $debutPeriode = $embauche > $debut ? $embauche : $debut;
+                $finPeriode = ($dateSortie && $dateSortie < $fin) ? $dateSortie : $fin;
+                $diff = (int) $debutPeriode->diff($finPeriode)->format('%a') + 1;
+                $joursTravailles = max(min($diff, 26), 0);
+            }
         }
         $prorata = $joursTravailles / 26;
 

@@ -192,10 +192,10 @@ class PaieController extends Controller
 
             $stmtPaie = $this->db->prepare("
                 INSERT INTO paies (periode_id, salarie_id, societe_id, jours_travailles, salaire_brut, sbi, prime_anciennete, salaire_plafonne_cnss, indemnite_transport, indemnite_panier, indemnite_representation, avantage_logement, total_gains, heures_supplementaires, montant_heures_sup, heures_sup_25, heures_sup_50, heures_sup_100, cnss_salariale, amo_salariale, mutuelle, sni, ir, deductions_familiales, autres_retenues, net_avant_retenues, net_a_payer, cnss_patronale, amo_patronale, frais_professionnels)
-                VALUES (?, ?, ?, 30, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ");
             $stmtPaie->execute([
-                $id, $s['id'], $societeId,
+                $id, $s['id'], $societeId, $c['joursTravailles'],
                 $c['sb'], $c['sbi'], $c['primeAnciennete'], $c['plafonne'],
                 $c['transport'], $c['panier'], $c['representation'], $c['logement'],
                 $c['totalGains'],
@@ -712,7 +712,8 @@ class PaieController extends Controller
         $salarie['indemnite_representation'] = $paie['indemnite_representation'];
         $salarie['avantage_logement'] = $paie['avantage_logement'];
 
-        $c = $this->calculator->calculerPaie($salarie, $cnssParams, $periode['date_fin'], $hs25, $hs50, $hs100, $gains, $retenues, $periode['date_debut'], $baremeHS);
+        $joursOverride = min((int) ($paie['jours_travailles'] ?? 26), 26);
+        $c = $this->calculator->calculerPaie($salarie, $cnssParams, $periode['date_fin'], $hs25, $hs50, $hs100, $gains, $retenues, $periode['date_debut'], $baremeHS, $joursOverride);
 
         $stmt = $this->db->prepare("
             UPDATE paies SET
