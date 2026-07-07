@@ -434,19 +434,13 @@ class PaieController extends Controller
             ]);
 
             $this->db->exec("DELETE FROM paie_gains WHERE paie_id = $id");
-            $insertGain = $this->db->prepare("INSERT INTO paie_gains (paie_id, rubrique_id, montant) VALUES (?, ?, ?)");
 
-            if (!empty($_POST['gain_custom_libelle'])) {
-                $rubInsert = $this->db->prepare("INSERT INTO rubriques_gains (societe_id, code, libelle, type_montant, valeur_defaut, actif) VALUES (?, ?, ?, 'fixe', 0, 1)");
-                foreach ($_POST['gain_custom_libelle'] as $idx => $libelle) {
-                    $libelle = trim($libelle);
-                    if ($libelle === '' || empty($_POST['gain_custom_actif'][$idx])) continue;
-                    $montant = (float) ($_POST['gain_custom_montant'][$idx] ?? 0);
-                    $code = 'CUST_' . bin2hex(random_bytes(4));
-                    $rubInsert->execute([$societeId, $code, $libelle]);
-                    $newRubId = $this->db->lastInsertId();
+            if (!empty($_POST['gain_new_rubrique_id'])) {
+                $insertGain = $this->db->prepare("INSERT INTO paie_gains (paie_id, rubrique_id, montant) VALUES (?, ?, ?)");
+                foreach ($_POST['gain_new_rubrique_id'] as $idx => $rubriqueId) {
+                    $montant = (float) ($_POST['gain_new_montant'][$idx] ?? 0);
                     if ($montant > 0) {
-                        $insertGain->execute([$id, $newRubId, $montant]);
+                        $insertGain->execute([$id, (int)$rubriqueId, $montant]);
                     }
                 }
             }
@@ -468,16 +462,15 @@ class PaieController extends Controller
                 }
             }
 
-            if (!empty($_POST['retenue_libelle'])) {
-                foreach ($_POST['retenue_libelle'] as $idx => $libelle) {
-                    $libelle = trim($libelle);
-                    if ($libelle === '') continue;
-                    $montant = (float) ($_POST['retenue_montant'][$idx] ?? 0);
-                    $type = $_POST['retenue_type'][$idx] ?? 'autre';
-                    $typesValides = ['avance','pret','sanction','autre'];
-                    if (!in_array($type, $typesValides)) $type = 'autre';
+            if (!empty($_POST['retenue_new_rubrique_id'])) {
+                foreach ($_POST['retenue_new_rubrique_id'] as $idx => $rubriqueId) {
+                    $montant = (float) ($_POST['retenue_new_montant'][$idx] ?? 0);
                     if ($montant > 0) {
-                        $insertRet->execute([$id, $type, $libelle, $montant]);
+                        $rub = $this->db->query("SELECT code, libelle FROM rubriques_retenues WHERE id = " . (int)$rubriqueId)->fetch();
+                        if ($rub) {
+                            $type = $this->mapRetenueType($rub['code']);
+                            $insertRet->execute([$id, $type, $rub['libelle'], $montant]);
+                        }
                     }
                 }
             }
@@ -494,6 +487,7 @@ class PaieController extends Controller
         }
 
         $rubriquesRetenues = $this->mergeRubriques('rubriques_retenues', $societeId);
+        $rubriquesGains = $this->mergeRubriques('rubriques_gains', $societeId);
 
         $this->render('paies/edit.php', [
             'title'             => 'Modifier la paie — ' . $paie['nom_famille'] . ' ' . $paie['prenom'],
@@ -503,6 +497,7 @@ class PaieController extends Controller
             'baremeHS'          => $baremeHS,
             'plafonds'          => $plafonds,
             'rubriquesRetenues' => $rubriquesRetenues,
+            'rubriquesGains'    => $rubriquesGains,
         ]);
     }
 
@@ -694,5 +689,15 @@ class PaieController extends Controller
             $merged[$r['code']] = $r;
         }
         return array_values($merged);
+    }
+
+    private function mapRetenueType(string $code): string
+    {
+        $map = [
+            'AVANCE' => 'avance',
+            'PRET' => 'pret',
+            'PRET_LOGEMENT' => 'pret',
+        ];
+        return $map[$code] ?? 'autre';
     }
 }

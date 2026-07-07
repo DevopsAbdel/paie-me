@@ -129,7 +129,7 @@
     z-index:1000;
 }
 .custom-modal {
-    background:var(--surface); border:1px solid var(--border); border-radius:8px;
+    background:var(--bg-surface); border:1px solid var(--border); border-radius:8px;
     box-shadow:0 8px 32px rgba(0,0,0,0.4);
 }
 .custom-modal .modal-header {

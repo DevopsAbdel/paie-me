@@ -74,7 +74,7 @@
     width:80px;
     padding:0.2rem 0.3rem;
     font-size:0.75rem;
-    background:var(--surface);
+    background:var(--bg-surface);
     border:1px solid var(--border);
     border-radius:3px;
     color:var(--text);
