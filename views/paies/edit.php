@@ -186,7 +186,7 @@ function overLimit(?float $valeur, ?float $plafond): bool
 
                     <?php if ($paie['prime_anciennete'] > 0): ?>
                     <tr>
-                        <td class="code">104</td>
+                        <td class="code">204</td>
                         <td><span class="info" title="Ancienneté : <?= $ancienPct ?>% du salaire de base + HS">ⓘ</span> Prime d'ancienneté</td>
                         <td class="montant"><?= number_format($primeBaseElargie, 2, ',', ' ') ?></td>
                         <td class="unite">DH</td>
