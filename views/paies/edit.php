@@ -69,6 +69,40 @@ function overLimit(?float $valeur, ?float $plafond): bool
                         <td></td>
                     </tr>
 
+                    <tr>
+                        <td class="code">101</td>
+                        <td>Durée de travail</td>
+                        <td class="montant">
+                            <input type="number" step="1" min="0" max="31" name="jours_travailles" class="form-control-inline" value="<?= (int)($paie['jours_travailles'] ?? 30) ?>" style="width:40px;"> jours
+                        </td>
+                        <td class="taux">—</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td class="code">102</td>
+                        <td>Jours de congé</td>
+                        <td class="montant">
+                            <input type="number" step="0.5" min="0" max="31" name="jours_conge" class="form-control-inline" value="<?= (float)($paie['jours_conge'] ?? 0) ?>" style="width:40px;"> jours
+                        </td>
+                        <td class="taux">—</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td class="code">103</td>
+                        <td>Jours fériés</td>
+                        <td class="montant">
+                            <input type="number" step="0.5" min="0" max="31" name="jours_feries" class="form-control-inline" value="<?= (float)($paie['jours_feries'] ?? 0) ?>" style="width:40px;"> jours
+                        </td>
+                        <td class="taux">—</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+
                     <?php $baseHS25 = round($th * $hs25, 2); ?>
                     <tr>
                         <td class="code">201</td>

@@ -119,6 +119,8 @@ CREATE TABLE IF NOT EXISTS paies (
     salarie_id                  INT UNSIGNED        NOT NULL,
     societe_id                  INT UNSIGNED        NOT NULL,
     jours_travailles            TINYINT UNSIGNED    NOT NULL DEFAULT 30,
+    jours_conge                 DECIMAL(4,1)        NOT NULL DEFAULT 0.00,
+    jours_feries                DECIMAL(4,1)        NOT NULL DEFAULT 0.00,
     salaire_brut                DECIMAL(10,2)       NOT NULL DEFAULT 0.00,
     salaire_plafonne_cnss       DECIMAL(10,2)       NOT NULL DEFAULT 0.00,
     indemnite_transport         DECIMAL(10,2)       NOT NULL DEFAULT 0.00,

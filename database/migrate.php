@@ -500,4 +500,8 @@ echo "   + table bareme_smig_smag\n";
 // === Colonne type dans paie_retenues ===
 addCol($p, 'paie_retenues', "type ENUM('avance','pret','sanction','autre') NOT NULL DEFAULT 'autre' AFTER paie_id");
 
+// === Jours de congé et jours fériés dans paies ===
+addCol($p, 'paies', 'jours_conge DECIMAL(4,1) NOT NULL DEFAULT 0.00 AFTER jours_travailles');
+addCol($p, 'paies', 'jours_feries DECIMAL(4,1) NOT NULL DEFAULT 0.00 AFTER jours_conge');
+
 echo "\nMigrations terminées.\n";

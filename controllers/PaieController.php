@@ -128,7 +128,7 @@ class PaieController extends Controller
             $this->redirect('/paie-me/paies');
         }
 
-        $existingPaies = $this->db->query("SELECT id, salarie_id, heures_supplementaires, heures_sup_25, heures_sup_50, heures_sup_100, indemnite_transport, indemnite_panier, indemnite_representation, avantage_logement FROM paies WHERE periode_id = $id")->fetchAll();
+        $existingPaies = $this->db->query("SELECT id, salarie_id, jours_travailles, jours_conge, jours_feries, heures_supplementaires, heures_sup_25, heures_sup_50, heures_sup_100, indemnite_transport, indemnite_panier, indemnite_representation, avantage_logement FROM paies WHERE periode_id = $id")->fetchAll();
         $heuresSup25Map = [];
         $heuresSup50Map = [];
         $heuresSup100Map = [];
@@ -141,6 +141,9 @@ class PaieController extends Controller
             $heuresSup50Map[$sId] = (float) ($ep['heures_sup_50'] ?? 0);
             $heuresSup100Map[$sId] = (float) ($ep['heures_sup_100'] ?? 0);
             $indemnitesMap[$sId] = [
+                'jours_travailles' => (int) ($ep['jours_travailles'] ?? 30),
+                'jours_conge' => (float) ($ep['jours_conge'] ?? 0),
+                'jours_feries' => (float) ($ep['jours_feries'] ?? 0),
                 'indemnite_transport' => (float) $ep['indemnite_transport'],
                 'indemnite_panier' => (float) $ep['indemnite_panier'],
                 'indemnite_representation' => (float) $ep['indemnite_representation'],
@@ -404,6 +407,9 @@ class PaieController extends Controller
             $hs100 = (float) ($_POST['heures_sup_100'] ?? 0);
             $stmt = $this->db->prepare("
                 UPDATE paies SET
+                    jours_travailles = ?,
+                    jours_conge = ?,
+                    jours_feries = ?,
                     heures_supplementaires = ?,
                     heures_sup_25 = ?,
                     heures_sup_50 = ?,
@@ -415,6 +421,9 @@ class PaieController extends Controller
                 WHERE id = ?
             ");
             $stmt->execute([
+                (int) ($_POST['jours_travailles'] ?? 30),
+                (float) ($_POST['jours_conge'] ?? 0),
+                (float) ($_POST['jours_feries'] ?? 0),
                 $hs25 + $hs50 + $hs100,
                 $hs25, $hs50, $hs100,
                 (float) ($_POST['indemnite_transport'] ?? 0),
