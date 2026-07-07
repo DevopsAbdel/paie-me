@@ -67,54 +67,54 @@ if (!$check) {
 $existing = $p->query("SELECT COUNT(*) FROM rubriques_gains WHERE is_global = 1 AND code = '501'")->fetchColumn();
 if (!$existing) {
     $p->exec("INSERT IGNORE INTO rubriques_gains (societe_id, is_global, code, libelle, type_montant, valeur_defaut, categorie, imposable, affectation, compte, plafond_dgi, plafond_cnss, justificatifs, source, source_maj, nature_edi, base_anciennete, au_prorata) VALUES
-        (NULL,1,'501','Prime de rendement','proportionnel',10.00,'Gain standard',1,'61711000','61711000','Imposable','Imposable','Contrat de travail / avenant définissant les objectifs et critères de rendement','Contrat de travail','2025-10-01','REND',1,0),
-        (NULL,1,'502','Prime d''objectifs','proportionnel',5.00,'Gain standard',1,'61711000','61711000','Imposable','Imposable','Contrat de travail / avenant définissant les objectifs','Contrat de travail','2025-10-01','OBJEC',1,0),
-        (NULL,1,'503','Prime d''assiduité','fixe',300.00,'Gain standard',1,'61711000','61711000','Imposable','Imposable','Règlement intérieur ou contrat définissant les conditions de présence','Règlement intérieur / contrat','2025-10-01','ASSID',1,0),
-        (NULL,1,'504','Prime de nuit','fixe',250.00,'Gain standard',1,'61711000','61711000','Imposable','Imposable','Planning / pointage justifiant les heures de nuit effectuées','Convention collective / contrat','2025-10-01','NUIT',1,0),
-        (NULL,1,'505','13ème mois (prorata)','proportionnel',8.33,'Gain standard',1,'61711000','61711000','Imposable','Imposable','Convention collective ou usage d''entreprise','Convention collective','2025-10-01','13EME',0,1),
-        (NULL,1,'330','Indemnité de transport urbain','fixe',500,'Transport & Déplacement',0,'61713000','61713000','500.00 DH / mois','500.00 DH / mois','Lieu de travail situé au milieu urbain de la ville','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
-        (NULL,1,'331','Indemnité de représentation','proportionnel',10,'Spécifiques à certains emplois',0,'61713000','61713000','10% du salaire de base','10% du salaire de base','Poste de direction, d''encadrement supérieur ou équivalent','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
-        (NULL,1,'334','Indemnité kilométrique','fixe',0,'Transport & Déplacement',0,'61713000','61713000','3 DH / KM','3 DH / KM','Carnet de bord, carte grise au nom du salarié, trajet < 50 KM','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
-        (NULL,1,'337','Indemnité de tournée','fixe',1500,'Transport & Déplacement',0,'61713000','61713000','1 500.00 DH / mois','1 500.00 DH / mois','Périmètre de déplacement limité à 50 KM, planning de tournée','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
-        (NULL,1,'339','Indemnité de déplacement justifiée','fixe',0,'Transport & Déplacement',0,'61713000','61713000','Nourriture (10x SMIG hor.), Hébergement (30x SMIG hor.)','Totalement exonéré si justifié','Pièces justificatives (factures, tickets, ordre de mission)','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
-        (NULL,1,'340','Indemnité de déplacement forfaitaire ponctuelle','fixe',0,'Transport & Déplacement',0,'61713000','61713000','Nourriture (10x SMIG hor.), Hébergement (30x SMIG hor.)','Repas: 171 DH/j, Hébergement: 513 DH/nuit','Ordre de mission stipulant la nature ponctuelle','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
-        (NULL,1,'341','Indemnité de déplacement forfaitaire régulière','fixe',5000,'Transport & Déplacement',0,'61713000','61713000','<= 5000 DH et <= Salaire de base','Exonération dans la limite de 100% du S.B. (max 5000 DH/mois)','Déplacements professionnels hors périmètre urbain (> 50 km)','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
-        (NULL,1,'342','Indemnité de transport hors urbain','fixe',750,'Transport & Déplacement',0,'61713000','61713000','750.00 DH / mois','750.00 DH / mois','Lieu de travail situé en dehors du milieu urbain','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
-        (NULL,1,'343','Prime d''outillage','fixe',100,'Spécifiques à certains emplois',0,'61713000','61713000','100 DH / mois','119.70 DH / 26 jours de travail','Le salarié doit être propriétaire de ses propres équipements','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
-        (NULL,1,'344','Prime de salissure','fixe',210,'Spécifiques à certains emplois',0,'61713000','61713000','210 DH / mois','239.40 DH / 26 jours de travail','Travaux salissants / insalubres (bleu de travail requis)','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
-        (NULL,1,'345','Prime d''usure de vêtements / Tenue','fixe',0,'Spécifiques à certains emplois',0,'61713000','61713000','Frais réels ou barème interne','Exonéré si port obligatoire pour le service','Obligation contractuelle ou règlement intérieur','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
-        (NULL,1,'346','Indemnité de panier / Panier de nuit','fixe',0,'Spécifiques à certains emplois',0,'61713000','61713000','2x SMIG horaire par jour','Exonération selon plafond légal en vigueur','Horaires de nuit ou travail continu sans coupure','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
-        (NULL,1,'347','Indemnité de pénibilité','fixe',0,'Spécifiques à certains emplois',0,'61713000','61713000','Selon convention collective','Exonéré sous réserve d''un cadre réglementé','Attestation de conditions de travail pénibles','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
-        (NULL,1,'348','Indemnité de risque / Danger','fixe',0,'Spécifiques à certains emplois',0,'61713000','61713000','Selon barème sectoriel','Exonéré si le risque est inhérent à la fonction','Fiche de poste, rapport d''évaluation des risques','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
-        (NULL,1,'349','Indemnité d''astreinte','fixe',0,'Spécifiques à certains emplois',0,'61713000','61713000','Selon convention collective','Exonéré si liée à des interventions urgentes hors horaires','Planning d''astreinte et rapports d''intervention','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
-        (NULL,1,'350','Indemnité de garde','fixe',0,'Spécifiques à certains emplois',0,'61713000','61713000','Barème interne conventionné','Exonéré dans le cadre médical ou de sécurité','Registre des gardes effectuées','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
-        (NULL,1,'351','Voiture de fonction ou de service','fixe',0,'Transport & Déplacement',0,'61713000','61713000','Charges supportées par l''entreprise','Totalement exonéré','Usage strictement professionnel ou convention d''affectation','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
-        (NULL,1,'352','Indemnité de voyage à l''étranger','fixe',0,'Transport & Déplacement',0,'61713000','61713000','Frais réels justifiés','Frais réels sur justificatifs ou barème officiel','Ordre de mission international, billets, factures hôtel','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
-        (NULL,1,'353','Indemnité de déménagement / mutation','fixe',0,'Transport & Déplacement',0,'61713000','61713000','Frais réels sur factures','Exonéré si requis par l''employeur','Décision de mutation, factures du déménageur','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
-        (NULL,1,'354','Allocations familiales additionnelles','fixe',0,'Caractère Social & Familial',0,'61712000','61712000','Plafond légal CNSS','Totalement exonéré','Livret de famille, attestation de non-paiement par ailleurs','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
-        (NULL,1,'355','Allocation de naissance','fixe',0,'Caractère Social & Familial',0,'61712000','61712000','Barème interne raisonnable','Exonéré si ponctuel','Extrait d''acte de naissance du nouveau-né','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
-        (NULL,1,'356','Allocation de mariage','fixe',0,'Caractère Social & Familial',0,'61712000','61712000','Barème social de l''entreprise','Exonéré si ponctuel','Acte de mariage adoulé ou officiel','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
-        (NULL,1,'357','Allocation de décès / Obsèques','fixe',0,'Caractère Social & Familial',0,'61712000','61712000','Frais réels ou forfait social','Totalement exonéré','Certificat de décès du conjoint ou d''un ascendant/descendant direct','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
-        (NULL,1,'358','Prime de scolarité / Rentrée scolaire','fixe',400,'Caractère Social & Familial',0,'61712000','61712000','Plafond par enfant/an','Exonéré si attribué aux enfants à charge','Certificat de scolarité annuel','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
-        (NULL,1,'359','Bons d''achat / Cadeaux de fin d''année','fixe',0,'Caractère Social & Familial',0,'61712000','61712000','Plafond annuel (ex: 10% SMIG)','Exonéré dans la limite du plafond social','Distribution générale à l''occasion de fêtes (Aïd, Achoura, etc.)','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
-        (NULL,1,'360','Indemnité de caisse (responsabilité pécuniaire)','fixe',190,'Spécifiques à certains emplois',0,'61713000','61713000','190 DH / mois','239.40 DH / 26 jours de travail','Poste de caissier ou manipulation effective de fonds','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
-        (NULL,1,'361','Subvention de cantine / Titres repas','fixe',0,'Caractère Social & Familial',0,'61712000','61712000','Plafond par ticket / jour','Exonéré selon la quote-part patronale réglementaire','Factures du prestataire de restauration ou émetteur de titres','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
-        (NULL,1,'362','Prise en charge des frais médicaux','fixe',0,'Caractère Social & Familial',0,'61712000','61712000','Sur dossier médical','Exonéré si géré par le fonds social / mutuelle','Décompte AMO/Mutuelle et ordonnances restées à charge','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
-        (NULL,1,'363','Aide aux vacances / Estivage','fixe',0,'Caractère Social & Familial',0,'61712000','61712000','Plafond annuel fixe','Exonéré si géré via les œuvres sociales (COS)','Factures d''organismes de vacances ou convention COS','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
-        (NULL,1,'364','Secours exceptionnel / Social','fixe',0,'Caractère Social & Familial',0,'61712000','61712000','Forfait ponctuel motivé','Exonéré si situation de précarité avérée','Dossier d''assistante sociale ou justificatifs de force majeure','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
-        (NULL,1,'365','Bourses d''études pour les enfants','fixe',0,'Caractère Social & Familial',0,'61712000','61712000','Selon mérite et critères sociaux','Exonéré si versé directement à l''établissement','Facture de l''école/université, attestation de réussite','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
-        (NULL,1,'366','Indemnité légale de licenciement','fixe',0,'Rupture & Fin de Contrat',0,'61715000','61715000','Barème du Code du Travail','Totalement exonérée de CNSS et DGI','Lettre de licenciement, PV de l''inspecteur du travail / tribunal','Code du Travail / Arrêté n° 1314-25','2025-10-01',NULL,0,0),
-        (NULL,1,'367','Indemnité de licenciement abusive','fixe',0,'Rupture & Fin de Contrat',0,'61715000','61715000','Fixée par tribunal ou conciliation','Exonérée selon la limite légale ou judiciaire','Jugement définitif ou PV de conciliation légalisé','Code du Travail / Arrêté n° 1314-25','2025-10-01',NULL,0,0),
-        (NULL,1,'368','Indemnité de départ volontaire / Retraite','fixe',0,'Rupture & Fin de Contrat',0,'61715000','61715000','Plafonds selon barème légal','Exonérée sous conditions de l''accord DGI/CNSS','Convention de départ volontaire signée et légalisée','Code du Travail / Arrêté n° 1314-25','2025-10-01',NULL,0,0),
-        (NULL,1,'369','Indemnité de préavis (dispensé)','fixe',0,'Rupture & Fin de Contrat',0,'61715000','61715000','Montant correspondant aux salaires','Assujettie sauf cas spécifiques d''exonération globale','Lettre de dispense de préavis','Code du Travail / Arrêté n° 1314-25','2025-10-01',NULL,0,0),
-        (NULL,1,'370','Prime de fin de carrière','fixe',0,'Rupture & Fin de Contrat',0,'61715000','61715000','Selon convention collective','Exonérée si assimilée à l''indemnité de départ','Notification de mise à la retraite','Code du Travail / Arrêté n° 1314-25','2025-10-01',NULL,0,0),
-        (NULL,1,'371','Indemnité compensatrice de logement','fixe',0,'Rupture & Fin de Contrat',0,'61715000','61715000','Frais réels ou barème','Exonérée si intégrée aux dommages et intérêts','Protocole d''accord transactionnel','Code du Travail / Arrêté n° 1314-25','2025-10-01',NULL,0,0),
-        (NULL,1,'372','Indemnité de non-concurrence','fixe',0,'Rupture & Fin de Contrat',0,'61715000','61715000','Fixée par contrat','Exonérée si qualifiée de dommages et intérêts','Clause contractuelle et reçu pour solde de tout compte','Code du Travail / Arrêté n° 1314-25','2025-10-01',NULL,0,0),
-        (NULL,1,'373','Indemnité de clientèle (VRP)','fixe',0,'Rupture & Fin de Contrat',0,'61715000','61715000','Selon préjudice commercial','Exonérée selon le Code du Travail','Calcul de la perte de clientèle validé par expert/tribunal','Code du Travail / Arrêté n° 1314-25','2025-10-01',NULL,0,0),
-        (NULL,1,'374','Indemnité de reconversion professionnelle','fixe',0,'Rupture & Fin de Contrat',0,'61715000','61715000','Prise en charge de la formation','Exonérée si versée au centre de formation','Facture du centre de formation, plan de sauvegarde de l''emploi','Code du Travail / Arrêté n° 1314-25','2025-10-01',NULL,0,0),
-        (NULL,1,'375','Indemnité de chômage technique / Partiel','fixe',0,'Rupture & Fin de Contrat',0,'61715000','61715000','Selon autorisations réglementaires','Exonérée en période de crise majeure','Autorisation du gouverneur ou décision ministérielle','Code du Travail / Arrêté n° 1314-25','2025-10-01',NULL,0,0),
-        (NULL,1,'376','Indemnité transactionnelle globale','fixe',0,'Rupture & Fin de Contrat',0,'61715000','61715000','Limite des dommages légaux','Exonérée à hauteur des plafonds légaux','Protocole de transaction enregistré auprès des autorités','Code du Travail / Arrêté n° 1314-25','2025-10-01',NULL,0,0),
-        (NULL,1,'377','Prime de tutorat / Fin de projet','fixe',0,'Rupture & Fin de Contrat',0,'61713000','61713000','Forfait contractuel','Exonéré si lié à un transfert d''outils de fin de contrat','Rapport de fin de mission validé par l''entreprise','Code du Travail / Arrêté n° 1314-25','2025-10-01',NULL,0,0);");
+        (NULL,1,'501','Prime de rendement','Proportionnel',10.00,'Gain standard',1,'61711000','61711000','Imposable','Imposable','Contrat de travail / avenant définissant les objectifs et critères de rendement','Contrat de travail','2025-10-01','REND',1,0),
+        (NULL,1,'502','Prime d''objectifs','Proportionnel',5.00,'Gain standard',1,'61711000','61711000','Imposable','Imposable','Contrat de travail / avenant définissant les objectifs','Contrat de travail','2025-10-01','OBJEC',1,0),
+        (NULL,1,'503','Prime d''assiduité','Fixe',300.00,'Gain standard',1,'61711000','61711000','Imposable','Imposable','Règlement intérieur ou contrat définissant les conditions de présence','Règlement intérieur / contrat','2025-10-01','ASSID',1,0),
+        (NULL,1,'504','Prime de nuit','Fixe',250.00,'Gain standard',1,'61711000','61711000','Imposable','Imposable','Planning / pointage justifiant les heures de nuit effectuées','Convention collective / contrat','2025-10-01','NUIT',1,0),
+        (NULL,1,'505','13ème mois (prorata)','Proportionnel',8.33,'Gain standard',1,'61711000','61711000','Imposable','Imposable','Convention collective ou usage d''entreprise','Convention collective','2025-10-01','13EME',0,1),
+        (NULL,1,'330','Indemnité de transport urbain','Fixe',500,'Transport & Déplacement',0,'61713000','61713000','500.00 DH / mois','500.00 DH / mois','Lieu de travail situé au milieu urbain de la ville','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
+        (NULL,1,'331','Indemnité de représentation','Proportionnel',10,'Spécifiques à certains emplois',0,'61713000','61713000','10% du salaire de base','10% du salaire de base','Poste de direction, d''encadrement supérieur ou équivalent','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
+        (NULL,1,'334','Indemnité kilométrique','Fixe',0,'Transport & Déplacement',0,'61713000','61713000','3 DH / KM','3 DH / KM','Carnet de bord, carte grise au nom du salarié, trajet < 50 KM','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
+        (NULL,1,'337','Indemnité de tournée','Fixe',1500,'Transport & Déplacement',0,'61713000','61713000','1 500.00 DH / mois','1 500.00 DH / mois','Périmètre de déplacement limité à 50 KM, planning de tournée','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
+        (NULL,1,'339','Indemnité de déplacement justifiée','Fixe',0,'Transport & Déplacement',0,'61713000','61713000','Nourriture (10x SMIG hor.), Hébergement (30x SMIG hor.)','Totalement exonéré si justifié','Pièces justificatives (factures, tickets, ordre de mission)','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
+        (NULL,1,'340','Indemnité de déplacement forfaitaire ponctuelle','Fixe',0,'Transport & Déplacement',0,'61713000','61713000','Nourriture (10x SMIG hor.), Hébergement (30x SMIG hor.)','Repas: 171 DH/j, Hébergement: 513 DH/nuit','Ordre de mission stipulant la nature ponctuelle','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
+        (NULL,1,'341','Indemnité de déplacement forfaitaire régulière','Fixe',5000,'Transport & Déplacement',0,'61713000','61713000','<= 5000 DH et <= Salaire de base','Exonération dans la limite de 100% du S.B. (max 5000 DH/mois)','Déplacements professionnels hors périmètre urbain (> 50 km)','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
+        (NULL,1,'342','Indemnité de transport hors urbain','Fixe',750,'Transport & Déplacement',0,'61713000','61713000','750.00 DH / mois','750.00 DH / mois','Lieu de travail situé en dehors du milieu urbain','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
+        (NULL,1,'343','Prime d''outillage','Fixe',100,'Spécifiques à certains emplois',0,'61713000','61713000','100 DH / mois','119.70 DH / 26 jours de travail','Le salarié doit être propriétaire de ses propres équipements','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
+        (NULL,1,'344','Prime de salissure','Fixe',210,'Spécifiques à certains emplois',0,'61713000','61713000','210 DH / mois','239.40 DH / 26 jours de travail','Travaux salissants / insalubres (bleu de travail requis)','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
+        (NULL,1,'345','Prime d''usure de vêtements / Tenue','Fixe',0,'Spécifiques à certains emplois',0,'61713000','61713000','Frais réels ou barème interne','Exonéré si port obligatoire pour le service','Obligation contractuelle ou règlement intérieur','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
+        (NULL,1,'346','Indemnité de panier / Panier de nuit','Fixe',0,'Spécifiques à certains emplois',0,'61713000','61713000','2x SMIG horaire par jour','Exonération selon plafond légal en vigueur','Horaires de nuit ou travail continu sans coupure','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
+        (NULL,1,'347','Indemnité de pénibilité','Fixe',0,'Spécifiques à certains emplois',0,'61713000','61713000','Selon convention collective','Exonéré sous réserve d''un cadre réglementé','Attestation de conditions de travail pénibles','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
+        (NULL,1,'348','Indemnité de risque / Danger','Fixe',0,'Spécifiques à certains emplois',0,'61713000','61713000','Selon barème sectoriel','Exonéré si le risque est inhérent à la fonction','Fiche de poste, rapport d''évaluation des risques','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
+        (NULL,1,'349','Indemnité d''astreinte','Fixe',0,'Spécifiques à certains emplois',0,'61713000','61713000','Selon convention collective','Exonéré si liée à des interventions urgentes hors horaires','Planning d''astreinte et rapports d''intervention','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
+        (NULL,1,'350','Indemnité de garde','Fixe',0,'Spécifiques à certains emplois',0,'61713000','61713000','Barème interne conventionné','Exonéré dans le cadre médical ou de sécurité','Registre des gardes effectuées','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
+        (NULL,1,'351','Voiture de fonction ou de service','Fixe',0,'Transport & Déplacement',0,'61713000','61713000','Charges supportées par l''entreprise','Totalement exonéré','Usage strictement professionnel ou convention d''affectation','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
+        (NULL,1,'352','Indemnité de voyage à l''étranger','Fixe',0,'Transport & Déplacement',0,'61713000','61713000','Frais réels justifiés','Frais réels sur justificatifs ou barème officiel','Ordre de mission international, billets, factures hôtel','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
+        (NULL,1,'353','Indemnité de déménagement / mutation','Fixe',0,'Transport & Déplacement',0,'61713000','61713000','Frais réels sur factures','Exonéré si requis par l''employeur','Décision de mutation, factures du déménageur','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
+        (NULL,1,'354','Allocations familiales additionnelles','Fixe',0,'Caractère Social & Familial',0,'61712000','61712000','Plafond légal CNSS','Totalement exonéré','Livret de famille, attestation de non-paiement par ailleurs','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
+        (NULL,1,'355','Allocation de naissance','Fixe',0,'Caractère Social & Familial',0,'61712000','61712000','Barème interne raisonnable','Exonéré si ponctuel','Extrait d''acte de naissance du nouveau-né','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
+        (NULL,1,'356','Allocation de mariage','Fixe',0,'Caractère Social & Familial',0,'61712000','61712000','Barème social de l''entreprise','Exonéré si ponctuel','Acte de mariage adoulé ou officiel','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
+        (NULL,1,'357','Allocation de décès / Obsèques','Fixe',0,'Caractère Social & Familial',0,'61712000','61712000','Frais réels ou forfait social','Totalement exonéré','Certificat de décès du conjoint ou d''un ascendant/descendant direct','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
+        (NULL,1,'358','Prime de scolarité / Rentrée scolaire','Fixe',400,'Caractère Social & Familial',0,'61712000','61712000','Plafond par enfant/an','Exonéré si attribué aux enfants à charge','Certificat de scolarité annuel','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
+        (NULL,1,'359','Bons d''achat / Cadeaux de fin d''année','Fixe',0,'Caractère Social & Familial',0,'61712000','61712000','Plafond annuel (ex: 10% SMIG)','Exonéré dans la limite du plafond social','Distribution générale à l''occasion de fêtes (Aïd, Achoura, etc.)','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
+        (NULL,1,'360','Indemnité de caisse (responsabilité pécuniaire)','Fixe',190,'Spécifiques à certains emplois',0,'61713000','61713000','190 DH / mois','239.40 DH / 26 jours de travail','Poste de caissier ou manipulation effective de fonds','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
+        (NULL,1,'361','Subvention de cantine / Titres repas','Fixe',0,'Caractère Social & Familial',0,'61712000','61712000','Plafond par ticket / jour','Exonéré selon la quote-part patronale réglementaire','Factures du prestataire de restauration ou émetteur de titres','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
+        (NULL,1,'362','Prise en charge des frais médicaux','Fixe',0,'Caractère Social & Familial',0,'61712000','61712000','Sur dossier médical','Exonéré si géré par le fonds social / mutuelle','Décompte AMO/Mutuelle et ordonnances restées à charge','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
+        (NULL,1,'363','Aide aux vacances / Estivage','Fixe',0,'Caractère Social & Familial',0,'61712000','61712000','Plafond annuel fixe','Exonéré si géré via les œuvres sociales (COS)','Factures d''organismes de vacances ou convention COS','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
+        (NULL,1,'364','Secours exceptionnel / Social','Fixe',0,'Caractère Social & Familial',0,'61712000','61712000','Forfait ponctuel motivé','Exonéré si situation de précarité avérée','Dossier d''assistante sociale ou justificatifs de force majeure','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
+        (NULL,1,'365','Bourses d''études pour les enfants','Fixe',0,'Caractère Social & Familial',0,'61712000','61712000','Selon mérite et critères sociaux','Exonéré si versé directement à l''établissement','Facture de l''école/université, attestation de réussite','Arrêté n° 1314-25','2025-10-01',NULL,0,0),
+        (NULL,1,'366','Indemnité légale de licenciement','Fixe',0,'Rupture & Fin de Contrat',0,'61715000','61715000','Barème du Code du Travail','Totalement exonérée de CNSS et DGI','Lettre de licenciement, PV de l''inspecteur du travail / tribunal','Code du Travail / Arrêté n° 1314-25','2025-10-01',NULL,0,0),
+        (NULL,1,'367','Indemnité de licenciement abusive','Fixe',0,'Rupture & Fin de Contrat',0,'61715000','61715000','Fixée par tribunal ou conciliation','Exonérée selon la limite légale ou judiciaire','Jugement définitif ou PV de conciliation légalisé','Code du Travail / Arrêté n° 1314-25','2025-10-01',NULL,0,0),
+        (NULL,1,'368','Indemnité de départ volontaire / Retraite','Fixe',0,'Rupture & Fin de Contrat',0,'61715000','61715000','Plafonds selon barème légal','Exonérée sous conditions de l''accord DGI/CNSS','Convention de départ volontaire signée et légalisée','Code du Travail / Arrêté n° 1314-25','2025-10-01',NULL,0,0),
+        (NULL,1,'369','Indemnité de préavis (dispensé)','Fixe',0,'Rupture & Fin de Contrat',0,'61715000','61715000','Montant correspondant aux salaires','Assujettie sauf cas spécifiques d''exonération globale','Lettre de dispense de préavis','Code du Travail / Arrêté n° 1314-25','2025-10-01',NULL,0,0),
+        (NULL,1,'370','Prime de fin de carrière','Fixe',0,'Rupture & Fin de Contrat',0,'61715000','61715000','Selon convention collective','Exonérée si assimilée à l''indemnité de départ','Notification de mise à la retraite','Code du Travail / Arrêté n° 1314-25','2025-10-01',NULL,0,0),
+        (NULL,1,'371','Indemnité compensatrice de logement','Fixe',0,'Rupture & Fin de Contrat',0,'61715000','61715000','Frais réels ou barème','Exonérée si intégrée aux dommages et intérêts','Protocole d''accord transactionnel','Code du Travail / Arrêté n° 1314-25','2025-10-01',NULL,0,0),
+        (NULL,1,'372','Indemnité de non-concurrence','Fixe',0,'Rupture & Fin de Contrat',0,'61715000','61715000','Fixée par contrat','Exonérée si qualifiée de dommages et intérêts','Clause contractuelle et reçu pour solde de tout compte','Code du Travail / Arrêté n° 1314-25','2025-10-01',NULL,0,0),
+        (NULL,1,'373','Indemnité de clientèle (VRP)','Fixe',0,'Rupture & Fin de Contrat',0,'61715000','61715000','Selon préjudice commercial','Exonérée selon le Code du Travail','Calcul de la perte de clientèle validé par expert/tribunal','Code du Travail / Arrêté n° 1314-25','2025-10-01',NULL,0,0),
+        (NULL,1,'374','Indemnité de reconversion professionnelle','Fixe',0,'Rupture & Fin de Contrat',0,'61715000','61715000','Prise en charge de la formation','Exonérée si versée au centre de formation','Facture du centre de formation, plan de sauvegarde de l''emploi','Code du Travail / Arrêté n° 1314-25','2025-10-01',NULL,0,0),
+        (NULL,1,'375','Indemnité de chômage technique / Partiel','Fixe',0,'Rupture & Fin de Contrat',0,'61715000','61715000','Selon autorisations réglementaires','Exonérée en période de crise majeure','Autorisation du gouverneur ou décision ministérielle','Code du Travail / Arrêté n° 1314-25','2025-10-01',NULL,0,0),
+        (NULL,1,'376','Indemnité transactionnelle globale','Fixe',0,'Rupture & Fin de Contrat',0,'61715000','61715000','Limite des dommages légaux','Exonérée à hauteur des plafonds légaux','Protocole de transaction enregistré auprès des autorités','Code du Travail / Arrêté n° 1314-25','2025-10-01',NULL,0,0),
+        (NULL,1,'377','Prime de tutorat / Fin de projet','Fixe',0,'Rupture & Fin de Contrat',0,'61713000','61713000','Forfait contractuel','Exonéré si lié à un transfert d''outils de fin de contrat','Rapport de fin de mission validé par l''entreprise','Code du Travail / Arrêté n° 1314-25','2025-10-01',NULL,0,0);");
     echo "   + rubriques gains globales insérées\n";
 } else {
     // Mettre à jour les métadonnées si colonnes existent mais données vides
@@ -171,12 +171,12 @@ if (!$existing) {
 $existing = $p->query("SELECT COUNT(*) FROM rubriques_retenues WHERE is_global = 1")->fetchColumn();
 if (!$existing) {
     $p->exec("INSERT IGNORE INTO rubriques_retenues (societe_id, is_global, code, libelle, type_montant, valeur_defaut) VALUES
-        (NULL, 1, '801', 'Avance sur salaire', 'fixe', 0),
-        (NULL, 1, '802', 'Prêt personnel', 'fixe', 0),
-        (NULL, 1, '803', 'Prêt logement', 'fixe', 0),
-        (NULL, 1, '804', 'Cotisation syndicale', 'fixe', 0),
-        (NULL, 1, '805', 'Pension alimentaire', 'fixe', 0),
-        (NULL, 1, '806', 'Saisie-arrêt', 'fixe', 0)");
+        (NULL, 1, '801', 'Avance sur salaire', 'Fixe', 0),
+        (NULL, 1, '802', 'Prêt personnel', 'Fixe', 0),
+        (NULL, 1, '803', 'Prêt logement', 'Fixe', 0),
+        (NULL, 1, '804', 'Cotisation syndicale', 'Fixe', 0),
+        (NULL, 1, '805', 'Pension alimentaire', 'Fixe', 0),
+        (NULL, 1, '806', 'Saisie-arrêt', 'Fixe', 0)");
     echo "   + rubriques retenues globales insérées\n";
 }
 
@@ -222,10 +222,10 @@ addCol($p, 'rubriques_gains', 'au_prorata TINYINT(1) NOT NULL DEFAULT 0 AFTER ba
 addCol($p, 'rubriques_gains', 'imposable_ir TINYINT(1) NOT NULL DEFAULT 1 AFTER au_prorata');
 addCol($p, 'rubriques_gains', 'imposable_cnss TINYINT(1) NOT NULL DEFAULT 1 AFTER imposable_ir');
 
-// Modifier type_montant pour inclure 'calcule'
+// Modifier type_montant pour utiliser majuscules
 try {
-    $p->exec("ALTER TABLE rubriques_gains MODIFY COLUMN type_montant ENUM('fixe','proportionnel','calcule') NOT NULL DEFAULT 'fixe'");
-    echo "  + type_montant: ajouté 'calcule'\n";
+    $p->exec("ALTER TABLE rubriques_gains MODIFY COLUMN type_montant ENUM('Fixe','Proportionnel') NOT NULL DEFAULT 'Fixe'");
+    echo "  + type_montant: majuscules\n";
 } catch (\PDOException $e) {
     // déjà modifié
 }
@@ -428,7 +428,7 @@ $p->exec("CREATE TABLE IF NOT EXISTS jours_feries (
     nom             VARCHAR(100)        NOT NULL,
     jour            TINYINT UNSIGNED    NOT NULL,
     mois            TINYINT UNSIGNED    NOT NULL,
-    type            ENUM('fixe','variable') NOT NULL DEFAULT 'fixe',
+    type            ENUM('Fixe','variable') NOT NULL DEFAULT 'Fixe',
     actif           TINYINT(1)          NOT NULL DEFAULT 1,
     created_at      DATETIME            NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (societe_id) REFERENCES societes(id) ON DELETE CASCADE
@@ -441,13 +441,13 @@ if (!$existingJf) {
     $societes = $p->query("SELECT id FROM societes")->fetchAll(PDO::FETCH_COLUMN);
     foreach ($societes as $sid) {
         $p->exec("INSERT IGNORE INTO jours_feries (societe_id, nom, jour, mois, type, actif) VALUES
-            ($sid, 'Jour de l''an', 1, 1, 'fixe', 1),
-            ($sid, 'Fête du Trône', 30, 7, 'fixe', 1),
-            ($sid, 'Fête de la révolution du Roi et du peuple', 20, 8, 'fixe', 1),
-            ($sid, 'Anniversaire du Roi Mohammed VI', 21, 8, 'fixe', 1),
-            ($sid, 'Fête de la Marche Verte', 6, 11, 'fixe', 1),
-            ($sid, 'Fête de l''Indépendance', 18, 11, 'fixe', 1),
-            ($sid, 'Fête du Travail', 1, 5, 'fixe', 1),
+            ($sid, 'Jour de l''an', 1, 1, 'Fixe', 1),
+            ($sid, 'Fête du Trône', 30, 7, 'Fixe', 1),
+            ($sid, 'Fête de la révolution du Roi et du peuple', 20, 8, 'Fixe', 1),
+            ($sid, 'Anniversaire du Roi Mohammed VI', 21, 8, 'Fixe', 1),
+            ($sid, 'Fête de la Marche Verte', 6, 11, 'Fixe', 1),
+            ($sid, 'Fête de l''Indépendance', 18, 11, 'Fixe', 1),
+            ($sid, 'Fête du Travail', 1, 5, 'Fixe', 1),
             ($sid, 'Aïd el-Fitr', 1, 1, 'variable', 1),
             ($sid, 'Aïd el-Adha', 1, 1, 'variable', 1),
             ($sid, '1er Moharram (Nouvel An islamique)', 1, 1, 'variable', 1),

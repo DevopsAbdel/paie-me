@@ -39,7 +39,7 @@ class PaieCalculator
         return 0;
     }
 
-    public function calculerPaie(array $s, array $cnssParams, string $dateFin, float $heuresSup25 = 0, float $heuresSup50 = 0, float $heuresSup100 = 0, array $gains = [], array $retenues = [], string $dateDebut = '', array $baremeHS = [], ?int $joursTravailleOverride = null): array
+    public function calculerPaie(array $s, array $cnssParams, string $dateFin, float $heuresSup25 = 0, float $heuresSup50 = 0, float $heuresSup100 = 0, array $gains = [], array $retenues = [], string $dateDebut = '', array $baremeHS = [], ?int $joursTravailleOverride = null, float $joursConge = 0, float $joursFeries = 0): array
     {
         $salaireBase = (float) $s['salaire_base'];
 
@@ -59,12 +59,8 @@ class PaieCalculator
                 $joursTravailles = max(min($diff, 26), 0);
             }
         }
-        $prorata = $joursTravailles / 26;
-
-        $primeAnciennete = 0;
-        if (!empty($s['date_embauche'])) {
-            $primeAnciennete = round($salaireBase * $this->calcAnciennete($s['date_embauche'], $dateFin), 2) * $prorata;
-        }
+        $totalPaidDays = min($joursTravailles + $joursConge + $joursFeries, 26);
+        $prorata = $totalPaidDays / 26;
 
         $tauxHoraire = $salaireBase > 0 ? $salaireBase / 191 : 0;
         $taux25 = (float) ($baremeHS['taux_normal'] ?? 25);
@@ -78,6 +74,17 @@ class PaieCalculator
         $heuresSup = $heuresSup25 + $heuresSup50 + $heuresSup100;
 
         $salaireBaseProrata = round($salaireBase * $prorata, 2);
+
+        $prorataTravaille = $joursTravailles / 26;
+
+        $primeAnciennete = 0;
+        if (!empty($s['date_embauche'])) {
+            $baseAnciennete = round($salaireBase * $prorataTravaille, 2)
+                + round($salaireBase / 26 * $joursConge, 2)
+                + round($salaireBase / 26 * $joursFeries, 2)
+                + $montantHeuresSup;
+            $primeAnciennete = round($baseAnciennete * $this->calcAnciennete($s['date_embauche'], $dateFin), 2);
+        }
 
         $transport     = round((float) ($s['indemnite_transport'] ?? 0) * $prorata, 2);
         $panier        = round((float) ($s['indemnite_panier'] ?? 0) * $prorata, 2);

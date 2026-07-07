@@ -10,8 +10,17 @@ $mHS25 = round($hs25 * $th * $t25 / 100, 2);
 $mHS50 = round($hs50 * $th * $t50 / 100, 2);
 $mHS100 = round($hs100 * $th * $t100 / 100, 2);
 $jt = (int) ($paie['jours_travailles'] ?? 30);
+$jc = (float) ($paie['jours_conge'] ?? 0);
+$jf = (float) ($paie['jours_feries'] ?? 0);
 $prorata = $jt / 26;
 $baseProrata = round($paie['salaire_base'] * $prorata, 2);
+$totalPaidDays = min($jt + $jc + $jf, 26);
+$prorataElargi = $totalPaidDays / 26;
+$primeBase = round($paie['salaire_base'] * $prorataElargi, 2);
+$tauxJournalier = $paie['salaire_base'] > 0 ? round($paie['salaire_base'] / 26, 2) : 0;
+$tauxHoraire = $paie['salaire_base'] > 0 ? round($paie['salaire_base'] / 26 / 8, 2) : 0;
+$primeBaseElargie = $baseProrata + ($jc * $tauxJournalier) + ($jf * $tauxJournalier) + $mHS25 + $mHS50 + $mHS100;
+$ancienPct = $primeBaseElargie > 0 ? round((float)($paie['prime_anciennete'] ?? 0) / $primeBaseElargie * 100, 0) : 0;
 
 function getPlafondDgi(string $code, array $plafonds, float $salaireBase): ?float
 {
@@ -70,14 +79,14 @@ function overLimit(?float $valeur, ?float $plafond): bool
                         <td>Salaire de base</td>
                         <td class="montant"><?= number_format($paie['salaire_base'], 2, ',', ' ') ?></td>
                         <td class="unite">DH</td>
-                        <td class="taux">—</td>
+                        <td class="taux"><?= number_format($tauxHoraire, 2, ',', ' ') ?> /h</td>
                         <td class="montant"><?= number_format($paie['salaire_base'], 2, ',', ' ') ?></td>
                         <td></td>
                         <td></td>
                         <td></td>
                         <td></td>
                     </tr>
-
+                    
                     <tr>
                         <td class="code">101</td>
                         <td>Durée de travail</td>
@@ -85,7 +94,7 @@ function overLimit(?float $valeur, ?float $plafond): bool
                             <input type="number" step="1" min="0" max="31" name="jours_travailles" class="form-control-inline" value="<?= $jt ?>" style="width:55px;">
                         </td>
                         <td class="unite">Jours</td>
-                        <td class="taux">—</td>
+                        <td class="taux"><?= number_format($tauxJournalier, 2, ',', ' ') ?> /j</td>
                         <td class="montant"><?= number_format($baseProrata, 2, ',', ' ') ?></td>
                         <td></td>
                         <td></td>
@@ -99,8 +108,8 @@ function overLimit(?float $valeur, ?float $plafond): bool
                             <input type="number" step="0.5" min="0" max="31" name="jours_conge" class="form-control-inline" value="<?= (float)($paie['jours_conge'] ?? 0) ?>" style="width:55px;">
                         </td>
                         <td class="unite">Jours</td>
-                        <td class="taux">—</td>
-                        <td></td>
+                        <td class="taux"><?= number_format($tauxJournalier, 2, ',', ' ') ?> /j</td>
+                        <td class="montant"><?= number_format($jc * $tauxJournalier, 2, ',', ' ') ?></td>
                         <td></td>
                         <td></td>
                         <td></td>
@@ -113,8 +122,8 @@ function overLimit(?float $valeur, ?float $plafond): bool
                             <input type="number" step="0.5" min="0" max="31" name="jours_feries" class="form-control-inline" value="<?= (float)($paie['jours_feries'] ?? 0) ?>" style="width:55px;">
                         </td>
                         <td class="unite">Jours</td>
-                        <td class="taux">—</td>
-                        <td></td>
+                        <td class="taux"><?= number_format($tauxJournalier, 2, ',', ' ') ?> /j</td>
+                        <td class="montant"><?= number_format($jf * $tauxJournalier, 2, ',', ' ') ?></td>
                         <td></td>
                         <td></td>
                         <td></td>
@@ -169,6 +178,35 @@ function overLimit(?float $valeur, ?float $plafond): bool
                         <td class="unite">Heure</td>
                         <td class="taux"><?= $t100 ?>%</td>
                         <td class="montant"><?= number_format($mHS100, 2, ',', ' ') ?></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+
+                    <?php if ($paie['prime_anciennete'] > 0): ?>
+                    <tr>
+                        <td class="code">104</td>
+                        <td><span class="info" title="Ancienneté : <?= $ancienPct ?>% du salaire de base + HS">ⓘ</span> Prime d'ancienneté</td>
+                        <td class="montant"><?= number_format($primeBaseElargie, 2, ',', ' ') ?></td>
+                        <td class="unite">DH</td>
+                        <td class="taux"><?= $ancienPct ?>%</td>
+                        <td class="montant"><?= number_format($paie['prime_anciennete'], 2, ',', ' ') ?></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <?php endif; ?>
+
+                    <?php $totalApresFeries = $baseProrata + ($jc * $tauxJournalier) + ($jf * $tauxJournalier) + $mHS25 + $mHS50 + $mHS100 + (float)($paie['prime_anciennete'] ?? 0); ?>
+                    <tr>
+                        <td class="code">205</td>
+                        <td>Salaire Recalculer</td>
+                        <td></td>
+                        <td class="unite">DH</td>
+                        <td class="taux">—</td>
+                        <td class="montant"><?= number_format($totalApresFeries, 2, ',', ' ') ?></td>
                         <td></td>
                         <td></td>
                         <td></td>
