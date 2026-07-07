@@ -761,9 +761,9 @@ class PaieController extends Controller
     private function mapRetenueType(string $code): string
     {
         $map = [
-            'AVANCE' => 'avance',
-            'PRET' => 'pret',
-            'PRET_LOGEMENT' => 'pret',
+            '801' => 'avance',
+            '802' => 'pret',
+            '803' => 'pret',
         ];
         return $map[$code] ?? 'autre';
     }

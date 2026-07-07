@@ -171,12 +171,12 @@ if (!$existing) {
 $existing = $p->query("SELECT COUNT(*) FROM rubriques_retenues WHERE is_global = 1")->fetchColumn();
 if (!$existing) {
     $p->exec("INSERT IGNORE INTO rubriques_retenues (societe_id, is_global, code, libelle, type_montant, valeur_defaut) VALUES
-        (NULL, 1, 'AVANCE', 'Avance sur salaire', 'fixe', 0),
-        (NULL, 1, 'PRET', 'Prêt personnel', 'fixe', 0),
-        (NULL, 1, 'PRET_LOGEMENT', 'Prêt logement', 'fixe', 0),
-        (NULL, 1, 'COTIS_SYNDICALE', 'Cotisation syndicale', 'fixe', 0),
-        (NULL, 1, 'PENSION_ALIMENT', 'Pension alimentaire', 'fixe', 0),
-        (NULL, 1, 'SAISIE_ARRET', 'Saisie-arrêt', 'fixe', 0)");
+        (NULL, 1, '801', 'Avance sur salaire', 'fixe', 0),
+        (NULL, 1, '802', 'Prêt personnel', 'fixe', 0),
+        (NULL, 1, '803', 'Prêt logement', 'fixe', 0),
+        (NULL, 1, '804', 'Cotisation syndicale', 'fixe', 0),
+        (NULL, 1, '805', 'Pension alimentaire', 'fixe', 0),
+        (NULL, 1, '806', 'Saisie-arrêt', 'fixe', 0)");
     echo "   + rubriques retenues globales insérées\n";
 }
 
