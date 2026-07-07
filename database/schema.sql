@@ -387,6 +387,7 @@ CREATE TABLE IF NOT EXISTS paie_gains (
 CREATE TABLE IF NOT EXISTS paie_retenues (
     id             INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     paie_id        INT UNSIGNED NOT NULL,
+    type           ENUM('avance','pret','sanction','autre') NOT NULL DEFAULT 'autre',
     libelle        VARCHAR(200) NOT NULL,
     montant        DECIMAL(10,2) NOT NULL DEFAULT 0.00,
     FOREIGN KEY (paie_id) REFERENCES paies(id) ON DELETE CASCADE

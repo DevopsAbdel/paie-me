@@ -497,4 +497,7 @@ $p->exec("CREATE TABLE IF NOT EXISTS bareme_smig_smag (
 ) ENGINE=InnoDB");
 echo "   + table bareme_smig_smag\n";
 
+// === Colonne type dans paie_retenues ===
+addCol($p, 'paie_retenues', "type ENUM('avance','pret','sanction','autre') NOT NULL DEFAULT 'autre' AFTER paie_id");
+
 echo "\nMigrations terminées.\n";

@@ -151,7 +151,7 @@ class PaieController extends Controller
             foreach ($pgs as $pg) {
                 $gainsOverridesMap[$sId][(int) $pg['rubrique_id']] = (float) $pg['montant'];
             }
-            $prs = $this->db->query("SELECT libelle, montant FROM paie_retenues WHERE paie_id = $pId")->fetchAll();
+            $prs = $this->db->query("SELECT type, libelle, montant FROM paie_retenues WHERE paie_id = $pId")->fetchAll();
             if (!empty($prs)) {
                 $retenuesOverridesMap[$sId] = $prs;
             }
@@ -214,10 +214,11 @@ class PaieController extends Controller
             }
             if (!empty($retenuesOverridesMap[(int) $s['id']])) {
                 if (!$insertRet) {
-                    $insertRet = $this->db->prepare("INSERT INTO paie_retenues (paie_id, libelle, montant) VALUES (?, ?, ?)");
+                    $insertRet = $this->db->prepare("INSERT INTO paie_retenues (paie_id, type, libelle, montant) VALUES (?, ?, ?, ?)");
                 }
                 foreach ($retenuesOverridesMap[(int) $s['id']] as $r) {
-                    $insertRet->execute([$newPaieId, $r['libelle'], $r['montant']]);
+                    $type = $r['type'] ?? 'autre';
+                    $insertRet->execute([$newPaieId, $type, $r['libelle'], $r['montant']]);
                 }
             }
         }
@@ -373,7 +374,7 @@ class PaieController extends Controller
         }
 
         $societeId = (int) $paie['societe_id'];
-        $paieRetenues = $this->db->query("SELECT id, libelle, montant FROM paie_retenues WHERE paie_id = $id ORDER BY id")->fetchAll();
+        $paieRetenues = $this->db->query("SELECT id, type, libelle, montant FROM paie_retenues WHERE paie_id = $id ORDER BY id")->fetchAll();
         $paieGains = $this->db->query("
             SELECT pg.montant, rg.code, rg.libelle, rg.type_montant, rg.valeur_defaut, rg.imposable
             FROM paie_gains pg
@@ -442,31 +443,57 @@ class PaieController extends Controller
             }
 
             $this->db->exec("DELETE FROM paie_retenues WHERE paie_id = $id");
+            $insertRet = $this->db->prepare("INSERT INTO paie_retenues (paie_id, type, libelle, montant) VALUES (?, ?, ?, ?)");
+
+            if (!empty($_POST['retenue_libelle_existing'])) {
+                foreach ($_POST['retenue_libelle_existing'] as $oldIdx => $libelle) {
+                    $libelle = trim($libelle);
+                    if ($libelle === '') continue;
+                    $montant = (float) ($_POST['retenue_montant_existing'][$oldIdx] ?? 0);
+                    $type = $_POST['retenue_type_existing'][$oldIdx] ?? 'autre';
+                    $typesValides = ['avance','pret','sanction','autre'];
+                    if (!in_array($type, $typesValides)) $type = 'autre';
+                    if ($montant > 0) {
+                        $insertRet->execute([$id, $type, $libelle, $montant]);
+                    }
+                }
+            }
+
             if (!empty($_POST['retenue_libelle'])) {
-                $insertRet = $this->db->prepare("INSERT INTO paie_retenues (paie_id, libelle, montant) VALUES (?, ?, ?)");
                 foreach ($_POST['retenue_libelle'] as $idx => $libelle) {
                     $libelle = trim($libelle);
                     if ($libelle === '') continue;
                     $montant = (float) ($_POST['retenue_montant'][$idx] ?? 0);
+                    $type = $_POST['retenue_type'][$idx] ?? 'autre';
+                    $typesValides = ['avance','pret','sanction','autre'];
+                    if (!in_array($type, $typesValides)) $type = 'autre';
                     if ($montant > 0) {
-                        $insertRet->execute([$id, $libelle, $montant]);
+                        $insertRet->execute([$id, $type, $libelle, $montant]);
                     }
                 }
             }
 
             Audit::log($this->db, 'update', 'paie', $id, 'Modification paie: ' . $paie['nom_famille'] . ' ' . $paie['prenom']);
 
+            $fermer = !empty($_POST['fermer_apres']);
             Session::setFlash('success', 'Paie mise à jour. Recalculez la période pour recalculer les totaux.');
-            $this->redirect('/paie-me/paies/paie/' . $id . '/edit');
+            if ($fermer) {
+                $this->redirect('/paie-me/paies/' . $paie['periode_id'] . '/lignes');
+            } else {
+                $this->redirect('/paie-me/paies/paie/' . $id . '/edit');
+            }
         }
 
+        $rubriquesRetenues = $this->mergeRubriques('rubriques_retenues', $societeId);
+
         $this->render('paies/edit.php', [
-            'title'        => 'Modifier la paie — ' . $paie['nom_famille'] . ' ' . $paie['prenom'],
-            'paie'         => $paie,
-            'paieRetenues' => $paieRetenues,
-            'paieGains'    => $paieGains,
-            'baremeHS'     => $baremeHS,
-            'plafonds'     => $plafonds,
+            'title'             => 'Modifier la paie — ' . $paie['nom_famille'] . ' ' . $paie['prenom'],
+            'paie'              => $paie,
+            'paieRetenues'      => $paieRetenues,
+            'paieGains'         => $paieGains,
+            'baremeHS'          => $baremeHS,
+            'plafonds'          => $plafonds,
+            'rubriquesRetenues' => $rubriquesRetenues,
         ]);
     }
 
