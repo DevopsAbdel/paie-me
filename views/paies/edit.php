@@ -201,7 +201,7 @@ function overLimit(?float $valeur, ?float $plafond): bool
                         <td></td>
                         <td></td>
                         <td></td>
-                        <td><button type="button" class="btn-icon" title="Supprimer" onclick="this.closest('tr').querySelector('input').value='0'">✖</button></td>
+                        <td><button type="button" class="btn-icon" title="Supprimer" onclick="var r=this.closest('tr');r.querySelector('input').value='0';r.style.display='none'">✖</button></td>
                     </tr>
                     <?php endforeach; ?>
 
