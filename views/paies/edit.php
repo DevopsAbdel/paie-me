@@ -82,7 +82,7 @@ function overLimit(?float $valeur, ?float $plafond): bool
                         <td class="code">101</td>
                         <td>Durée de travail</td>
                         <td class="montant">
-                            <input type="number" step="1" min="0" max="31" name="jours_travailles" class="form-control-inline" value="<?= $jt ?>" style="width:40px;">
+                            <input type="number" step="1" min="0" max="31" name="jours_travailles" class="form-control-inline" value="<?= $jt ?>" style="width:55px;">
                         </td>
                         <td class="unite">Jours</td>
                         <td class="taux">—</td>
@@ -96,7 +96,7 @@ function overLimit(?float $valeur, ?float $plafond): bool
                         <td class="code">102</td>
                         <td>Jours de congé</td>
                         <td class="montant">
-                            <input type="number" step="0.5" min="0" max="31" name="jours_conge" class="form-control-inline" value="<?= (float)($paie['jours_conge'] ?? 0) ?>" style="width:40px;">
+                            <input type="number" step="0.5" min="0" max="31" name="jours_conge" class="form-control-inline" value="<?= (float)($paie['jours_conge'] ?? 0) ?>" style="width:55px;">
                         </td>
                         <td class="unite">Jours</td>
                         <td class="taux">—</td>
@@ -110,7 +110,7 @@ function overLimit(?float $valeur, ?float $plafond): bool
                         <td class="code">103</td>
                         <td>Jours fériés</td>
                         <td class="montant">
-                            <input type="number" step="0.5" min="0" max="31" name="jours_feries" class="form-control-inline" value="<?= (float)($paie['jours_feries'] ?? 0) ?>" style="width:40px;">
+                            <input type="number" step="0.5" min="0" max="31" name="jours_feries" class="form-control-inline" value="<?= (float)($paie['jours_feries'] ?? 0) ?>" style="width:55px;">
                         </td>
                         <td class="unite">Jours</td>
                         <td class="taux">—</td>
@@ -128,7 +128,7 @@ function overLimit(?float $valeur, ?float $plafond): bool
                             HS <?= $t25 ?>%
                         </td>
                         <td class="montant">
-                            <input type="number" step="0.5" min="0" name="heures_sup_25" class="form-control-inline" value="<?= $hs25 ?>" style="width:40px;">
+                            <input type="number" step="0.5" min="0" name="heures_sup_25" class="form-control-inline" value="<?= $hs25 ?>" style="width:55px;">
                         </td>
                         <td class="unite">Heure</td>
                         <td class="taux"><?= $t25 ?>%</td>
@@ -146,7 +146,7 @@ function overLimit(?float $valeur, ?float $plafond): bool
                             HS <?= $t50 ?>%
                         </td>
                         <td class="montant">
-                            <input type="number" step="0.5" min="0" name="heures_sup_50" class="form-control-inline" value="<?= $hs50 ?>" style="width:40px;">
+                            <input type="number" step="0.5" min="0" name="heures_sup_50" class="form-control-inline" value="<?= $hs50 ?>" style="width:55px;">
                         </td>
                         <td class="unite">Heure</td>
                         <td class="taux"><?= $t50 ?>%</td>
@@ -164,7 +164,7 @@ function overLimit(?float $valeur, ?float $plafond): bool
                             HS <?= $t100 ?>%
                         </td>
                         <td class="montant">
-                            <input type="number" step="0.5" min="0" name="heures_sup_100" class="form-control-inline" value="<?= $hs100 ?>" style="width:40px;">
+                            <input type="number" step="0.5" min="0" name="heures_sup_100" class="form-control-inline" value="<?= $hs100 ?>" style="width:55px;">
                         </td>
                         <td class="unite">Heure</td>
                         <td class="taux"><?= $t100 ?>%</td>
