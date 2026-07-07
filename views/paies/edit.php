@@ -188,7 +188,7 @@ function overLimit(?float $valeur, ?float $plafond): bool
                         $pt = getPlafondDgi($code, $plafonds, (float) $paie['salaire_base']);
                         $ov = overLimit($val, $pt);
                     ?>
-                    <tr<?= $ov ? ' class="row-over-limit"' : '' ?>>
+                    <tr<?= $ov ? ' class="row-over-limit"' : '' ?><?= $val == 0 ? ' style="display:none"' : '' ?>>
                         <td class="code"><?= $code ?></td>
                         <td><span class="info" title="<?= $meta[2] ?>">ⓘ</span> <?= $meta[1] ?></td>
                         <td></td>
