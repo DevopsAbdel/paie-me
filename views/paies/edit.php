@@ -127,8 +127,8 @@ function overLimit(?float $valeur, ?float $plafond): bool
                             <span class="info" title="Taux horaire <?= number_format($th, 2, ',', ' ') ?> MAD/h">ⓘ</span>
                             HS <?= $t25 ?>%
                         </td>
-                        <td>
-                            <input type="number" step="0.5" min="0" name="heures_sup_25" class="form-control-inline" value="<?= $hs25 ?>" style="width:50px;">
+                        <td class="montant">
+                            <input type="number" step="0.5" min="0" name="heures_sup_25" class="form-control-inline" value="<?= $hs25 ?>" style="width:40px;">
                         </td>
                         <td class="unite">Heure</td>
                         <td class="taux"><?= $t25 ?>%</td>
@@ -145,8 +145,8 @@ function overLimit(?float $valeur, ?float $plafond): bool
                             <span class="info" title="Taux horaire <?= number_format($th, 2, ',', ' ') ?> MAD/h">ⓘ</span>
                             HS <?= $t50 ?>%
                         </td>
-                        <td>
-                            <input type="number" step="0.5" min="0" name="heures_sup_50" class="form-control-inline" value="<?= $hs50 ?>" style="width:50px;">
+                        <td class="montant">
+                            <input type="number" step="0.5" min="0" name="heures_sup_50" class="form-control-inline" value="<?= $hs50 ?>" style="width:40px;">
                         </td>
                         <td class="unite">Heure</td>
                         <td class="taux"><?= $t50 ?>%</td>
@@ -163,8 +163,8 @@ function overLimit(?float $valeur, ?float $plafond): bool
                             <span class="info" title="Taux horaire <?= number_format($th, 2, ',', ' ') ?> MAD/h">ⓘ</span>
                             HS <?= $t100 ?>%
                         </td>
-                        <td>
-                            <input type="number" step="0.5" min="0" name="heures_sup_100" class="form-control-inline" value="<?= $hs100 ?>" style="width:50px;">
+                        <td class="montant">
+                            <input type="number" step="0.5" min="0" name="heures_sup_100" class="form-control-inline" value="<?= $hs100 ?>" style="width:40px;">
                         </td>
                         <td class="unite">Heure</td>
                         <td class="taux"><?= $t100 ?>%</td>
@@ -201,7 +201,7 @@ function overLimit(?float $valeur, ?float $plafond): bool
                         <td></td>
                         <td></td>
                         <td></td>
-                        <td></td>
+                        <td><button type="button" class="btn-icon" title="Supprimer" onclick="this.closest('tr').querySelector('input').value='0'">✖</button></td>
                     </tr>
                     <?php endforeach; ?>
 
