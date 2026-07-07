@@ -9,6 +9,9 @@ $hs100 = (float) ($paie['heures_sup_100'] ?? 0);
 $mHS25 = round($hs25 * $th * $t25 / 100, 2);
 $mHS50 = round($hs50 * $th * $t50 / 100, 2);
 $mHS100 = round($hs100 * $th * $t100 / 100, 2);
+$jt = (int) ($paie['jours_travailles'] ?? 30);
+$prorata = $jt / 26;
+$baseProrata = round($paie['salaire_base'] * $prorata, 2);
 
 function getPlafondDgi(string $code, array $plafonds, float $salaireBase): ?float
 {
@@ -79,11 +82,11 @@ function overLimit(?float $valeur, ?float $plafond): bool
                         <td class="code">101</td>
                         <td>Durée de travail</td>
                         <td class="montant">
-                            <input type="number" step="1" min="0" max="31" name="jours_travailles" class="form-control-inline" value="<?= (int)($paie['jours_travailles'] ?? 30) ?>" style="width:40px;">
+                            <input type="number" step="1" min="0" max="31" name="jours_travailles" class="form-control-inline" value="<?= $jt ?>" style="width:40px;">
                         </td>
                         <td class="unite">Jours</td>
                         <td class="taux">—</td>
-                        <td></td>
+                        <td class="montant"><?= number_format($baseProrata, 2, ',', ' ') ?></td>
                         <td></td>
                         <td></td>
                         <td></td>
