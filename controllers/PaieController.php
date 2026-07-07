@@ -477,8 +477,16 @@ class PaieController extends Controller
 
             Audit::log($this->db, 'update', 'paie', $id, 'Modification paie: ' . $paie['nom_famille'] . ' ' . $paie['prenom']);
 
+            if (!empty($_POST['recalculer'])) {
+                $paieActualisee = $this->db->query("SELECT * FROM paies WHERE id = $id")->fetch();
+                $this->recalculerPaie($id, $paieActualisee);
+                Audit::log($this->db, 'recalculer', 'paie', $id, 'Recalcul paie: ' . $paie['nom_famille'] . ' ' . $paie['prenom']);
+                Session::setFlash('success', 'Paie recalculée avec succès.');
+                $this->redirect('/paie-me/paies/paie/' . $id . '/edit');
+            }
+
             $fermer = !empty($_POST['fermer_apres']);
-            Session::setFlash('success', 'Paie mise à jour. Recalculez la période pour recalculer les totaux.');
+            Session::setFlash('success', 'Paie mise à jour.');
             if ($fermer) {
                 $this->redirect('/paie-me/paies/' . $paie['periode_id'] . '/lignes');
             } else {
@@ -679,6 +687,56 @@ class PaieController extends Controller
         require __DIR__ . '/../views/' . $view;
         $content = ob_get_clean();
         require __DIR__ . '/../views/layout.php';
+    }
+
+    private function recalculerPaie(int $paieId, array $paie): void
+    {
+        $periode = $this->db->query("SELECT * FROM periodes WHERE id = {$paie['periode_id']}")->fetch();
+        if (!$periode) return;
+
+        $salarie = $this->db->query("SELECT * FROM salaries WHERE id = {$paie['salarie_id']}")->fetch();
+        if (!$salarie) return;
+
+        $societeId = $paie['societe_id'];
+        $cnssParams = $this->db->query("SELECT * FROM parametres_cnss_amo WHERE societe_id = $societeId")->fetch() ?: [];
+        $baremeHS = $this->db->query("SELECT * FROM bareme_heures_sup WHERE societe_id = $societeId")->fetch() ?: [];
+        $gains = $this->mergeRubriques('rubriques_gains', $societeId);
+        $retenues = $this->mergeRubriques('rubriques_retenues', $societeId);
+
+        $hs25 = (float) ($paie['heures_sup_25'] ?? 0);
+        $hs50 = (float) ($paie['heures_sup_50'] ?? 0);
+        $hs100 = (float) ($paie['heures_sup_100'] ?? 0);
+
+        $salarie['indemnite_transport'] = $paie['indemnite_transport'];
+        $salarie['indemnite_panier'] = $paie['indemnite_panier'];
+        $salarie['indemnite_representation'] = $paie['indemnite_representation'];
+        $salarie['avantage_logement'] = $paie['avantage_logement'];
+
+        $c = $this->calculator->calculerPaie($salarie, $cnssParams, $periode['date_fin'], $hs25, $hs50, $hs100, $gains, $retenues, $periode['date_debut'], $baremeHS);
+
+        $stmt = $this->db->prepare("
+            UPDATE paies SET
+                salaire_brut = ?, sbi = ?, prime_anciennete = ?,
+                salaire_plafonne_cnss = ?,
+                total_gains = ?, montant_heures_sup = ?,
+                cnss_salariale = ?, amo_salariale = ?, mutuelle = ?,
+                sni = ?, ir = ?, deductions_familiales = ?,
+                autres_retenues = ?, net_avant_retenues = ?, net_a_payer = ?,
+                cnss_patronale = ?, amo_patronale = ?, frais_professionnels = ?
+            WHERE id = ?
+        ");
+        $stmt->execute([
+            $c['sb'], $c['sbi'], $c['primeAnciennete'],
+            $c['plafonne'],
+            $c['totalGains'], $c['montantHeuresSup'],
+            $c['cnss'], $c['amo'], $c['mutuelle'],
+            $c['sni'], $c['ir'], $c['deductionsFamiliales'],
+            $c['autresRetenues'], $c['netAvant'], $c['net'],
+            $c['cnssPatronale'], $c['amoPatronale'], $c['fraisPro'],
+            $paieId,
+        ]);
+
+        BulletinController::genererPourPeriode($paie['periode_id'], $this->db);
     }
 
     private function mergeRubriques(string $table, int $societeId): array
