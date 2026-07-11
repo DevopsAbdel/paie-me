@@ -99,6 +99,7 @@
             Modifier
         </button>
         <button type="button" id="dc-btn-add" class="btn btn-sm btn-secondary" onclick="dcAjouter()" style="font-size:0.75rem; display:none;">+ Ajouter une tranche</button>
+        <button type="button" id="dc-btn-save" class="btn btn-sm btn-primary" onclick="document.getElementById('congeAnnuelForm').submit()" style="font-size:0.75rem; display:none;">Enregistrer les modifications</button>
         <button type="button" id="dc-btn-cancel" class="btn btn-sm btn-secondary" onclick="dcToggleEdit(false)" style="font-size:0.75rem; display:none;">Annuler</button>
     </div>
 </div>
@@ -112,6 +113,7 @@
 function dcToggleEdit(edit) {
     document.getElementById('dc-btn-edit').style.display = edit ? 'none' : '';
     document.getElementById('dc-btn-add').style.display = edit ? '' : 'none';
+    document.getElementById('dc-btn-save').style.display = edit ? '' : 'none';
     document.getElementById('dc-btn-cancel').style.display = edit ? '' : 'none';
     document.getElementById('dc-actions-header').style.display = edit ? '' : 'none';
 
