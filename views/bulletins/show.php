@@ -197,4 +197,84 @@ $taux = [
         <strong style="font-size:1.25rem; color:<?= $netColor ?>;"><?= number_format($b['net_a_payer'], 2, ',', ' ') ?> MAD</strong>
     </div>
 
+    <h4 style="margin:1.5rem 0 0.5rem 1rem; color:<?= $couleur ?>;">Cumuls annuels</h4>
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Libellé</th>
+                    <th style="text-align:right;">Cumul</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Salaire brut</td>
+                    <td style="text-align:right;"><?= number_format($cumuls['cumul_brut'], 2, ',', ' ') ?></td>
+                </tr>
+                <tr>
+                    <td>CNSS (part salariale)</td>
+                    <td style="text-align:right;"><?= number_format($cumuls['cumul_cnss'], 2, ',', ' ') ?></td>
+                </tr>
+                <tr>
+                    <td>AMO (part salariale)</td>
+                    <td style="text-align:right;"><?= number_format($cumuls['cumul_amo'], 2, ',', ' ') ?></td>
+                </tr>
+                <tr>
+                    <td>Mutuelle</td>
+                    <td style="text-align:right;"><?= number_format($cumuls['cumul_mutuelle'], 2, ',', ' ') ?></td>
+                </tr>
+                <tr>
+                    <td>Frais professionnels</td>
+                    <td style="text-align:right;"><?= number_format($cumuls['cumul_fp'], 2, ',', ' ') ?></td>
+                </tr>
+                <tr>
+                    <td>Impôt sur le revenu (IR)</td>
+                    <td style="text-align:right;"><?= number_format($cumuls['cumul_ir'], 2, ',', ' ') ?></td>
+                </tr>
+                <tr>
+                    <td>Salaire net imposable (SNI)</td>
+                    <td style="text-align:right;"><?= number_format($cumuls['cumul_sni'], 2, ',', ' ') ?></td>
+                </tr>
+                <tr style="font-weight:bold; border-top:2px solid <?= $couleur ?>;">
+                    <td>Net à payer</td>
+                    <td style="text-align:right;"><?= number_format($cumuls['cumul_net'], 2, ',', ' ') ?></td>
+                </tr>
+                <?php if ($cumuls['cumul_transport'] > 0 || $cumuls['cumul_panier'] > 0 || $cumuls['cumul_representation'] > 0): ?>
+                <tr style="border-top:1px solid var(--border);">
+                    <td colspan="2" style="font-weight:bold; color:<?= $couleur ?>; padding-top:0.75rem;">Indemnités</td>
+                </tr>
+                <?php if ($cumuls['cumul_transport'] > 0): ?>
+                <tr>
+                    <td>Indemnité de transport</td>
+                    <td style="text-align:right;"><?= number_format($cumuls['cumul_transport'], 2, ',', ' ') ?></td>
+                </tr>
+                <?php endif; ?>
+                <?php if ($cumuls['cumul_panier'] > 0): ?>
+                <tr>
+                    <td>Indemnité de panier</td>
+                    <td style="text-align:right;"><?= number_format($cumuls['cumul_panier'], 2, ',', ' ') ?></td>
+                </tr>
+                <?php endif; ?>
+                <?php if ($cumuls['cumul_representation'] > 0): ?>
+                <tr>
+                    <td>Indemnité de représentation</td>
+                    <td style="text-align:right;"><?= number_format($cumuls['cumul_representation'], 2, ',', ' ') ?></td>
+                </tr>
+                <?php endif; ?>
+                <?php endif; ?>
+                <tr style="border-top:1px solid var(--border);">
+                    <td colspan="2" style="font-weight:bold; color:<?= $couleur ?>; padding-top:0.75rem;">Congés</td>
+                </tr>
+                <tr>
+                    <td>Jours de congé consommés</td>
+                    <td style="text-align:right;"><?= number_format($cumuls['jours_conge_consommes'], 1, ',', ' ') ?> jour(s)</td>
+                </tr>
+                <tr>
+                    <td>Jours de congé restants</td>
+                    <td style="text-align:right;"><?= number_format($cumuls['jours_conge_restants'], 1, ',', ' ') ?> jour(s)</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
 </div>

@@ -57,12 +57,14 @@ class BulletinController extends Controller
 
         $template = $this->getTemplate($bulletin['societe_id']);
         $cnssParams = $this->getCnssParams($bulletin['societe_id']);
+        $cumuls = $this->getCumuls($bulletin['paie_id'], $bulletin['salarie_id'], $bulletin['societe_id'], $bulletin['annee'], $bulletin['mois']);
 
         $this->render('bulletins/show.php', [
             'title'      => 'Bulletin de paie',
             'b'          => $bulletin,
             'template'   => $template,
             'cnssParams' => $cnssParams,
+            'cumuls'     => $cumuls,
         ]);
     }
 
@@ -76,6 +78,7 @@ class BulletinController extends Controller
 
         $template = $this->getTemplate($bulletin['societe_id']);
         $cnssParams = $this->getCnssParams($bulletin['societe_id']);
+        $cumuls = $this->getCumuls($bulletin['paie_id'], $bulletin['salarie_id'], $bulletin['societe_id'], $bulletin['annee'], $bulletin['mois']);
         $b = $bulletin;
 
         ob_start();
@@ -164,6 +167,66 @@ class BulletinController extends Controller
             'taux_amo_salarial'  => 2.26,
             'taux_amo_patronal'  => 4.11,
         ];
+    }
+
+    private function getCumuls(int $paieId, int $salarieId, int $societeId, int $annee, int $mois): array
+    {
+        $stmt = $this->db->prepare("
+            SELECT
+                SUM(pa.salaire_brut) AS cumul_brut,
+                SUM(pa.cnss_salariale) AS cumul_cnss,
+                SUM(pa.amo_salariale) AS cumul_amo,
+                SUM(pa.mutuelle) AS cumul_mutuelle,
+                SUM(pa.frais_professionnels) AS cumul_fp,
+                SUM(pa.sni) AS cumul_sni,
+                SUM(pa.ir) AS cumul_ir,
+                SUM(pa.net_a_payer) AS cumul_net,
+                SUM(pa.indemnite_transport) AS cumul_transport,
+                SUM(pa.indemnite_panier) AS cumul_panier,
+                SUM(pa.indemnite_representation) AS cumul_representation,
+                SUM(pa.montant_hs_25) AS cumul_hs25,
+                SUM(pa.montant_hs_50) AS cumul_hs50,
+                SUM(pa.montant_hs_100) AS cumul_hs100
+            FROM paies pa
+            JOIN periodes p ON pa.periode_id = p.id
+            WHERE pa.salarie_id = ? AND pa.societe_id = ? AND p.annee = ?
+              AND pa.id <= ?
+        ");
+        $stmt->execute([$salarieId, $societeId, $annee, $paieId]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        $cumuls = [];
+        foreach ($row as $k => $v) {
+            $cumuls[$k] = (float)($v ?? 0);
+        }
+
+        $cumuls['jours_conge_consommes'] = 0;
+        $cumuls['jours_conge_restants'] = 0;
+        $stmt2 = $this->db->prepare("
+            SELECT COALESCE(SUM(c.nb_jours), 0) AS total_pris
+            FROM conges c
+            WHERE c.salarie_id = ? AND c.statut = 'approuve'
+              AND YEAR(c.date_debut) BETWEEN ? AND ?
+        ");
+        $stmt2->execute([$salarieId, $annee - 1, $annee]);
+        $cumuls['jours_conge_consommes'] = (float)($stmt2->fetchColumn() ?? 0);
+
+        $emp = $this->db->prepare("SELECT date_embauche FROM salaries WHERE id = ?");
+        $emp->execute([$salarieId]);
+        $dateEmb = $emp->fetchColumn();
+        $joursDroitAnnuel = 22;
+        if ($dateEmb) {
+            $anneesAnc = (int)(new \DateTime($dateEmb))->diff(new \DateTime("$annee-12-31"))->format('%y');
+            $dc = $this->db->prepare("SELECT * FROM droit_conge WHERE societe_id = ? AND ? BETWEEN annees_min AND annees_max LIMIT 1");
+            $dc->execute([$societeId, $anneesAnc]);
+            $droit = $dc->fetch(PDO::FETCH_ASSOC);
+            if ($droit) {
+                $joursDroitAnnuel = (float)$droit['jours_par_mois'] * 12;
+            }
+        }
+        $cumuls['jours_conge_restants'] = max(0, $joursDroitAnnuel - $cumuls['jours_conge_consommes']);
+
+        return $cumuls;
     }
 
     private function getDefaultTemplate(): array
