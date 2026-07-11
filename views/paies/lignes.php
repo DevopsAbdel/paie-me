@@ -38,7 +38,7 @@
                 </thead>
                 <tbody>
                     <?php foreach ($paies as $pa): ?>
-                    <tr>
+                    <tr style="cursor:pointer;" onclick="window.location.href='/paie-me/paies/paie/<?= $pa['id'] ?>/edit'">
                         <td><?= htmlspecialchars($pa['matricule']) ?></td>
                         <td><?= htmlspecialchars($pa['cnss'] ?? '') ?></td>
                         <td><?= htmlspecialchars($pa['nom_famille'] . ' ' . $pa['prenom']) ?></td>
@@ -152,6 +152,8 @@
 }
 .btn-close:hover { color:var(--text); }
 .ligne-salarie:hover td { background:rgba(59,130,246,0.06); }
+table tbody tr[data-href]:hover td,
+table tbody tr[onclick]:hover td { background:rgba(59,130,246,0.06); }
 </style>
 
 <script>
