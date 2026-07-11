@@ -34,13 +34,13 @@
             <div class="form-group">
                 <label>Enfants à charge</label>
                 <input type="number" name="enfants_a_charge" class="form-control" id="enfants_a_charge" value="<?= $salarie['enfants_a_charge'] ?? 0 ?>" min="0">
-                <small style="color:var(--text-muted); font-size:0.7rem;">&lt;18 ans / &le;21 ans étudiant / &le;25 ans études sup.</small>
             </div>
             <div class="form-group">
                 <label>Personnes à charge</label>
-                <input type="number" name="personnes_a_charge" class="form-control" id="personnes_a_charge" readonly value="<?= $salarie['personnes_a_charge'] ?? 0 ?>" min="0" style="cursor:not-allowed; opacity:0.7;">
+                <input type="number" name="personnes_a_charge" class="form-control" id="personnes_a_charge" readonly value="<?= $salarie['personnes_a_charge'] ?? 0 ?>" min="0" style="cursor:not-allowed; opacity:0.65;">
             </div>
         </div>
+        <small style="display:block; color:var(--text-muted); font-size:0.7rem; margin-top:-0.5rem; margin-bottom:0.75rem;">&lt;18 ans / &le;21 ans étudiant / &le;25 ans études sup. — Personnes à charge = enfants à charge + conjoint si marié(e)</small>
         <script>
         (function() {
             var sitEl = document.querySelector('select[name="situation_familiale"]');
