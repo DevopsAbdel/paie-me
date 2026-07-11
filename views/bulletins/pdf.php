@@ -130,7 +130,7 @@ $taux = [
         </tr>
     </table>
 
-    <div style="text-align:center; font-size:20px; font-weight:bold; color:<?= $couleur ?>; margin:12px 0; padding:8px 0; border-bottom:2px solid <?= $couleur ?>; text-transform:uppercase; letter-spacing:0.1em;">BULLETIN DE PAIE</div>
+    <div style="text-align:center; font-size:20px; font-weight:bold; color:<?= $couleur ?>; margin:4px 0 12px 0; padding:8px 0; border-bottom:2px solid <?= $couleur ?>; text-transform:uppercase; letter-spacing:0.1em;">BULLETIN DE PAIE</div>
 
     <table style="width:100%; border-collapse:collapse; margin-bottom:6px; font-size:8px;">
         <tr>
