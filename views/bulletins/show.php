@@ -110,7 +110,7 @@ $taux = [
             <p style="color:var(--text-muted); font-size:0.875rem; margin:0.25rem 0 0 0;">
                 N° <?= htmlspecialchars($b['numero']) ?><br>
                 Période: <?= str_pad($b['mois'], 2, '0', STR_PAD_LEFT) . '/' . $b['annee'] ?><br>
-                Émis le: <?= $b['date_emission'] ?>
+                Émis le: <?= date('d/m/Y', strtotime($b['date_emission'])) ?>
             </p>
         </div>
     </div>
@@ -120,7 +120,7 @@ $taux = [
             <td style="padding:0.25rem 0.5rem; width:25%;"><strong>Salarié:</strong> <?= htmlspecialchars($b['nom_famille'] . ' ' . $b['prenom']) ?></td>
             <td style="padding:0.25rem 0.5rem; width:25%;"><strong>Durée de travail:</strong> <?= $joursTrav ?> j / <?= $heuresMensuelles ?> h</td>
             <td style="padding:0.25rem 0.5rem; width:25%;"><strong>Matricule:</strong> <?= htmlspecialchars($b['matricule']) ?></td>
-            <td style="padding:0.25rem 0.5rem; width:25%;"><strong>Date d'embauche:</strong> <?= $b['date_embauche'] ?></td>
+            <td style="padding:0.25rem 0.5rem; width:25%;"><strong>Date d'embauche:</strong> <?= date('d/m/Y', strtotime($b['date_embauche'])) ?></td>
         </tr>
         <tr>
             <td style="padding:0.25rem 0.5rem;"><strong>CIN:</strong> <?= htmlspecialchars($b['cin']) ?></td>

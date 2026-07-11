@@ -125,7 +125,7 @@ $taux = [
             <td style="vertical-align:middle; padding-bottom:8px; text-align:right; white-space:nowrap;">
                 <h2 style="font-size:11px; margin:0; color:<?= $couleur ?>;"><?= htmlspecialchars($b['numero']) ?></h2>
                 <p style="margin:1px 0; font-size:8px; color:#666;">Période: <?= str_pad($b['mois'], 2, '0', STR_PAD_LEFT) . '/' . $b['annee'] ?></p>
-                <p style="margin:1px 0; font-size:8px; color:#666;">Émis le: <?= $b['date_emission'] ?></p>
+                <p style="margin:1px 0; font-size:8px; color:#666;">Émis le: <?= date('d/m/Y', strtotime($b['date_emission'])) ?></p>
             </td>
         </tr>
     </table>
@@ -135,7 +135,7 @@ $taux = [
             <td style="padding:1px 0; width:25%;"><strong>Salarié:</strong> <?= htmlspecialchars($b['nom_famille'] . ' ' . $b['prenom']) ?></td>
             <td style="padding:1px 0; width:25%;"><strong>Durée de travail:</strong> <?= $joursTrav ?> j / <?= $heuresMensuelles ?> h</td>
             <td style="padding:1px 0; width:25%;"><strong>Matricule:</strong> <?= htmlspecialchars($b['matricule']) ?></td>
-            <td style="padding:1px 0; width:25%;"><strong>Date d'embauche:</strong> <?= $b['date_embauche'] ?></td>
+            <td style="padding:1px 0; width:25%;"><strong>Date d'embauche:</strong> <?= date('d/m/Y', strtotime($b['date_embauche'])) ?></td>
         </tr>
         <tr>
             <td style="padding:1px 0;"><strong>CIN:</strong> <?= htmlspecialchars($b['cin']) ?></td>
