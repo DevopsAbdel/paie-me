@@ -84,6 +84,7 @@
                 <li><a href="<?= $baseB ?>jours_feries" style="display:block; padding:0.3rem 0.5rem; color:<?= str_contains($uri, '/jours_feries')?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">Jours fériés</a></li>
                 <li><a href="<?= $baseB ?>impot_revenu" style="display:block; padding:0.3rem 0.5rem; color:<?= str_contains($uri, '/impot_revenu')?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">Impôt sur le revenu</a></li>
                 <li><a href="<?= $baseB ?>heures_sup" style="display:block; padding:0.3rem 0.5rem; color:<?= str_contains($uri, '/heures_sup')?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">Heures sup</a></li>
+                <li><a href="<?= $baseB ?>smig_smag" style="display:block; padding:0.3rem 0.5rem; color:<?= str_contains($uri, '/smig_smag')?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">SMIG & SMAG</a></li>
             </ul>
             <?php endif; ?>
         </li>
@@ -118,7 +119,6 @@
                 <li><a href="<?= $baseP ?>attestations" style="display:block; padding:0.3rem 0.5rem; color:<?= str_contains($uri, '/attestations')?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">Attestations</a></li>
                 <li><a href="<?= $baseP ?>codification" style="display:block; padding:0.3rem 0.5rem; color:<?= str_contains($uri, '/codification')?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">Codification</a></li>
                 <li><a href="<?= $baseP ?>journal" style="display:block; padding:0.3rem 0.5rem; color:<?= str_contains($uri, '/journal')?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">Journal comptable</a></li>
-                <li><a href="<?= $baseP ?>bareme_salaire" style="display:block; padding:0.3rem 0.5rem; color:<?= str_contains($uri, '/bareme_salaire')?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">SMIG & SMAG</a></li>
             </ul>
             <?php endif; ?>
         </li>

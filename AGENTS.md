@@ -82,6 +82,12 @@ Net  = salaire - (CNSS + AMO + IR)
 - La classe `.table-actions` applique `display: flex; align-items: center; gap: 0.35rem; white-space: nowrap;`.
 - Les boutons dans `.table-actions` utilisent `.btn-sm` avec `padding: 0.25rem 0.5rem; font-size: 0.75rem;`.
 
+## Règles CSS — Listes déroulantes (select)
+- Toute balise `<select>` **doit** porter la classe `form-control` pour activer la flèche custom (SVG chevron via `background-image` définie dans `select.form-control` à style.css:416).
+- La flèche native du navigateur est masquée (`appearance: none`) et remplacée par un chevron SVG gris (`#94a3b8`) positionné à droite.
+- **Ne jamais créer un `<select>` sans `class="form-control"`** — sinon la flèche est absente et le select est difficilement distinguishable d'un champ texte en dark mode.
+- Exemple correct : `<select name="type" class="form-control" required>...</select>`
+
 ## Encodage UTF-8 — RÈGLE CRITIQUE
 - **Tous les fichiers PHP, SQL, CSS, JS** doivent être **sauvés en UTF-8 sans BOM**.
 - **Toute donnée contenant des accents français** (`é`, `è`, `ê`, `ë`, `à`, `â`, `ù`, `û`, `ô`, `î`, `ç`, `É`, `È`, etc.) doit être **validée** avant insertion.
@@ -99,6 +105,12 @@ Net  = salaire - (CNSS + AMO + IR)
 ## Progress (current session)
 
 ### Done
+- **Règle CSS select** ajoutée dans AGENTS.md : tout `<select>` doit porter `class="form-control"` pour la flèche custom SVG
+- **Fix CSS modal** : `background` → `background-color` dans `.modal-body .form-control` pour préserver la flèche SVG des selects en modal (style.css:728)
+- **Barème SMIG & SMAG déplacé** des Paramètres vers les Barèmes (sous-page `smig_smag`)
+- **Barèmes 2025 + 2026** insérés dans `bareme_smig_smag` pour les 3 sociétés
+- **Modal calcul salaire SMIG/SMAG** ajoutée dans `smig_smag.php` (sélection type + jours travaillés → calcul en temps réel)
+- Bouton "Calculer SMIG/SMAG" vert, aligné avec "Enregistrer" dans le pied de carte
 - **Indemnités et gains modifiables dans la page d'édition** : 
   - `edit.php` affiche 4 champs indemnités (transport, panier, représentation, logement) éditables + tableau des rubriques de gains avec checkbox/montant
   - `editPaie()` POST sauvegarde indemnités dans `paies` + gains dans nouvelle table `paie_gains`

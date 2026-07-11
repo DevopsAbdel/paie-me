@@ -725,7 +725,7 @@ body:has(.login-wrapper) {
 }
 .modal-body .form-control,
 .modal-body .form-select {
-    background: var(--bg-primary);
+    background-color: var(--bg-primary);
     border: 1px solid var(--border);
     color: var(--text);
 }

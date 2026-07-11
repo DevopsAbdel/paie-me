@@ -78,7 +78,7 @@ if (Test-Path $mysqlExe) {
 if (-not $NoBrowser) {
     Write-Info "Ouverture de Chrome avec connexion automatique..."
     $loginHtml = Join-Path $env:TEMP "paie-me-login.html"
-    @"
+    $html = @"
 <!DOCTYPE html>
 <html><body>
 <form id="f" action="$ProjectUrl/login" method="POST">
@@ -87,7 +87,8 @@ if (-not $NoBrowser) {
 </form>
 <script>document.getElementById('f').submit()</script>
 </body></html>
-"@ | Out-File -Encoding UTF8NoBOM -FilePath $loginHtml
+"@
+    [System.IO.File]::WriteAllText($loginHtml, $html, [System.Text.UTF8Encoding]::new($false))
     $chrome = Get-ChildItem -Path @("$env:ProgramFiles\Google\Chrome\Application\chrome.exe", "${env:ProgramFiles(x86)}\Google\Chrome\Application\chrome.exe", "$env:LOCALAPPDATA\Google\Chrome\Application\chrome.exe") -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty FullName
     if ($chrome) {
         Start-Process -FilePath $chrome -ArgumentList "--new-window `"$loginHtml`" --window-size=1366,768"
