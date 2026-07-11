@@ -969,3 +969,20 @@ body:has(.login-wrapper) {
     color: var(--text-muted);
     font-size: 0.8125rem;
 }
+
+/* ── Modales personnalisées ── */
+.custom-modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:1000; display:flex; align-items:center; justify-content:center; }
+.custom-modal { background:var(--bg-surface); border:1px solid var(--border); border-radius:8px; width:90%; max-height:80vh; overflow-y:auto; box-shadow:0 8px 32px rgba(0,0,0,0.5); }
+.custom-modal-header { display:flex; justify-content:space-between; align-items:center; padding:0.75rem 1rem; border-bottom:1px solid var(--border); }
+.custom-modal-body { padding:1rem; }
+.custom-modal-body .form-control,
+.custom-modal-body .form-select { background:var(--bg-primary); border:1px solid var(--border); color:var(--text); color-scheme:dark; }
+.custom-modal-body .form-control:focus,
+.custom-modal-body .form-select:focus { border-color:var(--accent); outline:none; }
+.custom-modal-body select.form-select option { background:#1e293b; color:var(--text); }
+.custom-modal-body .form-control[type="number"] { -moz-appearance:textfield; appearance:textfield; }
+.custom-modal-footer { display:flex; justify-content:flex-end; gap:0.5rem; padding:0.75rem 1rem; border-top:1px solid var(--border); }
+.indemnite-row { cursor:pointer; }
+.indemnite-row:hover { background:var(--bg-hover); }
+.indemnite-row.selected { background:rgba(59,130,246,0.15); }
+.indemnite-row.selected td { color:var(--accent); font-weight:500; }

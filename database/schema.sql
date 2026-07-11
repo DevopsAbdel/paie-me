@@ -91,6 +91,36 @@ CREATE TABLE IF NOT EXISTS salaries (
 ) ENGINE=InnoDB;
 
 -- -----------------------------------------------------------
+-- Indemnités custom par salarié
+-- -----------------------------------------------------------
+CREATE TABLE IF NOT EXISTS salarie_indemnites (
+    id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    salarie_id      INT UNSIGNED        NOT NULL,
+    libelle         VARCHAR(150)        NOT NULL,
+    montant         DECIMAL(10,2)       NOT NULL DEFAULT 0.00,
+    plafond_dgi     DECIMAL(10,2)       DEFAULT NULL,
+    plafond_cnss    DECIMAL(10,2)       DEFAULT NULL,
+    actif           TINYINT(1)          NOT NULL DEFAULT 1,
+    created_at      DATETIME            NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (salarie_id) REFERENCES salaries(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- -----------------------------------------------------------
+-- Gains personnalisés par salarié (fiche salarié)
+-- -----------------------------------------------------------
+CREATE TABLE IF NOT EXISTS salarie_gains (
+    id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    salarie_id      INT UNSIGNED        NOT NULL,
+    rubrique_id     INT UNSIGNED        NOT NULL,
+    montant         DECIMAL(10,2)       NOT NULL DEFAULT 0.00,
+    actif           TINYINT(1)          NOT NULL DEFAULT 1,
+    created_at      DATETIME            NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY unique_salarie_rubrique (salarie_id, rubrique_id),
+    FOREIGN KEY (salarie_id) REFERENCES salaries(id) ON DELETE CASCADE,
+    FOREIGN KEY (rubrique_id) REFERENCES rubriques_gains(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- -----------------------------------------------------------
 -- Périodes de paie
 -- -----------------------------------------------------------
 CREATE TABLE IF NOT EXISTS periodes (

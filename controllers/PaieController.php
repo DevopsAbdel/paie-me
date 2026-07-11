@@ -177,6 +177,20 @@ class PaieController extends Controller
 
         $salaries = $this->db->query("SELECT id, salaire_base, date_embauche, date_sortie, situation_familiale, indemnite_transport, indemnite_panier, indemnite_representation, avantage_logement, nb_enfants, avances_salaire, mutuelle FROM salaries WHERE societe_id = $societeId AND actif = 1")->fetchAll();
 
+        $indemnitesCustomCache = [];
+        $tmpRows = $this->db->query("SELECT salarie_id, libelle, montant, plafond_dgi, plafond_cnss FROM salarie_indemnites WHERE actif = 1 ORDER BY id")->fetchAll();
+        foreach ($tmpRows as $tmpR) {
+            $indemnitesCustomCache[(int) $tmpR['salarie_id']][] = $tmpR;
+        }
+        unset($tmpRows);
+
+        $salarieGainsCache = [];
+        $tmpSG = $this->db->query("SELECT sg.salarie_id, rg.id as rubrique_id, rg.code, rg.libelle, rg.type_montant, rg.valeur_defaut, rg.imposable FROM salarie_gains sg JOIN rubriques_gains rg ON sg.rubrique_id = rg.id WHERE sg.actif = 1 AND rg.actif = 1 ORDER BY rg.code")->fetchAll();
+        foreach ($tmpSG as $tmpR) {
+            $salarieGainsCache[(int) $tmpR['salarie_id']][] = $tmpR;
+        }
+        unset($tmpSG);
+
         foreach ($salaries as $s) {
             $hs25 = $heuresSup25Map[(int) $s['id']] ?? 0;
             $hs50 = $heuresSup50Map[(int) $s['id']] ?? 0;
@@ -190,7 +204,10 @@ class PaieController extends Controller
             }
             $jc = (float) ($indemnOverrides['jours_conge'] ?? 0);
             $jf = (float) ($indemnOverrides['jours_feries'] ?? 0);
-            $c = $this->calculator->calculerPaie($s, $cnssParams, $dateFin, $hs25, $hs50, $hs100, $gains, $retenues, $dateDebut, $baremeHS, null, $jc, $jf);
+            $ic = $indemnitesCustomCache[(int) $s['id']] ?? [];
+            $gainsSalarie = $salarieGainsCache[(int) $s['id']] ?? [];
+            $mergedGains = $this->mergeGainsWithSalarie($gains, $gainsSalarie);
+            $c = $this->calculator->calculerPaie($s, $cnssParams, $dateFin, $hs25, $hs50, $hs100, $mergedGains, $retenues, $dateDebut, $baremeHS, null, $jc, $jf, $ic);
 
             $stmtPaie = $this->db->prepare("
                 INSERT INTO paies (periode_id, salarie_id, societe_id, jours_travailles, salaire_brut, sbi, prime_anciennete, salaire_plafonne_cnss, indemnite_transport, indemnite_panier, indemnite_representation, avantage_logement, total_gains, heures_supplementaires, montant_heures_sup, heures_sup_25, heures_sup_50, heures_sup_100, cnss_salariale, amo_salariale, mutuelle, sni, ir, deductions_familiales, autres_retenues, net_avant_retenues, net_a_payer, cnss_patronale, amo_patronale, frais_professionnels)
@@ -381,7 +398,7 @@ class PaieController extends Controller
         $societeId = (int) $paie['societe_id'];
         $paieRetenues = $this->db->query("SELECT id, type, libelle, montant FROM paie_retenues WHERE paie_id = $id ORDER BY id")->fetchAll();
         $paieGains = $this->db->query("
-            SELECT pg.montant, rg.code, rg.libelle, rg.type_montant, rg.valeur_defaut, rg.imposable
+            SELECT pg.rubrique_id, pg.montant, rg.code, rg.libelle, rg.type_montant, rg.valeur_defaut, rg.imposable
             FROM paie_gains pg
             JOIN rubriques_gains rg ON pg.rubrique_id = rg.id
             WHERE pg.paie_id = $id
@@ -436,9 +453,18 @@ class PaieController extends Controller
             ]);
 
             $this->db->exec("DELETE FROM paie_gains WHERE paie_id = $id");
+            $insertGain = $this->db->prepare("INSERT INTO paie_gains (paie_id, rubrique_id, montant) VALUES (?, ?, ?)");
+
+            if (!empty($_POST['gain_existing_rubrique_id'])) {
+                foreach ($_POST['gain_existing_rubrique_id'] as $idx => $rubriqueId) {
+                    $montant = (float) ($_POST['gain_existing_montant'][$idx] ?? 0);
+                    if ($montant > 0) {
+                        $insertGain->execute([$id, (int)$rubriqueId, $montant]);
+                    }
+                }
+            }
 
             if (!empty($_POST['gain_new_rubrique_id'])) {
-                $insertGain = $this->db->prepare("INSERT INTO paie_gains (paie_id, rubrique_id, montant) VALUES (?, ?, ?)");
                 foreach ($_POST['gain_new_rubrique_id'] as $idx => $rubriqueId) {
                     $montant = (float) ($_POST['gain_new_montant'][$idx] ?? 0);
                     if ($montant > 0) {
@@ -604,7 +630,10 @@ class PaieController extends Controller
 
         $compteur = 0;
         foreach ($salaries as $s) {
-            $c = $this->calculator->calculerPaie($s, $cnssParams, $dateFin, 0, 0, 0, $gains, $retenues, $dateDebut, $baremeHS);
+            $ic = $this->db->query("SELECT libelle, montant, plafond_dgi, plafond_cnss FROM salarie_indemnites WHERE salarie_id = {$s['id']} AND actif = 1 ORDER BY id")->fetchAll();
+            $gs = $this->db->query("SELECT sg.salarie_id, rg.id as rubrique_id, rg.code, rg.libelle, rg.type_montant, rg.valeur_defaut, rg.imposable FROM salarie_gains sg JOIN rubriques_gains rg ON sg.rubrique_id = rg.id WHERE sg.salarie_id = {$s['id']} AND sg.actif = 1 AND rg.actif = 1 ORDER BY rg.code")->fetchAll();
+            $mergedGains = $this->mergeGainsWithSalarie($gains, $gs);
+            $c = $this->calculator->calculerPaie($s, $cnssParams, $dateFin, 0, 0, 0, $mergedGains, $retenues, $dateDebut, $baremeHS, null, 0, 0, $ic);
 
             $stmtPaie = $this->db->prepare("
                 INSERT INTO paies (periode_id, salarie_id, societe_id, jours_travailles, salaire_brut, sbi, prime_anciennete, salaire_plafonne_cnss, indemnite_transport, indemnite_panier, indemnite_representation, avantage_logement, total_gains, heures_supplementaires, montant_heures_sup, heures_sup_25, heures_sup_50, heures_sup_100, cnss_salariale, amo_salariale, mutuelle, sni, ir, deductions_familiales, autres_retenues, net_avant_retenues, net_a_payer, cnss_patronale, amo_patronale, frais_professionnels)
@@ -717,7 +746,10 @@ class PaieController extends Controller
         $joursOverride = min((int) ($paie['jours_travailles'] ?? 26), 26);
         $jc = (float) ($paie['jours_conge'] ?? 0);
         $jf = (float) ($paie['jours_feries'] ?? 0);
-        $c = $this->calculator->calculerPaie($salarie, $cnssParams, $periode['date_fin'], $hs25, $hs50, $hs100, $gains, $retenues, $periode['date_debut'], $baremeHS, $joursOverride, $jc, $jf);
+        $ic = $this->db->query("SELECT libelle, montant, plafond_dgi, plafond_cnss FROM salarie_indemnites WHERE salarie_id = {$salarie['id']} AND actif = 1 ORDER BY id")->fetchAll();
+        $gs = $this->db->query("SELECT sg.salarie_id, rg.id as rubrique_id, rg.code, rg.libelle, rg.type_montant, rg.valeur_defaut, rg.imposable FROM salarie_gains sg JOIN rubriques_gains rg ON sg.rubrique_id = rg.id WHERE sg.salarie_id = {$salarie['id']} AND sg.actif = 1 AND rg.actif = 1 ORDER BY rg.code")->fetchAll();
+        $mergedGains = $this->mergeGainsWithSalarie($gains, $gs);
+        $c = $this->calculator->calculerPaie($salarie, $cnssParams, $periode['date_fin'], $hs25, $hs50, $hs100, $mergedGains, $retenues, $periode['date_debut'], $baremeHS, $joursOverride, $jc, $jf, $ic);
 
         $stmt = $this->db->prepare("
             UPDATE paies SET
@@ -750,6 +782,20 @@ class PaieController extends Controller
             $this->mergeRubriques('rubriques_gains', $societeId),
             fn($g) => ($g['categorie'] ?? '') === 'Gain standard'
         ));
+    }
+
+    private function mergeGainsWithSalarie(array $autoGains, array $salarieGains): array
+    {
+        if (empty($salarieGains)) return $autoGains;
+
+        $merged = [];
+        foreach ($autoGains as $g) {
+            $merged[$g['code']] = $g;
+        }
+        foreach ($salarieGains as $sg) {
+            $merged[$sg['code']] = $sg;
+        }
+        return array_values($merged);
     }
 
     private function mergeRubriques(string $table, int $societeId): array

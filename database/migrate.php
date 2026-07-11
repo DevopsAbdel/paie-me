@@ -539,4 +539,34 @@ $p->exec("CREATE TABLE IF NOT EXISTS conges_soldes (
 ) ENGINE=InnoDB");
 echo "   + table conges_soldes\n";
 
+// === Table salarie_indemnites ===
+$p->exec("CREATE TABLE IF NOT EXISTS salarie_indemnites (
+    id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    salarie_id      INT UNSIGNED        NOT NULL,
+    libelle         VARCHAR(150)        NOT NULL,
+    montant         DECIMAL(10,2)       NOT NULL DEFAULT 0.00,
+    plafond_dgi     DECIMAL(10,2)       DEFAULT NULL,
+    plafond_cnss    DECIMAL(10,2)       DEFAULT NULL,
+    actif           TINYINT(1)          NOT NULL DEFAULT 1,
+    created_at      DATETIME            NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (salarie_id) REFERENCES salaries(id) ON DELETE CASCADE
+) ENGINE=InnoDB");
+echo "   + table salarie_indemnites\n";
+
+try { $p->exec("ALTER TABLE salarie_indemnites ADD COLUMN plafond_cnss DECIMAL(10,2) DEFAULT NULL AFTER plafond_dgi"); echo "   + plafond_cnss ajouté\n"; } catch (\Exception $e) {}
+
+// === Table salarie_gains ===
+$p->exec("CREATE TABLE IF NOT EXISTS salarie_gains (
+    id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    salarie_id      INT UNSIGNED        NOT NULL,
+    rubrique_id     INT UNSIGNED        NOT NULL,
+    montant         DECIMAL(10,2)       NOT NULL DEFAULT 0.00,
+    actif           TINYINT(1)          NOT NULL DEFAULT 1,
+    created_at      DATETIME            NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY unique_salarie_rubrique (salarie_id, rubrique_id),
+    FOREIGN KEY (salarie_id) REFERENCES salaries(id) ON DELETE CASCADE,
+    FOREIGN KEY (rubrique_id) REFERENCES rubriques_gains(id) ON DELETE CASCADE
+) ENGINE=InnoDB");
+echo "   + table salarie_gains\n";
+
 echo "\nMigrations terminées.\n";

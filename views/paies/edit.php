@@ -239,12 +239,16 @@ function overLimit(?float $valeur, ?float $plafond): bool
                         <td></td>
                         <td class="unite">DH</td>
                         <td class="taux">—</td>
-                        <td class="montant<?= $ovG ? ' over-limit' : '' ?>"><?= number_format($g['montant'], 2, ',', ' ') ?>
+                        <td class="montant<?= $ovG ? ' over-limit' : '' ?>">
+                            <input type="hidden" name="gain_existing_rubrique_id[]" value="<?= (int)$g['rubrique_id'] ?>">
+                            <input type="number" step="0.01" min="0" name="gain_existing_montant[]" class="form-control-inline" style="width:80px;" value="<?= $g['montant'] ?>">
                             <?php if ($ptG !== null): ?><span class="plafond-label">max <?= number_format($ptG, 2, ',', ' ') ?></span><?php endif; ?>
                         </td>
                         <td></td>
                         <td></td>
-                        <td></td>
+                        <td style="text-align:center;">
+                            <button type="button" class="btn btn-sm btn-danger" onclick="this.closest('tr').remove()" style="padding:0.1rem 0.3rem;font-size:0.65rem;">✕</button>
+                        </td>
                     </tr>
                     <?php endforeach; ?>
 
@@ -585,16 +589,6 @@ function overLimit(?float $valeur, ?float $plafond): bool
 .form-select-inline { padding:0.2rem 0.3rem; font-size:0.72rem; background:var(--bg-surface); border:1px solid var(--border); border-radius:3px; color:var(--text); }
 .form-select-inline:focus { border-color:var(--accent); outline:none; }
 
-.custom-modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:1000; display:flex; align-items:center; justify-content:center; }
-.custom-modal { background:var(--bg-surface); border:1px solid var(--border); border-radius:8px; width:90%; max-height:80vh; overflow-y:auto; box-shadow:0 8px 32px rgba(0,0,0,0.5); }
-.custom-modal-header { display:flex; justify-content:space-between; align-items:center; padding:0.75rem 1rem; border-bottom:1px solid var(--border); }
-.custom-modal-body { padding:1rem; }
-.custom-modal-body .form-control,
-.custom-modal-body .form-select { background:var(--bg-primary); border:1px solid var(--border); color:var(--text); color-scheme:dark; }
-.custom-modal-body .form-control:focus,
-.custom-modal-body .form-select:focus { border-color:var(--accent); outline:none; }
-.custom-modal-body select.form-select option { background:#1e293b; color:var(--text); }
-.custom-modal-body .form-control[type="number"] { -moz-appearance:textfield; appearance:textfield; }
 .gain-row { cursor:pointer; }
 .gain-row:hover { background:var(--bg-hover); }
 .gain-row.selected { background:rgba(59,130,246,0.15); }
@@ -603,7 +597,6 @@ function overLimit(?float $valeur, ?float $plafond): bool
 .retenue-row:hover { background:var(--bg-hover); }
 .retenue-row.selected { background:rgba(59,130,246,0.15); }
 .retenue-row.selected td { color:var(--accent); font-weight:500; }
-.custom-modal-footer { display:flex; justify-content:flex-end; gap:0.5rem; padding:0.75rem 1rem; border-top:1px solid var(--border); }
 </style>
 
 <script>

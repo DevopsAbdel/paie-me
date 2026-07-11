@@ -39,7 +39,7 @@ class PaieCalculator
         return 0;
     }
 
-    public function calculerPaie(array $s, array $cnssParams, string $dateFin, float $heuresSup25 = 0, float $heuresSup50 = 0, float $heuresSup100 = 0, array $gains = [], array $retenues = [], string $dateDebut = '', array $baremeHS = [], ?int $joursTravailleOverride = null, float $joursConge = 0, float $joursFeries = 0): array
+    public function calculerPaie(array $s, array $cnssParams, string $dateFin, float $heuresSup25 = 0, float $heuresSup50 = 0, float $heuresSup100 = 0, array $gains = [], array $retenues = [], string $dateDebut = '', array $baremeHS = [], ?int $joursTravailleOverride = null, float $joursConge = 0, float $joursFeries = 0, array $indemnitesCustom = []): array
     {
         $salaireBase = (float) $s['salaire_base'];
 
@@ -110,13 +110,24 @@ class PaieCalculator
             $totalRetenuesCustom += round($baseRet * $prorata, 2);
         }
 
-        $sb = $salaireBaseProrata + $primeAnciennete + $montantHeuresSup + $transport + $panier + $representation + $logement + $totalGains;
+        $indemniteCustomTotal = 0;
+        $indemniteCustomExonere = 0;
+        foreach ($indemnitesCustom as $ic) {
+            $montantProrata = round((float) $ic['montant'] * $prorata, 2);
+            $indemniteCustomTotal += $montantProrata;
+            if (!empty($ic['plafond_cnss'])) {
+                $plafondCnssProrata = round((float) $ic['plafond_cnss'] * $prorata, 2);
+                $indemniteCustomExonere += max($montantProrata - $plafondCnssProrata, 0);
+            }
+        }
+
+        $sb = $salaireBaseProrata + $primeAnciennete + $montantHeuresSup + $transport + $panier + $representation + $logement + $totalGains + $indemniteCustomTotal;
 
         $plafondTransport = round(500 * $prorata, 2);
         $plafondPanier = round(780 * $prorata, 2);
         $transportExonere = min($transport, $plafondTransport);
         $panierExonere = min($panier, $plafondPanier);
-        $sbi = $sb - $transportExonere - $panierExonere;
+        $sbi = $sb - $transportExonere - $panierExonere - $indemniteCustomExonere;
 
         $plafonne = min($sb, (float) ($cnssParams['plafond_cnss'] ?? 6000));
         $cnss = round($plafonne * (float) ($cnssParams['taux_cnss_salarial'] ?? 4.48) / 100, 2);
@@ -154,7 +165,7 @@ class PaieCalculator
         return compact(
             'joursTravailles', 'primeAnciennete', 'heuresSup25', 'heuresSup50', 'heuresSup100',
             'heuresSup', 'montantHeuresSup', 'montantHS25', 'montantHS50', 'montantHS100',
-            'transport', 'panier', 'representation', 'logement', 'totalGains', 'sb', 'sbi', 'plafonne',
+            'transport', 'panier', 'representation', 'logement', 'totalGains', 'indemniteCustomTotal', 'sb', 'sbi', 'plafonne',
             'cnss', 'amo', 'fraisPro', 'sni', 'deductionsFamiliales', 'avances',
             'mutuelle', 'autresRetenues', 'netAvant', 'net', 'cnssPatronale', 'amoPatronale'
         ) + ['ir' => $ir, 'irNet' => $irNet];

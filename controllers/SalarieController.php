@@ -84,6 +84,10 @@ class SalarieController extends Controller
 
             Audit::log($this->db, 'create', 'salarie', (int) $this->db->lastInsertId(), 'Création salarié: ' . $data['nom_famille'] . ' ' . $data['prenom']);
 
+            $newSalarieId = (int) $this->db->lastInsertId();
+            $this->saveIndemnitesCustom($newSalarieId);
+            $this->saveGainsCustom($newSalarieId);
+
             Session::setFlash('success', 'Salarié ajouté avec succès.');
             $redirectId = $fromSociete ?: ($ctx ? $ctx['id'] : null);
             $this->redirect($redirectId ? '/paie-me/societes/' . $redirectId . '/salaries' : '/paie-me/salaries');
@@ -92,6 +96,9 @@ class SalarieController extends Controller
         $societeId = $fromSociete ?? ($ctx ? $ctx['id'] : null);
         $services = $societeId ? $this->db->query("SELECT * FROM services WHERE societe_id = $societeId ORDER BY nom")->fetchAll() : [];
         $fonctions = $societeId ? $this->db->query("SELECT * FROM fonctions WHERE societe_id = $societeId ORDER BY nom")->fetchAll() : [];
+        $rubriquesIndemnites = $this->db->query("SELECT code, libelle, plafond_dgi, plafond_cnss FROM rubriques_gains WHERE code BETWEEN '330' AND '377' ORDER BY code")->fetchAll();
+        $societeForGains = $fromSociete ?? ($ctx ? $ctx['id'] : 0);
+        $rubriquesGains = $societeForGains ? $this->db->query("SELECT id, code, libelle, type_montant, valeur_defaut FROM rubriques_gains WHERE (societe_id IS NULL OR societe_id = $societeForGains) AND actif = 1 AND categorie = 'Gain standard' ORDER BY code")->fetchAll() : [];
         $this->render('salaries/form.php', [
             'title'       => 'Nouveau salarié',
             'salarie'     => null,
@@ -100,6 +107,10 @@ class SalarieController extends Controller
             'fonctions'   => $fonctions,
             'fromSociete' => $fromSociete,
             'societeContext' => $ctx,
+            'indemnitesCustom' => [],
+            'rubriquesIndemnites' => $rubriquesIndemnites,
+            'gainsCustom' => [],
+            'rubriquesGains' => $rubriquesGains,
         ]);
     }
 
@@ -149,6 +160,9 @@ class SalarieController extends Controller
 
             Audit::log($this->db, 'update', 'salarie', $id, 'Modification salarié: ' . $salarie['nom_famille'] . ' ' . $salarie['prenom']);
 
+            $this->saveIndemnitesCustom($id);
+            $this->saveGainsCustom($id);
+
             Session::setFlash('success', 'Salarié mis à jour.');
             $societeId = $data['societe_id'] ?? $salarie['societe_id'];
             $this->redirect('/paie-me/societes/' . $societeId . '/salaries');
@@ -162,6 +176,12 @@ class SalarieController extends Controller
         $salarie['rib'] = Crypto::decrypt($salarie['rib']);
         $salarie['cin'] = Crypto::decrypt($salarie['cin']);
 
+        $indemnitesCustom = $this->db->query("SELECT id, libelle, montant, plafond_dgi, plafond_cnss FROM salarie_indemnites WHERE salarie_id = $id AND actif = 1 ORDER BY id")->fetchAll();
+        $rubriquesIndemnites = $this->db->query("SELECT code, libelle, plafond_dgi, plafond_cnss FROM rubriques_gains WHERE code BETWEEN '330' AND '377' ORDER BY code")->fetchAll();
+        $gainsCustom = $this->db->query("SELECT sg.id, sg.rubrique_id, sg.montant, rg.code, rg.libelle FROM salarie_gains sg JOIN rubriques_gains rg ON sg.rubrique_id = rg.id WHERE sg.salarie_id = $id AND sg.actif = 1 ORDER BY rg.code")->fetchAll();
+        $societeIdForGains = $salarie['societe_id'];
+        $rubriquesGains = $this->db->query("SELECT id, code, libelle, type_montant, valeur_defaut FROM rubriques_gains WHERE (societe_id IS NULL OR societe_id = $societeIdForGains) AND actif = 1 AND categorie = 'Gain standard' ORDER BY code")->fetchAll();
+
         $this->render('salaries/form.php', [
             'title'           => 'Modifier salarié',
             'salarie'         => $salarie,
@@ -170,6 +190,10 @@ class SalarieController extends Controller
             'fonctions'       => $fonctions,
             'fromSociete'     => $fromSociete,
             'societeContext'  => $ctx,
+            'indemnitesCustom'=> $indemnitesCustom,
+            'rubriquesIndemnites' => $rubriquesIndemnites,
+            'gainsCustom'     => $gainsCustom,
+            'rubriquesGains'  => $rubriquesGains,
         ]);
     }
 
@@ -295,6 +319,40 @@ class SalarieController extends Controller
             'avances_salaire'        => $_POST['avances_salaire'] ?? 0,
             'mutuelle'               => $_POST['mutuelle'] ?? 0,
         ];
+    }
+
+    private function saveIndemnitesCustom(int $salarieId): void
+    {
+        $this->db->exec("DELETE FROM salarie_indemnites WHERE salarie_id = $salarieId");
+
+        if (empty($_POST['indemnite_custom_libelle'])) return;
+
+        $stmt = $this->db->prepare("INSERT INTO salarie_indemnites (salarie_id, libelle, montant, plafond_dgi, plafond_cnss) VALUES (?, ?, ?, ?, ?)");
+        foreach ($_POST['indemnite_custom_libelle'] as $idx => $libelle) {
+            $libelle = trim($libelle);
+            if ($libelle === '') continue;
+            $montant = (float) ($_POST['indemnite_custom_montant'][$idx] ?? 0);
+            if ($montant <= 0) continue;
+            $plafondDgi = !empty($_POST['indemnite_custom_plafond_dgi'][$idx]) ? (float) $_POST['indemnite_custom_plafond_dgi'][$idx] : null;
+            $plafondCnss = !empty($_POST['indemnite_custom_plafond_cnss'][$idx]) ? (float) $_POST['indemnite_custom_plafond_cnss'][$idx] : null;
+            $stmt->execute([$salarieId, $libelle, $montant, $plafondDgi, $plafondCnss]);
+        }
+    }
+
+    private function saveGainsCustom(int $salarieId): void
+    {
+        $this->db->exec("DELETE FROM salarie_gains WHERE salarie_id = $salarieId");
+
+        if (empty($_POST['gain_custom_rubrique_id'])) return;
+
+        $stmt = $this->db->prepare("INSERT INTO salarie_gains (salarie_id, rubrique_id, montant) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE montant = VALUES(montant)");
+        foreach ($_POST['gain_custom_rubrique_id'] as $idx => $rubriqueId) {
+            $rubriqueId = (int) $rubriqueId;
+            if ($rubriqueId <= 0) continue;
+            $montant = (float) ($_POST['gain_custom_montant'][$idx] ?? 0);
+            if ($montant <= 0) continue;
+            $stmt->execute([$salarieId, $rubriqueId, $montant]);
+        }
     }
 
     protected function render(string $view, array $data = []): void
