@@ -196,12 +196,12 @@ $taux = [
     <div style="margin-top:16px; font-size:7px; color:#333; padding-top:6px; border-top:0.5px solid #ccc;">
         <p style="margin:0 0 2px 0;">Fait à <?= htmlspecialchars($b['ville'] ?? '_______') ?>, le <?= date('d/m/Y') ?></p>
         <div style="margin-top:14px; display:flex; justify-content:space-between; align-items:flex-start;">
-            <div style="text-align:left;">
-                <div style="border-bottom:0.5px solid #999; width:130px; margin:0 0 3px 0;"></div>
+            <div style="width:130px; text-align:center;">
+                <div style="border-bottom:0.5px solid #999; margin:0 0 3px 0;"></div>
                 <strong>Cachet et signature<br>du responsable RH</strong>
             </div>
-            <div style="text-align:right;">
-                <div style="border-bottom:0.5px solid #999; width:130px; margin:0 0 3px auto;"></div>
+            <div style="width:130px; text-align:center;">
+                <div style="border-bottom:0.5px solid #999; margin:0 0 3px 0;"></div>
                 <strong>Émargement<br>du salarié</strong>
             </div>
         </div>
