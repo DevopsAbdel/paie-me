@@ -133,15 +133,7 @@ $taux = [
             <p><strong>Matricule:</strong> <?= htmlspecialchars($b['matricule']) ?></p>
             <p><strong>CIN:</strong> <?= htmlspecialchars($b['cin']) ?> | <strong>CNSS:</strong> <?= htmlspecialchars($b['cnss_num']) ?></p>
             <p><strong>Poste:</strong> <?= htmlspecialchars($b['fonction_nom'] ?? $b['poste']) ?></p>
-        </div>
-        <div class="infos-right">
             <p><strong>Durée de travail:</strong> <?= $joursTrav ?> jour(s) / <?= $heuresMensuelles ?> heures</p>
-            <?php if ((float)($b['jours_conge'] ?? 0) > 0): ?>
-            <p><strong>Jours congé:</strong> <?= number_format((float)$b['jours_conge'], 1, ',', ' ') ?> jour(s)</p>
-            <?php endif; ?>
-            <?php if ((float)($b['jours_feries'] ?? 0) > 0): ?>
-            <p><strong>Jours fériés:</strong> <?= number_format((float)$b['jours_feries'], 1, ',', ' ') ?> jour(s)</p>
-            <?php endif; ?>
             <p><strong>Situation:</strong> <?= htmlspecialchars($b['situation_familiale'] ?? 'Célibataire') ?> | <?= (int)($b['nb_enfants'] ?? 0) ?> enfant(s)</p>
         </div>
     </div>
