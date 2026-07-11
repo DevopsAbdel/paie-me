@@ -42,6 +42,7 @@ CREATE TABLE IF NOT EXISTS societes (
     banque              VARCHAR(100),
     agence              VARCHAR(100),
     rib                 VARCHAR(255),
+    modele_bulletin_id  INT UNSIGNED,
     logo                VARCHAR(255),
     damancom_login      VARCHAR(100),
     damancom_password   VARCHAR(255),
@@ -759,4 +760,18 @@ CREATE TABLE IF NOT EXISTS conges_soldes (
     FOREIGN KEY (societe_id) REFERENCES societes(id) ON DELETE CASCADE,
     FOREIGN KEY (salarie_id) REFERENCES salaries(id) ON DELETE CASCADE,
     UNIQUE KEY unique_salarie_annee (salarie_id, annee)
+) ENGINE=InnoDB;
+
+-- -----------------------------------------------------------
+-- Modèles de Bulletins de Paie
+-- -----------------------------------------------------------
+CREATE TABLE IF NOT EXISTS modeles_bulletins (
+    id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    societe_id      INT UNSIGNED        NOT NULL,
+    nom             VARCHAR(200)        NOT NULL,
+    description     TEXT,
+    config          JSON                NOT NULL,
+    defaut          TINYINT(1)          NOT NULL DEFAULT 0,
+    created_at      DATETIME            NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (societe_id) REFERENCES societes(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;

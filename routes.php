@@ -12,6 +12,7 @@ use Controllers\IrController;
 use Controllers\ComptabiliteController;
 use Controllers\SourceLegaleController;
 use Controllers\CongeController;
+use Controllers\ModeleBulletinController;
 
 Router::get('/',                       [AuthController::class, 'login']);
 Router::get('/login',                  [AuthController::class, 'login']);
@@ -99,3 +100,9 @@ Router::get('/societes/{id}/conges/solde-initial',      [CongeController::class,
 Router::post('/societes/{id}/conges/solde-initial',     [CongeController::class, 'soldeInitial']);
 Router::get('/societes/{id}/conges/attestation',        [CongeController::class, 'attestation']);
 Router::get('/societes/{id}/conges/attestation/pdf/{id2}', [CongeController::class, 'pdf']);
+
+Router::get('/societes/{id}/modeles-bulletins', [ModeleBulletinController::class, 'index']);
+Router::post('/societes/{id}/modeles-bulletins', [ModeleBulletinController::class, 'store']);
+Router::get('/societes/{id}/modeles-bulletins/{id2}/delete', [ModeleBulletinController::class, 'delete']);
+Router::get('/societes/{id}/modeles-bulletins/{id2}/assign', [ModeleBulletinController::class, 'assign']);
+Router::post('/societes/{id}/modeles-bulletins/{id2}/update', [ModeleBulletinController::class, 'update']);

@@ -1,3 +1,60 @@
+<?php
+$cfg = $template['config'] ?? [];
+$couleur = $cfg['couleur_primaire'] ?? '#3b82f6';
+$sections = $cfg['sections'] ?? [];
+$netLabel = $cfg['net_label'] ?? 'Net à payer';
+$netColor = $cfg['net_color'] ?? $couleur;
+
+$values = [
+    'salaire_base'          => (float)($b['salaire_base'] ?? 0),
+    'prime_anciennete'      => (float)($b['prime_anciennete'] ?? 0),
+    'indemnite_transport'   => (float)($b['indemnite_transport'] ?? 0),
+    'indemnite_panier'      => (float)($b['indemnite_panier'] ?? 0),
+    'indemnite_representation' => (float)($b['indemnite_representation'] ?? 0),
+    'avantage_logement'     => (float)($b['avantage_logement'] ?? 0),
+    'heures_sup'            => (float)($b['montant_heures_sup'] ?? 0),
+    'salaire_brut'          => (float)($b['salaire_brut'] ?? 0),
+    'sbi'                   => (float)($b['sbi'] ?? 0),
+    'cnss_salariale'        => (float)($b['cnss_salariale'] ?? 0),
+    'amo_salariale'         => (float)($b['amo_salariale'] ?? 0),
+    'frais_professionnels'  => (float)($b['frais_professionnels'] ?? 0),
+    'sni'                   => (float)($b['sni'] ?? 0),
+    'ir'                    => (float)($b['ir'] ?? 0),
+    'deductions_familiales' => (float)($b['deductions_familiales'] ?? 0),
+    'cnss_patronale'        => (float)($b['cnss_patronale'] ?? 0),
+    'amo_patronale'         => (float)($b['amo_patronale'] ?? 0),
+    'allocation_familiale'  => (float)($b['allocation_familiale'] ?? 0),
+    'prestation_sociale'    => (float)($b['prestation_sociale'] ?? 0),
+    'taxe_formation'        => (float)($b['taxe_formation'] ?? 0),
+    'net_a_payer'           => (float)($b['net_a_payer'] ?? 0),
+];
+
+$bases = [
+    'cnss_salariale'       => min($values['salaire_brut'], 6000),
+    'cnss_patronale'       => min($values['salaire_brut'], 6000),
+    'amo_salariale'        => $values['salaire_brut'],
+    'amo_patronale'        => $values['salaire_brut'],
+    'frais_professionnels' => $values['sni'],
+    'ir'                   => $values['sni'],
+    'allocation_familiale' => $values['salaire_brut'],
+    'prestation_sociale'   => $values['salaire_brut'],
+    'taxe_formation'       => $values['salaire_brut'],
+];
+
+$taux = [
+    'cnss_salariale'       => '4,48 %',
+    'cnss_patronale'       => '8,98 %',
+    'amo_salariale'        => '2,26 %',
+    'amo_patronale'        => '4,52 %',
+    'frais_professionnels' => '20 %',
+    'allocation_familiale' => '6,40 %',
+    'prestation_sociale'   => '0,99 %',
+    'taxe_formation'       => '1,60 %',
+];
+
+$netBg = '#f3f4f6';
+$netFg = '#111827';
+?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -16,17 +73,17 @@
         table.details td { padding: 4px 8px; border-bottom: 1px solid #ddd; }
         table.details .right { text-align: right; }
         table.details .bold { font-weight: bold; }
-        .net { background: #f3f4f6; padding: 10px 15px; text-align: right; font-size: 16px; font-weight: bold; border-radius: 4px; margin-top: 10px; }
+        .net { background: <?= $netBg ?>; color: <?= $netFg ?>; padding: 10px 15px; text-align: right; font-size: 16px; font-weight: bold; border-radius: 4px; margin-top: 10px; }
         .footer { text-align: center; margin-top: 30px; font-size: 10px; color: #999; border-top: 1px solid #ddd; padding-top: 10px; }
     </style>
 </head>
 <body>
-    <div class="header" style="display:flex; align-items:center; gap:15px; text-align:left; border-bottom:3px solid #3b82f6; padding-bottom:15px;">
-        <div style="width:50px; height:50px; background:#3b82f6; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:700; color:#fff;">
+    <div class="header" style="display:flex; align-items:center; gap:15px; text-align:left; border-bottom:3px solid <?= $couleur ?>; padding-bottom:15px;">
+        <div style="width:50px; height:50px; background:<?= $couleur ?>; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:700; color:#fff;">
             <?= strtoupper(mb_substr($b['raison_sociale'], 0, 2)) ?>
         </div>
         <div style="flex:1;">
-            <h1 style="font-size:16px; margin:0; color:#3b82f6;"><?= htmlspecialchars($b['raison_sociale']) ?></h1>
+            <h1 style="font-size:16px; margin:0; color:<?= $couleur ?>;"><?= htmlspecialchars($b['raison_sociale']) ?></h1>
             <p style="margin:2px 0; font-size:10px; color:#666;">
                 ICE: <?= htmlspecialchars($b['ice']) ?> | IF: <?= htmlspecialchars($b['if_fiscal']) ?> | CNSS: <?= htmlspecialchars($b['cnss_societe']) ?>
             </p>
@@ -56,50 +113,56 @@
         </tr>
     </table>
 
-    <h3>Éléments du salaire</h3>
+    <?php foreach ($sections as $section): ?>
+    <h3><?= htmlspecialchars($section['titre']) ?></h3>
     <table class="details">
-        <tr><th>Libellé</th><th class="right">Montant (MAD)</th></tr>
-        <tr><td>Salaire de base</td><td class="right"><?= number_format($b['salaire_base'], 2, ',', ' ') ?></td></tr>
-        <?php if ((float)$b['prime_anciennete'] > 0): ?>
-        <tr><td>Prime d'ancienneté</td><td class="right"><?= number_format($b['prime_anciennete'], 2, ',', ' ') ?></td></tr>
-        <?php endif; ?>
-        <?php if ((float)$b['montant_heures_sup'] > 0): ?>
-        <tr><td>Heures supplémentaires (<?= (float)$b['heures_supplementaires'] ?>h)</td><td class="right"><?= number_format($b['montant_heures_sup'], 2, ',', ' ') ?></td></tr>
-        <?php endif; ?>
-        <tr><td>Indemnité de transport</td><td class="right"><?= number_format($b['indemnite_transport'], 2, ',', ' ') ?></td></tr>
-        <tr><td>Indemnité de panier</td><td class="right"><?= number_format($b['indemnite_panier'], 2, ',', ' ') ?></td></tr>
-        <?php if ((float)$b['indemnite_representation'] > 0): ?>
-        <tr><td>Indemnité de représentation</td><td class="right"><?= number_format($b['indemnite_representation'], 2, ',', ' ') ?></td></tr>
-        <?php endif; ?>
-        <?php if ((float)$b['avantage_logement'] > 0): ?>
-        <tr><td>Avantage logement</td><td class="right"><?= number_format($b['avantage_logement'], 2, ',', ' ') ?></td></tr>
-        <?php endif; ?>
-        <tr class="bold"><td>Salaire brut global (SBG)</td><td class="right"><?= number_format($b['salaire_brut'], 2, ',', ' ') ?></td></tr>
-        <?php if ((float)$b['sbi'] > 0): ?>
-        <tr><td>Salaire brut imposable (SBI)</td><td class="right"><?= number_format($b['sbi'], 2, ',', ' ') ?></td></tr>
+        <tr>
+            <?php foreach ($section['colonnes'] as $col): ?>
+            <th<?= $col !== 'Libellé' ? ' class="right"' : '' ?>><?= htmlspecialchars($col) ?></th>
+            <?php endforeach; ?>
+        </tr>
+        <?php foreach ($section['lignes'] as $ligne): ?>
+        <?php
+            $code = $ligne['code'];
+            $val = $values[$code] ?? 0;
+            if ($val == 0 && !isset($values[$code])) continue;
+            $isConditionnel = $ligne['conditionnel'] ?? false;
+            if ($isConditionnel && $val == 0) continue;
+        ?>
+        <tr>
+            <td><?= htmlspecialchars($ligne['label']) ?></td>
+            <?php for ($i = 1; $i < count($section['colonnes']); $i++): ?>
+                <?php if ($section['colonnes'][$i] === 'Base'): ?>
+                    <td class="right"><?= isset($bases[$code]) ? number_format($bases[$code], 2, ',', ' ') : '—' ?></td>
+                <?php elseif ($section['colonnes'][$i] === 'Taux'): ?>
+                    <td class="right"><?= $taux[$code] ?? '—' ?></td>
+                <?php else: ?>
+                    <td class="right"><?= number_format($val, 2, ',', ' ') ?></td>
+                <?php endif; ?>
+            <?php endfor; ?>
+        </tr>
+        <?php endforeach; ?>
+        <?php if (!empty($section['total'])): ?>
+        <tr class="bold">
+            <td><?= htmlspecialchars($section['total']['label']) ?></td>
+            <?php for ($i = 1; $i < count($section['colonnes']); $i++): ?>
+                <?php if ($section['colonnes'][$i] === 'Base' || $section['colonnes'][$i] === 'Taux'): ?>
+                    <td class="right"></td>
+                <?php else: ?>
+                    <td class="right"><?= number_format($values[$section['total']['code']] ?? 0, 2, ',', ' ') ?></td>
+                <?php endif; ?>
+            <?php endfor; ?>
+        </tr>
         <?php endif; ?>
     </table>
+    <?php endforeach; ?>
 
-    <h3>Cotisations et retenues</h3>
-    <table class="details">
-        <tr><th>Libellé</th><th class="right">Montant (MAD)</th></tr>
-        <tr><td>CNSS (part salariale)</td><td class="right"><?= number_format($b['cnss_salariale'], 2, ',', ' ') ?></td></tr>
-        <tr><td>AMO (part salariale)</td><td class="right"><?= number_format($b['amo_salariale'], 2, ',', ' ') ?></td></tr>
-        <?php if ((float)$b['frais_professionnels'] > 0): ?>
-        <tr><td>Frais professionnels</td><td class="right"><?= number_format($b['frais_professionnels'], 2, ',', ' ') ?></td></tr>
-        <?php endif; ?>
-        <tr class="bold"><td>Salaire net imposable (SNI)</td><td class="right"><?= number_format($b['sni'], 2, ',', ' ') ?></td></tr>
-        <tr><td>Impôt sur le revenu (IR brut)</td><td class="right"><?= number_format($b['ir'], 2, ',', ' ') ?></td></tr>
-        <?php if ((float)$b['deductions_familiales'] > 0): ?>
-        <tr><td>Déductions pour charges de famille</td><td class="right" style="color:#22c55e;">+ <?= number_format($b['deductions_familiales'], 2, ',', ' ') ?></td></tr>
-        <?php endif; ?>
-    </table>
+    <div class="net"><?= htmlspecialchars($netLabel) ?> : <?= number_format($b['net_a_payer'], 2, ',', ' ') ?> MAD</div>
 
-    <div class="net">Net à payer : <?= number_format($b['net_a_payer'], 2, ',', ' ') ?> MAD</div>
-
+    <?php if ($cfg['show_footer'] ?? true): ?>
     <div class="footer" style="display:flex; justify-content:space-between; align-items:center;">
         <div style="display:flex; align-items:center; gap:6px;">
-            <div style="width:24px; height:24px; background:#3b82f6; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; color:#fff;">
+            <div style="width:24px; height:24px; background:<?= $couleur ?>; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; color:#fff;">
                 <?= strtoupper(mb_substr($b['raison_sociale'], 0, 2)) ?>
             </div>
             <span><?= htmlspecialchars($b['raison_sociale']) ?></span>
@@ -114,5 +177,6 @@
             <?php if ($b['rib']): ?>| RIB: <?= htmlspecialchars($b['rib']) ?><?php endif; ?>
         </div>
     </div>
+    <?php endif; ?>
 </body>
 </html>

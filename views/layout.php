@@ -62,6 +62,12 @@
             </a>
         </li>
         <li>
+            <a href="/paie-me/societes/<?= $ctx['id'] ?>/modeles-bulletins" class="<?= str_contains($_SERVER['REQUEST_URI'], '/modeles-bulletins') ? 'active' : '' ?>">
+                <span class="icon" data-lucide="layout-template"></span>
+                <span>Modèles Bulletins</span>
+            </a>
+        </li>
+        <li>
             <a href="/paie-me/societes/<?= $ctx['id'] ?>/cnss" class="<?= str_contains($_SERVER['REQUEST_URI'], '/cnss') ? 'active' : '' ?>">
                 <span class="icon" data-lucide="shield-check"></span>
                 <span>CNSS / Damancom</span>

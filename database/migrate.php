@@ -614,4 +614,88 @@ $p->exec("CREATE TABLE IF NOT EXISTS salarie_gains (
 ) ENGINE=InnoDB");
 echo "   + table salarie_gains\n";
 
+// === Table modeles_bulletins ===
+$p->exec("CREATE TABLE IF NOT EXISTS modeles_bulletins (
+    id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    societe_id      INT UNSIGNED        NOT NULL,
+    nom             VARCHAR(200)        NOT NULL,
+    description     TEXT,
+    config          JSON                NOT NULL,
+    defaut          TINYINT(1)          NOT NULL DEFAULT 0,
+    created_at      DATETIME            NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (societe_id) REFERENCES societes(id) ON DELETE CASCADE
+) ENGINE=InnoDB");
+echo "   + table modeles_bulletins\n";
+
+// Add modele_bulletin_id to societes
+try { $p->exec("ALTER TABLE societes ADD COLUMN modele_bulletin_id INT UNSIGNED NULL AFTER rib"); echo "   + modele_bulletin_id ajouté à societes\n"; } catch (\Exception $e) {}
+
+// Seed default template for all societes without one
+$societesSansModele = $p->query("
+    SELECT s.id FROM societes s
+    LEFT JOIN modeles_bulletins mb ON mb.societe_id = s.id AND mb.defaut = 1
+    WHERE mb.id IS NULL
+")->fetchAll(PDO::FETCH_COLUMN);
+if (!empty($societesSansModele)) {
+    $defaultConfig = json_encode([
+        'nom' => 'Modèle Standard Maroc',
+        'couleur_primaire' => '#3b82f6',
+        'sections' => [
+            [
+                'titre' => 'Éléments du salaire',
+                'colonnes' => ['Libellé', 'Base', 'Taux', 'Montant'],
+                'lignes' => [
+                    ['code' => 'salaire_base', 'label' => 'Salaire de base', 'type' => 'gain', 'show_base' => true, 'show_taux' => true],
+                    ['code' => 'prime_anciennete', 'label' => "Prime d'ancienneté", 'type' => 'gain', 'show_base' => true, 'show_taux' => true, 'conditionnel' => true],
+                    ['code' => 'indemnite_transport', 'label' => 'Indemnité de transport', 'type' => 'gain', 'conditionnel' => true],
+                    ['code' => 'indemnite_panier', 'label' => 'Indemnité de panier', 'type' => 'gain', 'conditionnel' => true],
+                    ['code' => 'indemnite_representation', 'label' => 'Indemnité de représentation', 'type' => 'gain', 'conditionnel' => true],
+                    ['code' => 'avantage_logement', 'label' => 'Avantage logement', 'type' => 'gain', 'conditionnel' => true],
+                    ['code' => 'heures_sup', 'label' => 'Heures supplémentaires', 'type' => 'gain', 'show_base' => true, 'conditionnel' => true],
+                ],
+                'total' => ['code' => 'salaire_brut', 'label' => 'Salaire brut global (SBG)'],
+            ],
+            [
+                'titre' => 'Cotisations salariales',
+                'colonnes' => ['Libellé', 'Base', 'Taux', 'Montant'],
+                'lignes' => [
+                    ['code' => 'cnss_salariale', 'label' => 'Cotisation CNSS', 'type' => 'retenue', 'show_base' => true, 'show_taux' => true],
+                    ['code' => 'amo_salariale', 'label' => 'Cotisation AMO', 'type' => 'retenue', 'show_base' => true, 'show_taux' => true],
+                    ['code' => 'frais_professionnels', 'label' => 'Frais professionnels', 'type' => 'retenue', 'show_base' => true, 'show_taux' => true, 'conditionnel' => true],
+                ],
+                'total' => ['code' => 'sni', 'label' => 'Salaire net imposable (SNI)'],
+            ],
+            [
+                'titre' => 'Impôt sur le revenu',
+                'colonnes' => ['Libellé', 'Base', 'Taux', 'Montant'],
+                'lignes' => [
+                    ['code' => 'ir', 'label' => 'Impôt sur le revenu (IR)', 'type' => 'retenue', 'show_base' => true, 'show_taux' => true],
+                    ['code' => 'deductions_familiales', 'label' => 'Déductions charges de famille', 'type' => 'gain', 'conditionnel' => true],
+                ],
+                'total' => null,
+            ],
+            [
+                'titre' => 'Cotisations patronales',
+                'colonnes' => ['Libellé', 'Base', 'Taux', 'Montant'],
+                'lignes' => [
+                    ['code' => 'cnss_patronale', 'label' => 'Cotisation CNSS patronale', 'type' => 'patronale', 'show_base' => true, 'show_taux' => true],
+                    ['code' => 'amo_patronale', 'label' => 'Cotisation AMO patronale', 'type' => 'patronale', 'show_base' => true, 'show_taux' => true],
+                    ['code' => 'allocation_familiale', 'label' => 'Allocation familiale', 'type' => 'patronale', 'show_base' => true, 'show_taux' => true],
+                    ['code' => 'prestation_sociale', 'label' => 'Prestations sociales', 'type' => 'patronale', 'show_base' => true, 'show_taux' => true],
+                    ['code' => 'taxe_formation', 'label' => 'Taxe de formation professionnelle', 'type' => 'patronale', 'show_base' => true, 'show_taux' => true],
+                ],
+                'total' => null,
+            ],
+        ],
+        'net_label' => 'Net à payer',
+        'net_color' => '#3b82f6',
+        'show_footer' => true,
+    ]);
+    $ins = $p->prepare("INSERT INTO modeles_bulletins (societe_id, nom, description, config, defaut) VALUES (?, ?, ?, ?, 1)");
+    foreach ($societesSansModele as $sid) {
+        $ins->execute([$sid, 'Modèle Standard Maroc', 'Bulletin conforme au Code du Travail marocain', $defaultConfig]);
+    }
+    echo "   + " . count($societesSansModele) . " modèle(s) par défaut inséré(s)\n";
+}
+
 echo "\nMigrations terminées.\n";

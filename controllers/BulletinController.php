@@ -55,9 +55,12 @@ class BulletinController extends Controller
             $this->redirect('/paie-me/bulletins');
         }
 
+        $template = $this->getTemplate($bulletin['societe_id']);
+
         $this->render('bulletins/show.php', [
             'title'    => 'Bulletin de paie',
             'b'        => $bulletin,
+            'template' => $template,
         ]);
     }
 
@@ -68,6 +71,8 @@ class BulletinController extends Controller
             Session::setFlash('error', 'Bulletin introuvable.');
             $this->redirect('/paie-me/bulletins');
         }
+
+        $template = $this->getTemplate($bulletin['societe_id']);
 
         ob_start();
         require __DIR__ . '/../views/bulletins/pdf.php';
@@ -113,6 +118,7 @@ class BulletinController extends Controller
                    s.indemnite_panier, s.indemnite_representation, s.avantage_logement, s.salaire_base,
                    so.raison_sociale, so.ice, so.if_fiscal, so.cnss as cnss_societe, so.rc, so.ville,
                    so.adresse, so.telephone, so.email, so.logo, so.banque, so.rib,
+                   so.modele_bulletin_id,
                    p.mois, p.annee
             FROM bulletins b
             JOIN paies pa ON b.paie_id = pa.id
@@ -125,6 +131,66 @@ class BulletinController extends Controller
         ");
         $stmt->execute([$id, $userId]);
         return $stmt->fetch() ?: null;
+    }
+
+    private function getTemplate(int $societeId): array
+    {
+        $stmt = $this->db->prepare("SELECT * FROM modeles_bulletins WHERE societe_id = ? ORDER BY defaut DESC LIMIT 1");
+        $stmt->execute([$societeId]);
+        $template = $stmt->fetch();
+        if (!$template) {
+            return $this->getDefaultTemplate();
+        }
+        $template['config'] = json_decode($template['config'], true) ?: [];
+        return $template;
+    }
+
+    private function getDefaultTemplate(): array
+    {
+        return [
+            'nom' => 'Modèle Standard',
+            'config' => [
+                'couleur_primaire' => '#3b82f6',
+                'net_label' => 'Net à payer',
+                'net_color' => '#3b82f6',
+                'show_footer' => true,
+                'sections' => [
+                    [
+                        'titre' => 'Éléments du salaire',
+                        'colonnes' => ['Libellé', 'Montant'],
+                        'lignes' => [
+                            ['code' => 'salaire_base', 'label' => 'Salaire de base'],
+                            ['code' => 'prime_anciennete', 'label' => "Prime d'ancienneté"],
+                            ['code' => 'indemnite_transport', 'label' => 'Indemnité de transport'],
+                            ['code' => 'indemnite_panier', 'label' => 'Indemnité de panier'],
+                            ['code' => 'indemnite_representation', 'label' => 'Indemnité de représentation'],
+                            ['code' => 'avantage_logement', 'label' => 'Avantage logement'],
+                            ['code' => 'heures_sup', 'label' => 'Heures supplémentaires'],
+                        ],
+                        'total' => ['code' => 'salaire_brut', 'label' => 'Salaire brut global (SBG)'],
+                    ],
+                    [
+                        'titre' => 'Cotisations et retenues',
+                        'colonnes' => ['Libellé', 'Montant'],
+                        'lignes' => [
+                            ['code' => 'cnss_salariale', 'label' => 'CNSS (part salariale)'],
+                            ['code' => 'amo_salariale', 'label' => 'AMO (part salariale)'],
+                            ['code' => 'frais_professionnels', 'label' => 'Frais professionnels'],
+                        ],
+                        'total' => ['code' => 'sni', 'label' => 'Salaire net imposable (SNI)'],
+                    ],
+                    [
+                        'titre' => 'Impôt sur le revenu',
+                        'colonnes' => ['Libellé', 'Montant'],
+                        'lignes' => [
+                            ['code' => 'ir', 'label' => 'Impôt sur le revenu (IR)'],
+                            ['code' => 'deductions_familiales', 'label' => 'Déductions charges de famille'],
+                        ],
+                        'total' => null,
+                    ],
+                ],
+            ],
+        ];
     }
 
     protected function render(string $view, array $data = []): void
