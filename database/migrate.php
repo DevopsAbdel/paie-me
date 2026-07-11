@@ -423,6 +423,30 @@ $p->exec("CREATE TABLE IF NOT EXISTS droit_conge (
 ) ENGINE=InnoDB");
 echo "   + table droit_conge\n";
 
+// Seed tranches par défaut pour societes sans tranches
+$existingTranches = $p->query("SELECT COUNT(*) FROM droit_conge")->fetchColumn();
+if ((int)$existingTranches === 0) {
+    $societes = $p->query("SELECT id FROM societes")->fetchAll(PDO::FETCH_COLUMN);
+    $defaultTranches = [
+        [0, 5, 1.50, 0.00],
+        [5, 10, 1.50, 1.50],
+        [10, 15, 1.50, 3.00],
+        [15, 20, 1.50, 4.50],
+        [20, 25, 1.50, 6.00],
+        [25, 30, 1.50, 7.50],
+        [30, 35, 1.50, 9.00],
+        [35, 40, 1.50, 10.50],
+        [40, 99, 1.50, 12.00],
+    ];
+    $ins = $p->prepare("INSERT INTO droit_conge (societe_id, annees_min, annees_max, jours_par_mois, jours_supplementaires) VALUES (?, ?, ?, ?, ?)");
+    foreach ($societes as $sid) {
+        foreach ($defaultTranches as $t) {
+            $ins->execute([$sid, $t[0], $t[1], $t[2], $t[3]]);
+        }
+    }
+    echo "   + 9 tranches par défaut insérées\n";
+}
+
 // === Heures supplémentaires 25%/50%/100% dans paies ===
 addCol($p, 'paies', 'heures_sup_25 DECIMAL(10,2) NOT NULL DEFAULT 0.00 AFTER montant_heures_sup');
 addCol($p, 'paies', 'heures_sup_50 DECIMAL(10,2) NOT NULL DEFAULT 0.00 AFTER heures_sup_25');

@@ -720,7 +720,11 @@ class SocieteController extends Controller
             }
 
             if ($sousTab === 'jours_feries') {
-                if (!empty($_POST['nom'])) {
+                if (!empty($_POST['edit_jf_id'])) {
+                    $stmt = $this->db->prepare("UPDATE jours_feries SET nom=?, jour=?, mois=?, type=? WHERE id=? AND societe_id=?");
+                    $stmt->execute([$_POST['nom'], $_POST['jour'], $_POST['mois'], $_POST['type'] ?? 'fixe', (int)$_POST['edit_jf_id'], $id]);
+                    Session::setFlash('success', 'Jour férié modifié.');
+                } elseif (!empty($_POST['nom'])) {
                     $stmt = $this->db->prepare("INSERT INTO jours_feries (societe_id, nom, jour, mois, type, actif) VALUES (?, ?, ?, ?, ?, 1)");
                     $stmt->execute([$id, $_POST['nom'], $_POST['jour'], $_POST['mois'], $_POST['type'] ?? 'fixe']);
                     Session::setFlash('success', 'Jour férié ajouté.');
