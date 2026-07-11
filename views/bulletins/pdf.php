@@ -196,7 +196,7 @@ $taux = [
 
     <div class="net"><?= htmlspecialchars($netLabel) ?> : <?= number_format($b['net_a_payer'], 2, ',', ' ') ?> MAD</div>
 
-    <div class="section-title">Cumuls annuels</div>
+    <div class="section-title" style="margin-top:12px;">Cumuls annuels</div>
     <table style="width:100%; border-collapse:collapse; font-size:7px; margin-bottom:4px;">
         <tr>
             <td style="padding:1.5px 3px; width:20%;"><strong>Brut:</strong> <?= number_format($cumuls['cumul_brut'], 2, ',', ' ') ?></td>
