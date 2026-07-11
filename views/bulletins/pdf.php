@@ -5,6 +5,12 @@ $sections = $cfg['sections'] ?? [];
 $netLabel = $cfg['net_label'] ?? 'Net à payer';
 $netColor = $cfg['net_color'] ?? $couleur;
 
+$plafond = (float)($cnssParams['plafond_cnss'] ?? 6000);
+$tauxCnssS = (float)($cnssParams['taux_cnss_salarial'] ?? 4.48);
+$tauxCnssP = (float)($cnssParams['taux_cnss_patronal'] ?? 8.98);
+$tauxAmoS  = (float)($cnssParams['taux_amo_salarial'] ?? 2.26);
+$tauxAmoP  = (float)($cnssParams['taux_amo_patronal'] ?? 4.11);
+
 $values = [
     '100' => (float)($b['salaire_base'] ?? 0),
     '204' => (float)($b['prime_anciennete'] ?? 0),
@@ -12,13 +18,13 @@ $values = [
     '346' => (float)($b['indemnite_panier'] ?? 0),
     '331' => (float)($b['indemnite_representation'] ?? 0),
     '340' => (float)($b['avantage_logement'] ?? 0),
-    '201' => 0,
-    '202' => 0,
-    '203' => (float)($b['montant_heures_sup'] ?? 0),
+    '201' => (float)($b['montant_hs_25'] ?? 0),
+    '202' => (float)($b['montant_hs_50'] ?? 0),
+    '203' => (float)($b['montant_hs_100'] ?? 0),
     'SB'  => (float)($b['salaire_brut'] ?? 0),
     '400' => (float)($b['cnss_salariale'] ?? 0),
     '410' => (float)($b['amo_salariale'] ?? 0),
-    '420' => 0,
+    '420' => (float)($b['mutuelle'] ?? 0),
     '501' => (float)($b['frais_professionnels'] ?? 0),
     '502' => (float)($b['sni'] ?? 0),
     '600' => (float)($b['ir'] ?? 0),
@@ -27,22 +33,23 @@ $values = [
     '410P' => (float)($b['amo_patronale'] ?? 0),
 ];
 
-$bases = [
-    '400' => min($values['SB'] ?? $values['100'] ?? 0, 6000),
-    '400P' => min($values['SB'] ?? $values['100'] ?? 0, 6000),
-    '410' => $values['SB'] ?? $values['100'] ?? 0,
-    '410P' => $values['SB'] ?? $values['100'] ?? 0,
-    '501' => $values['502'] ?? 0,
-    '600' => $values['502'] ?? 0,
-];
-
 $sbiAnnuel = (float)($b['sbi'] ?? 0) * 12;
 $fpTaux = $sbiAnnuel <= 78000 ? '35%' : '25%';
+
+$bases = [
+    '400' => min($values['SB'] ?? $values['100'] ?? 0, $plafond),
+    '400P' => min($values['SB'] ?? $values['100'] ?? 0, $plafond),
+    '410' => $values['SB'] ?? $values['100'] ?? 0,
+    '410P' => $values['SB'] ?? $values['100'] ?? 0,
+    '501' => (float)($b['sbi'] ?? 0),
+    '600' => (float)($b['sni'] ?? 0),
+];
+
 $taux = [
-    '400'  => '4,48%',
-    '400P' => '8,98%',
-    '410'  => '2,26%',
-    '410P' => '4,52%',
+    '400'  => number_format($tauxCnssS, 2, ',', ' ') . '%',
+    '400P' => number_format($tauxCnssP, 2, ',', ' ') . '%',
+    '410'  => number_format($tauxAmoS, 2, ',', ' ') . '%',
+    '410P' => number_format($tauxAmoP, 2, ',', ' ') . '%',
     '501'  => $fpTaux,
 ];
 ?>

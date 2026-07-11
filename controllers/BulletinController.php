@@ -56,11 +56,13 @@ class BulletinController extends Controller
         }
 
         $template = $this->getTemplate($bulletin['societe_id']);
+        $cnssParams = $this->getCnssParams($bulletin['societe_id']);
 
         $this->render('bulletins/show.php', [
-            'title'    => 'Bulletin de paie',
-            'b'        => $bulletin,
-            'template' => $template,
+            'title'      => 'Bulletin de paie',
+            'b'          => $bulletin,
+            'template'   => $template,
+            'cnssParams' => $cnssParams,
         ]);
     }
 
@@ -73,6 +75,7 @@ class BulletinController extends Controller
         }
 
         $template = $this->getTemplate($bulletin['societe_id']);
+        $cnssParams = $this->getCnssParams($bulletin['societe_id']);
         $b = $bulletin;
 
         ob_start();
@@ -149,6 +152,19 @@ class BulletinController extends Controller
         }
         $template['config'] = json_decode($template['config'], true) ?: [];
         return $template;
+    }
+
+    private function getCnssParams(int $societeId): array
+    {
+        $stmt = $this->db->prepare("SELECT * FROM parametres_cnss_amo WHERE societe_id = ? LIMIT 1");
+        $stmt->execute([$societeId]);
+        return $stmt->fetch() ?: [
+            'plafond_cnss'       => 6000.00,
+            'taux_cnss_salarial' => 4.48,
+            'taux_cnss_patronal' => 8.98,
+            'taux_amo_salarial'  => 2.26,
+            'taux_amo_patronal'  => 4.11,
+        ];
     }
 
     private function getDefaultTemplate(): array

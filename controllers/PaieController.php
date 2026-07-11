@@ -210,8 +210,8 @@ class PaieController extends Controller
             $c = $this->calculator->calculerPaie($s, $cnssParams, $dateFin, $hs25, $hs50, $hs100, $mergedGains, $retenues, $dateDebut, $baremeHS, null, $jc, $jf, $ic);
 
             $stmtPaie = $this->db->prepare("
-                INSERT INTO paies (periode_id, salarie_id, societe_id, jours_travailles, salaire_brut, sbi, prime_anciennete, salaire_plafonne_cnss, indemnite_transport, indemnite_panier, indemnite_representation, avantage_logement, total_gains, heures_supplementaires, montant_heures_sup, heures_sup_25, heures_sup_50, heures_sup_100, cnss_salariale, amo_salariale, mutuelle, sni, ir, deductions_familiales, autres_retenues, net_avant_retenues, net_a_payer, cnss_patronale, amo_patronale, frais_professionnels)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO paies (periode_id, salarie_id, societe_id, jours_travailles, salaire_brut, sbi, prime_anciennete, salaire_plafonne_cnss, indemnite_transport, indemnite_panier, indemnite_representation, avantage_logement, total_gains, heures_supplementaires, montant_heures_sup, montant_hs_25, montant_hs_50, montant_hs_100, heures_sup_25, heures_sup_50, heures_sup_100, cnss_salariale, amo_salariale, mutuelle, sni, ir, deductions_familiales, autres_retenues, net_avant_retenues, net_a_payer, cnss_patronale, amo_patronale, frais_professionnels)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ");
             $stmtPaie->execute([
                 $id, $s['id'], $societeId, $c['joursTravailles'],
@@ -219,6 +219,7 @@ class PaieController extends Controller
                 $c['transport'], $c['panier'], $c['representation'], $c['logement'],
                 $c['totalGains'],
                 $c['heuresSup'], $c['montantHeuresSup'],
+                $c['montantHS25'], $c['montantHS50'], $c['montantHS100'],
                 $c['heuresSup25'], $c['heuresSup50'], $c['heuresSup100'],
                 $c['cnss'], $c['amo'], $c['mutuelle'], $c['sni'], $c['ir'], $c['deductionsFamiliales'],
                 $c['autresRetenues'], $c['netAvant'], $c['net'],
@@ -636,8 +637,8 @@ class PaieController extends Controller
             $c = $this->calculator->calculerPaie($s, $cnssParams, $dateFin, 0, 0, 0, $mergedGains, $retenues, $dateDebut, $baremeHS, null, 0, 0, $ic);
 
             $stmtPaie = $this->db->prepare("
-                INSERT INTO paies (periode_id, salarie_id, societe_id, jours_travailles, salaire_brut, sbi, prime_anciennete, salaire_plafonne_cnss, indemnite_transport, indemnite_panier, indemnite_representation, avantage_logement, total_gains, heures_supplementaires, montant_heures_sup, heures_sup_25, heures_sup_50, heures_sup_100, cnss_salariale, amo_salariale, mutuelle, sni, ir, deductions_familiales, autres_retenues, net_avant_retenues, net_a_payer, cnss_patronale, amo_patronale, frais_professionnels)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO paies (periode_id, salarie_id, societe_id, jours_travailles, salaire_brut, sbi, prime_anciennete, salaire_plafonne_cnss, indemnite_transport, indemnite_panier, indemnite_representation, avantage_logement, total_gains, heures_supplementaires, montant_heures_sup, montant_hs_25, montant_hs_50, montant_hs_100, heures_sup_25, heures_sup_50, heures_sup_100, cnss_salariale, amo_salariale, mutuelle, sni, ir, deductions_familiales, autres_retenues, net_avant_retenues, net_a_payer, cnss_patronale, amo_patronale, frais_professionnels)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ");
             $stmtPaie->execute([
                 $id, $s['id'], $societeId,
@@ -646,6 +647,7 @@ class PaieController extends Controller
                 $c['transport'], $c['panier'], $c['representation'], $c['logement'],
                 $c['totalGains'],
                 $c['heuresSup'], $c['montantHeuresSup'],
+                $c['montantHS25'], $c['montantHS50'], $c['montantHS100'],
                 $c['heuresSup25'], $c['heuresSup50'], $c['heuresSup100'],
                 $c['cnss'], $c['amo'], $c['mutuelle'], $c['sni'], $c['ir'], $c['deductionsFamiliales'],
                 $c['autresRetenues'], $c['netAvant'], $c['net'],
@@ -756,6 +758,7 @@ class PaieController extends Controller
                 salaire_brut = ?, sbi = ?, prime_anciennete = ?,
                 salaire_plafonne_cnss = ?,
                 total_gains = ?, montant_heures_sup = ?,
+                montant_hs_25 = ?, montant_hs_50 = ?, montant_hs_100 = ?,
                 cnss_salariale = ?, amo_salariale = ?, mutuelle = ?,
                 sni = ?, ir = ?, deductions_familiales = ?,
                 autres_retenues = ?, net_avant_retenues = ?, net_a_payer = ?,
@@ -766,6 +769,7 @@ class PaieController extends Controller
             $c['sb'], $c['sbi'], $c['primeAnciennete'],
             $c['plafonne'],
             $c['totalGains'], $c['montantHeuresSup'],
+            $c['montantHS25'], $c['montantHS50'], $c['montantHS100'],
             $c['cnss'], $c['amo'], $c['mutuelle'],
             $c['sni'], $c['ir'], $c['deductionsFamiliales'],
             $c['autresRetenues'], $c['netAvant'], $c['net'],

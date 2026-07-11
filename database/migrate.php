@@ -614,6 +614,11 @@ $p->exec("CREATE TABLE IF NOT EXISTS salarie_gains (
 ) ENGINE=InnoDB");
 echo "   + table salarie_gains\n";
 
+// === Heures supplémentaires montants individuels dans paies ===
+addCol($p, 'paies', 'montant_hs_25 DECIMAL(10,2) NOT NULL DEFAULT 0.00 AFTER montant_heures_sup');
+addCol($p, 'paies', 'montant_hs_50 DECIMAL(10,2) NOT NULL DEFAULT 0.00 AFTER montant_hs_25');
+addCol($p, 'paies', 'montant_hs_100 DECIMAL(10,2) NOT NULL DEFAULT 0.00 AFTER montant_hs_50');
+
 // === Table modeles_bulletins ===
 $p->exec("CREATE TABLE IF NOT EXISTS modeles_bulletins (
     id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
