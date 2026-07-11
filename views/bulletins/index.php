@@ -35,7 +35,9 @@
                         <td><?= $b['date_emission'] ?></td>
                         <td>
                             <div class="table-actions">
-                                <a href="/paie-me/bulletins/<?= $b['id'] ?>" class="btn btn-secondary btn-sm">Voir</a>
+                                <a href="/paie-me/bulletins/<?= $b['id'] ?>" class="btn-icon btn-view" title="Voir">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                </a>
                             </div>
                         </td>
                     </tr>

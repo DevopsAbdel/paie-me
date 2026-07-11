@@ -82,6 +82,38 @@ Net  = salaire - (CNSS + AMO + IR)
 - La classe `.table-actions` applique `display: flex; align-items: center; gap: 0.35rem; white-space: nowrap;`.
 - Les boutons dans `.table-actions` utilisent `.btn-sm` avec `padding: 0.25rem 0.5rem; font-size: 0.75rem;`.
 
+## Règles CSS — Icônes d'actions (tableaux)
+- **Toute colonne « Actions »** dans un tableau utilise des icônes outlined (stroke-only, pas de fill) via SVG inline.
+- Les icônes sont dans un `<div class="table-actions">` pour l'alignement flex.
+- **Pas de texte** — uniquement des icônes SVG avec `title="..."` pour le tooltip natif au hover.
+- Chaque type d'action a une couleur dédiée via `.btn-icon.btn-{type}` :
+  | Classe | Couleur | Usage | Icône SVG |
+  |--------|---------|-------|-----------|
+  | `btn-view` | `#3b82f6` (bleu) | Voir / détails | Oeil (`eye`) |
+  | `btn-edit` | `#eab308` (jaune) | Modifier | Crayon (`edit`) |
+  | `btn-delete` | `#ef4444` (rouge) | Supprimer | Corbeille (`trash-2`) |
+  | `btn-info` | `#22d3ee` (cyan) | PDF / CSV / Journal / Export | Fichier (`file`) |
+- Au hover, chaque icône affiche un fond teinté correspondant (ex: `rgba(239,68,68,0.12)` pour delete).
+- **Pattern HTML standard :**
+  ```html
+  <td>
+      <div class="table-actions">
+          <button type="button" class="btn-icon btn-view" title="Voir les détails" onclick="voirXxx(<?= (int)$x['id'] ?>)">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+          <button type="button" class="btn-icon btn-edit" title="Modifier" onclick="openModal(<?= (int)$x['id'] ?>)">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <a href="<?= $baseUrl ?>/xxx?delete_xxx=<?= $x['id'] ?>" class="btn-icon btn-delete" title="Supprimer" onclick="return confirm('Supprimer ?')">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+          </a>
+      </div>
+  </td>
+  ```
+- **Ne jamais utiliser** du texte brut (ex: « Supprimer », « Modifier ») dans les colonnes d'actions — toujours des icônes outlined.
+- **Ne jamais utiliser** d'icônes avec `fill` (solid) — uniquement `stroke` pour un rendu outlined léger.
+- Le `title` est obligatoire pour l'accessibilité et l'info-bulle au survol.
+
 ## Règles CSS — Listes déroulantes (select)
 - Toute balise `<select>` **doit** porter la classe `form-control` pour activer la flèche custom (SVG chevron via `background-image` définie dans `select.form-control` à style.css:416).
 - La flèche native du navigateur est masquée (`appearance: none`) et remplacée par un chevron SVG gris (`#94a3b8`) positionné à droite.

@@ -241,6 +241,14 @@ a:hover {
     background: rgba(239, 68, 68, 0.12);
 }
 
+.btn-icon.btn-info {
+    color: #22d3ee;
+}
+
+.btn-icon.btn-info:hover {
+    background: rgba(34, 211, 238, 0.12);
+}
+
 /* ── Cards ── */
 .card {
     background: var(--bg-surface);
