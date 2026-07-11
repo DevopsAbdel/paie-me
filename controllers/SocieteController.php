@@ -699,9 +699,23 @@ class SocieteController extends Controller
                 $stmt = $this->db->prepare("
                     INSERT INTO conge_annuel (societe_id, jours_par_mois, report_autorise, report_max)
                     VALUES (?, ?, ?, ?)
-                    ON DUPLICATE KEY UPDATE jours_par_mois=VALUES(jours_par_mois), report_autorise=VALUES(report_autorise), report_max=VALUES(report_max)
+                    ON DUPLICATE KEY UPDATE report_autorise=VALUES(report_autorise), report_max=VALUES(report_max)
                 ");
                 $stmt->execute([$id, $_POST['jours_par_mois'] ?? 1.50, (int)($_POST['report_autorise'] ?? 0), $_POST['report_max'] ?? 15]);
+
+                $this->db->exec("DELETE FROM droit_conge WHERE societe_id = $id");
+                if (!empty($_POST['dc_annees_min'])) {
+                    $ins = $this->db->prepare("INSERT INTO droit_conge (societe_id, annees_min, annees_max, jours_par_mois, jours_supplementaires) VALUES (?, ?, ?, ?, ?)");
+                    foreach ($_POST['dc_annees_min'] as $k => $min) {
+                        $max = (int)($_POST['dc_annees_max'][$k] ?? 0);
+                        $jpm = (float)($_POST['dc_jours_par_mois'][$k] ?? 1.50);
+                        $jsup = (float)($_POST['dc_jours_sup'][$k] ?? 0);
+                        if ($max > 0 || $jpm > 0) {
+                            $ins->execute([$id, $min, $max, $jpm, $jsup]);
+                        }
+                    }
+                }
+
                 Session::setFlash('success', 'Configuration congé annuel mise à jour.');
             }
 
@@ -754,6 +768,7 @@ class SocieteController extends Controller
         $baremeAnnuel  = $this->db->query("SELECT * FROM bareme_ir WHERE type='annuel' ORDER BY `min`")->fetchAll();
         $anciennete    = $this->db->query("SELECT * FROM bareme_anciennete WHERE societe_id = $id ORDER BY annees_min")->fetchAll();
         $conge         = $this->db->query("SELECT * FROM conge_annuel WHERE societe_id = $id")->fetch();
+        $droitConge    = $this->db->query("SELECT * FROM droit_conge WHERE societe_id = $id ORDER BY annees_min")->fetchAll();
         $joursFeries   = $this->db->query("SELECT * FROM jours_feries WHERE societe_id = $id ORDER BY mois, jour")->fetchAll();
         $heuresSup     = $this->db->query("SELECT * FROM bareme_heures_sup WHERE societe_id = $id")->fetch();
         $baremeSmigSmag = $this->db->query("SELECT * FROM bareme_smig_smag WHERE societe_id = $id ORDER BY annee DESC, type")->fetchAll();
@@ -777,6 +792,7 @@ class SocieteController extends Controller
             'baremeAnnuel' => $baremeAnnuel,
             'anciennete'   => $anciennete,
             'conge'        => $conge,
+            'droitConge'   => $droitConge,
             'joursFeries'   => $joursFeries,
             'heuresSup'     => $heuresSup,
             'baremeSmigSmag' => $baremeSmigSmag,
