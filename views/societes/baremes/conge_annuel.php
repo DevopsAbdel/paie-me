@@ -15,7 +15,7 @@
     <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:0.75rem;">
         <div class="form-group">
             <label>Délai d'ancienneté (mois)</label>
-            <input type="number" name="delai_anciennete" value="<?= htmlspecialchars($conge['delai_anciennete'] ?? '6') ?>" class="form-control" min="0">
+            <input type="number" name="delai_anciennete" value="<?= htmlspecialchars($conge['delai_anciennete'] ?? '6') ?>" class="form-control" min="6">
             <small style="color:var(--text-muted); font-size:0.7rem; margin-top:0.25rem; display:block;">Mois avant éligibilité (défaut : 6)</small>
         </div>
         <div class="form-group">

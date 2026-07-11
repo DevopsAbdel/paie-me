@@ -703,7 +703,8 @@ class SocieteController extends Controller
                 ");
                 $reportMax = min(15, max(0, (int)($_POST['report_max'] ?? 15)));
                 $reportMaxAnnees = min(2, max(0, (int)($_POST['report_max_annees'] ?? 2)));
-                $stmt->execute([$id, $_POST['jours_par_mois'] ?? 1.50, (int)($_POST['report_autorise'] ?? 0), $reportMax, $_POST['delai_anciennete'] ?? 6, $reportMaxAnnees]);
+                $delaiAnciennete = max(6, (int)($_POST['delai_anciennete'] ?? 6));
+                $stmt->execute([$id, $_POST['jours_par_mois'] ?? 1.50, (int)($_POST['report_autorise'] ?? 0), $reportMax, $delaiAnciennete, $reportMaxAnnees]);
 
                 $this->db->exec("DELETE FROM droit_conge WHERE societe_id = $id");
                 if (!empty($_POST['dc_annees_min'])) {
