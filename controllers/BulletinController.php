@@ -186,7 +186,8 @@ class BulletinController extends Controller
                 SUM(pa.indemnite_representation) AS cumul_representation,
                 SUM(pa.montant_hs_25) AS cumul_hs25,
                 SUM(pa.montant_hs_50) AS cumul_hs50,
-                SUM(pa.montant_hs_100) AS cumul_hs100
+                SUM(pa.montant_hs_100) AS cumul_hs100,
+                SUM(pa.jours_travailles) AS cumul_jours
             FROM paies pa
             JOIN periodes p ON pa.periode_id = p.id
             WHERE pa.salarie_id = ? AND pa.societe_id = ? AND p.annee = ?

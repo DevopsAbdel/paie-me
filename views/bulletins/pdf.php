@@ -210,9 +210,10 @@ $taux = [
             <td style="padding:1.5px 3px;"><strong>SNI:</strong> <?= number_format($cumuls['cumul_sni'], 2, ',', ' ') ?></td>
         </tr>
         <tr style="border-top:1px solid #999;">
-            <td colspan="3" style="padding:1.5px 3px; font-weight:bold; font-size:8px;"><?= htmlspecialchars($netLabel) ?> cumulé: <?= number_format($cumuls['cumul_net'], 2, ',', ' ') ?> MAD</td>
-            <td style="padding:1.5px 3px;"><strong>Congés:</strong> <?= number_format($cumuls['jours_conge_consommes'], 1, ',', ' ') ?> / <?= number_format($cumuls['jours_conge_restants'], 1, ',', ' ') ?> jr</td>
-            <td style="padding:1.5px 3px;">&nbsp;</td>
+            <td colspan="2" style="padding:1.5px 3px; font-weight:bold; font-size:8px;"><?= htmlspecialchars($netLabel) ?> cumulé: <?= number_format($cumuls['cumul_net'], 2, ',', ' ') ?> MAD</td>
+            <td style="padding:1.5px 3px;"><strong>Jrs déclarés:</strong> <?= number_format($cumuls['cumul_jours'], 0, ',', ' ') ?></td>
+            <td style="padding:1.5px 3px;"><strong>Congés:</strong> <?= number_format($cumuls['jours_conge_consommes'], 1, ',', ' ') ?> / <?= number_format($cumuls['jours_conge_restants'], 1, ',', ' ') ?></td>
+            <td>&nbsp;</td>
         </tr>
     </table>
 

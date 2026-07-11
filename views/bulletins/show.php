@@ -239,6 +239,10 @@ $taux = [
                     <td>Net à payer</td>
                     <td style="text-align:right;"><?= number_format($cumuls['cumul_net'], 2, ',', ' ') ?></td>
                 </tr>
+                <tr>
+                    <td>Jours déclarés</td>
+                    <td style="text-align:right;"><?= number_format($cumuls['cumul_jours'], 0, ',', ' ') ?> jour(s)</td>
+                </tr>
                 <?php if ($cumuls['cumul_transport'] > 0 || $cumuls['cumul_panier'] > 0 || $cumuls['cumul_representation'] > 0): ?>
                 <tr style="border-top:1px solid var(--border);">
                     <td colspan="2" style="font-weight:bold; color:<?= $couleur ?>; padding-top:0.75rem;">Indemnités</td>
