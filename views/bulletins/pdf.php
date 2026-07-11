@@ -195,16 +195,18 @@ $taux = [
 
     <div style="margin-top:16px; font-size:7px; color:#333; padding-top:6px; border-top:0.5px solid #ccc;">
         <p style="margin:0 0 2px 0;">Fait à <?= htmlspecialchars($b['ville'] ?? '_______') ?>, le <?= date('d/m/Y') ?></p>
-        <div style="margin-top:14px; display:flex; justify-content:space-between; align-items:flex-end;">
-            <div style="width:130px; text-align:center;">
-                <strong>Cachet et signature<br>du responsable RH</strong>
-                <div style="border-bottom:0.5px solid #999; margin:3px 0 0 0;"></div>
-            </div>
-            <div style="width:130px; text-align:center;">
-                <strong>Émargement<br>du salarié</strong>
-                <div style="border-bottom:0.5px solid #999; margin:3px 0 0 0;"></div>
-            </div>
-        </div>
+        <table style="width:100%; margin-top:14px; border-collapse:collapse; font-size:7px;">
+            <tr>
+                <td style="width:50%; text-align:center; vertical-align:bottom; padding:0;">
+                    <strong>Cachet et signature<br>du responsable RH</strong>
+                    <div style="border-bottom:0.5px solid #999; width:130px; margin:3px auto 0;"></div>
+                </td>
+                <td style="width:50%; text-align:center; vertical-align:bottom; padding:0;">
+                    <strong>Émargement<br>du salarié</strong>
+                    <div style="border-bottom:0.5px solid #999; width:130px; margin:3px auto 0;"></div>
+                </td>
+            </tr>
+        </table>
     </div>
 
 </body>
