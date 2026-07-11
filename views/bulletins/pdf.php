@@ -112,31 +112,36 @@ $taux = [
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="header-logo"><?= strtoupper(mb_substr($b['raison_sociale'], 0, 2)) ?></div>
-        <div class="header-info">
-            <h1><?= htmlspecialchars($b['raison_sociale']) ?></h1>
-            <p>ICE: <?= htmlspecialchars($b['ice']) ?> | IF: <?= htmlspecialchars($b['if_fiscal']) ?> | CNSS: <?= htmlspecialchars($b['cnss_societe']) ?></p>
-            <p><?= htmlspecialchars($b['adresse'] ?? '') ?><?php if ($b['telephone']): ?> | Tél: <?= htmlspecialchars($b['telephone']) ?><?php endif; ?><?php if ($b['email']): ?> | <?= htmlspecialchars($b['email']) ?><?php endif; ?></p>
-        </div>
-        <div class="header-right">
-            <h2>Bulletin de paie</h2>
-            <p>N° <?= htmlspecialchars($b['numero']) ?></p>
-            <p>Période: <?= str_pad($b['mois'], 2, '0', STR_PAD_LEFT) . '/' . $b['annee'] ?></p>
-            <p>Émis le: <?= $b['date_emission'] ?></p>
-        </div>
-    </div>
+    <table style="width:100%; border-collapse:collapse; margin-bottom:6px; border-bottom:2px solid <?= $couleur ?>;">
+        <tr>
+            <td style="vertical-align:middle; padding:0 8px 8px 0; width:36px;">
+                <div style="width:36px; height:36px; background:<?= $couleur ?>; border-radius:6px; text-align:center; line-height:36px; font-size:14px; font-weight:700; color:#fff;"><?= strtoupper(mb_substr($b['raison_sociale'], 0, 2)) ?></div>
+            </td>
+            <td style="vertical-align:middle; padding-bottom:8px;">
+                <h1 style="font-size:12px; margin:0; color:<?= $couleur ?>;"><?= htmlspecialchars($b['raison_sociale']) ?></h1>
+                <p style="margin:1px 0; font-size:8px; color:#666;">ICE: <?= htmlspecialchars($b['ice']) ?> | IF: <?= htmlspecialchars($b['if_fiscal']) ?> | CNSS: <?= htmlspecialchars($b['cnss_societe']) ?></p>
+                <p style="margin:1px 0; font-size:8px; color:#666;"><?= htmlspecialchars($b['adresse'] ?? '') ?><?php if ($b['telephone']): ?> | Tél: <?= htmlspecialchars($b['telephone']) ?><?php endif; ?><?php if ($b['email']): ?> | <?= htmlspecialchars($b['email']) ?><?php endif; ?></p>
+            </td>
+            <td style="vertical-align:middle; padding-bottom:8px; text-align:right; white-space:nowrap;">
+                <h2 style="font-size:11px; margin:0; color:<?= $couleur ?>;"><?= htmlspecialchars($b['numero']) ?></h2>
+                <p style="margin:1px 0; font-size:8px; color:#666;">Période: <?= str_pad($b['mois'], 2, '0', STR_PAD_LEFT) . '/' . $b['annee'] ?></p>
+                <p style="margin:1px 0; font-size:8px; color:#666;">Émis le: <?= $b['date_emission'] ?></p>
+            </td>
+        </tr>
+    </table>
 
-    <div class="infos">
-        <div class="infos-left">
-            <p><strong>Salarié:</strong> <?= htmlspecialchars($b['nom_famille'] . ' ' . $b['prenom']) ?></p>
-            <p><strong>Matricule:</strong> <?= htmlspecialchars($b['matricule']) ?></p>
-            <p><strong>CIN:</strong> <?= htmlspecialchars($b['cin']) ?> | <strong>CNSS:</strong> <?= htmlspecialchars($b['cnss_num']) ?></p>
-            <p><strong>Poste:</strong> <?= htmlspecialchars($b['fonction_nom'] ?? $b['poste']) ?></p>
-            <p><strong>Durée de travail:</strong> <?= $joursTrav ?> jour(s) / <?= $heuresMensuelles ?> heures</p>
-            <p><strong>Situation:</strong> <?= htmlspecialchars($b['situation_familiale'] ?? 'Célibataire') ?> | <?= (int)($b['nb_enfants'] ?? 0) ?> enfant(s)</p>
-        </div>
-    </div>
+    <table style="width:100%; border-collapse:collapse; margin-bottom:6px;">
+        <tr>
+            <td style="font-size:8px; padding:0;">
+                <p style="margin:1px 0;"><strong>Salarié:</strong> <?= htmlspecialchars($b['nom_famille'] . ' ' . $b['prenom']) ?></p>
+                <p style="margin:1px 0;"><strong>Matricule:</strong> <?= htmlspecialchars($b['matricule']) ?></p>
+                <p style="margin:1px 0;"><strong>CIN:</strong> <?= htmlspecialchars($b['cin']) ?> | <strong>CNSS:</strong> <?= htmlspecialchars($b['cnss_num']) ?></p>
+                <p style="margin:1px 0;"><strong>Poste:</strong> <?= htmlspecialchars($b['fonction_nom'] ?? $b['poste']) ?></p>
+                <p style="margin:1px 0;"><strong>Durée de travail:</strong> <?= $joursTrav ?> jour(s) / <?= $heuresMensuelles ?> heures</p>
+                <p style="margin:1px 0;"><strong>Situation:</strong> <?= htmlspecialchars($b['situation_familiale'] ?? 'Célibataire') ?> | <?= (int)($b['nb_enfants'] ?? 0) ?> enfant(s)</p>
+            </td>
+        </tr>
+    </table>
 
     <?php foreach ($sections as $section): ?>
     <p class="section-title"><?= htmlspecialchars($section['titre']) ?></p>
