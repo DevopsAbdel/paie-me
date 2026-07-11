@@ -50,7 +50,7 @@ $taux = [
     <meta charset="UTF-8">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'DejaVu Sans', sans-serif; font-size: 9px; color: #1e293b; line-height: 1.3; }
+        body { font-family: 'DejaVu Sans', sans-serif; font-size: 9px; color: #1e293b; line-height: 1.3; margin: 8mm 15mm; }
         .header { display: flex; align-items: center; gap: 10px; padding-bottom: 8px; margin-bottom: 6px; border-bottom: 2px solid <?= $couleur ?>; }
         .header-logo { width: 36px; height: 36px; background: <?= $couleur ?>; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: #fff; flex-shrink: 0; }
         .header-info { flex: 1; }
