@@ -28,12 +28,12 @@
         </div>
         <div class="form-group">
             <label>Report max (jours)</label>
-            <input type="number" name="report_max" value="<?= htmlspecialchars($conge['report_max'] ?? '15') ?>" class="form-control" min="0">
+            <input type="number" name="report_max" value="<?= htmlspecialchars($conge['report_max'] ?? '15') ?>" class="form-control" min="0" max="15">
             <small style="font-size:0.7rem;">&nbsp;</small>
         </div>
         <div class="form-group">
             <label>Report max (années consécutives)</label>
-            <input type="number" name="report_max_annees" value="<?= htmlspecialchars($conge['report_max_annees'] ?? '2') ?>" class="form-control" min="0">
+            <input type="number" name="report_max_annees" value="<?= htmlspecialchars($conge['report_max_annees'] ?? '2') ?>" class="form-control" min="0" max="2">
             <small style="color:var(--text-muted); font-size:0.7rem; margin-top:0.25rem; display:block;">Années consécutives max (défaut : 2)</small>
         </div>
     </div>

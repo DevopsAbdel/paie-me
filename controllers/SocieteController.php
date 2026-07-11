@@ -701,7 +701,9 @@ class SocieteController extends Controller
                     VALUES (?, ?, ?, ?, ?, ?)
                     ON DUPLICATE KEY UPDATE report_autorise=VALUES(report_autorise), report_max=VALUES(report_max), delai_anciennete=VALUES(delai_anciennete), report_max_annees=VALUES(report_max_annees)
                 ");
-                $stmt->execute([$id, $_POST['jours_par_mois'] ?? 1.50, (int)($_POST['report_autorise'] ?? 0), $_POST['report_max'] ?? 15, $_POST['delai_anciennete'] ?? 6, $_POST['report_max_annees'] ?? 2]);
+                $reportMax = min(15, max(0, (int)($_POST['report_max'] ?? 15)));
+                $reportMaxAnnees = min(2, max(0, (int)($_POST['report_max_annees'] ?? 2)));
+                $stmt->execute([$id, $_POST['jours_par_mois'] ?? 1.50, (int)($_POST['report_autorise'] ?? 0), $reportMax, $_POST['delai_anciennete'] ?? 6, $reportMaxAnnees]);
 
                 $this->db->exec("DELETE FROM droit_conge WHERE societe_id = $id");
                 if (!empty($_POST['dc_annees_min'])) {
