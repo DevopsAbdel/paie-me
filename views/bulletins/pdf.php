@@ -130,6 +130,8 @@ $taux = [
         </tr>
     </table>
 
+    <div style="text-align:center; font-size:11px; font-weight:bold; color:<?= $couleur ?>; margin:6px 0; padding:4px 0; border-bottom:2px solid <?= $couleur ?>;">Bulletin de paie</div>
+
     <table style="width:100%; border-collapse:collapse; margin-bottom:6px; font-size:8px;">
         <tr>
             <td style="padding:1px 0; width:25%;"><strong>Salarié:</strong> <?= htmlspecialchars($b['nom_famille'] . ' ' . $b['prenom']) ?></td>
@@ -144,6 +146,8 @@ $taux = [
             <td style="padding:1px 0;"><strong>Poste:</strong> <?= htmlspecialchars($b['fonction_nom'] ?? $b['poste']) ?></td>
         </tr>
     </table>
+
+    <div style="border-bottom:2px solid <?= $couleur ?>; margin-bottom:6px;"></div>
 
     <?php foreach ($sections as $section): ?>
     <p class="section-title"><?= htmlspecialchars($section['titre']) ?></p>
