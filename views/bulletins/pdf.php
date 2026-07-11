@@ -196,9 +196,15 @@ $taux = [
         </tr>
         <tr>
             <td style="padding:1.5px 3px;"><strong>Mutuelle:</strong> <?= number_format($cumuls['cumul_mutuelle'], 2, ',', ' ') ?></td>
+            <?php if ($cumuls['cumul_transport'] > 0): ?>
             <td style="padding:1.5px 3px;"><strong>Transport:</strong> <?= number_format($cumuls['cumul_transport'], 2, ',', ' ') ?></td>
+            <?php endif; ?>
+            <?php if ($cumuls['cumul_panier'] > 0): ?>
             <td style="padding:1.5px 3px;"><strong>Panier:</strong> <?= number_format($cumuls['cumul_panier'], 2, ',', ' ') ?></td>
+            <?php endif; ?>
+            <?php if ($cumuls['cumul_representation'] > 0): ?>
             <td style="padding:1.5px 3px;"><strong>Repr.:</strong> <?= number_format($cumuls['cumul_representation'], 2, ',', ' ') ?></td>
+            <?php endif; ?>
             <td style="padding:1.5px 3px;"><strong>SNI:</strong> <?= number_format($cumuls['cumul_sni'], 2, ',', ' ') ?></td>
         </tr>
         <tr style="border-top:1px solid #999;">
