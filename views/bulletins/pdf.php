@@ -135,8 +135,10 @@ $taux = [
             <td style="font-size:8px; padding:0;">
                 <p style="margin:1px 0;"><strong>Salarié:</strong> <?= htmlspecialchars($b['nom_famille'] . ' ' . $b['prenom']) ?></p>
                 <p style="margin:1px 0;"><strong>Matricule:</strong> <?= htmlspecialchars($b['matricule']) ?></p>
-                <p style="margin:1px 0;"><strong>CIN:</strong> <?= htmlspecialchars($b['cin']) ?> | <strong>CNSS:</strong> <?= htmlspecialchars($b['cnss_num']) ?></p>
+                <p style="margin:1px 0;"><strong>CIN:</strong> <?= htmlspecialchars($b['cin']) ?></p>
+                <p style="margin:1px 0;"><strong>CNSS:</strong> <?= htmlspecialchars($b['cnss_num']) ?></p>
                 <p style="margin:1px 0;"><strong>Poste:</strong> <?= htmlspecialchars($b['fonction_nom'] ?? $b['poste']) ?></p>
+                <p style="margin:1px 0;"><strong>Date d'embauche:</strong> <?= $b['date_embauche'] ?></p>
                 <p style="margin:1px 0;"><strong>Durée de travail:</strong> <?= $joursTrav ?> jour(s) / <?= $heuresMensuelles ?> heures</p>
                 <p style="margin:1px 0;"><strong>Situation:</strong> <?= htmlspecialchars($b['situation_familiale'] ?? 'Célibataire') ?> | <?= (int)($b['nb_enfants'] ?? 0) ?> enfant(s)</p>
             </td>
