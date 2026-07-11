@@ -126,7 +126,7 @@ $taux = [
         </tr>
         <tr>
             <td style="padding:0.25rem 0.5rem;"><strong>CIN:</strong> <?= htmlspecialchars($b['cin']) ?></td>
-            <td style="padding:0.25rem 0.5rem;"><strong>Situation:</strong> <?= htmlspecialchars($b['situation_familiale'] ?? 'Célibataire') ?> | <?= (int)($b['nb_enfants'] ?? 0) ?> enfant(s)</td>
+            <td style="padding:0.25rem 0.5rem;"><strong>Situation:</strong> <?= ucfirst(htmlspecialchars($b['situation_familiale'] ?? 'Célibataire')) ?> | <?= (int)($b['nb_enfants'] ?? 0) ?> enfant(s)</td>
         </tr>
         <tr>
             <td style="padding:0.25rem 0.5rem;"><strong>CNSS:</strong> <?= htmlspecialchars($b['cnss_num']) ?></td>
