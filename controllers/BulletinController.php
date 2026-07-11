@@ -73,6 +73,7 @@ class BulletinController extends Controller
         }
 
         $template = $this->getTemplate($bulletin['societe_id']);
+        $b = $bulletin;
 
         ob_start();
         require __DIR__ . '/../views/bulletins/pdf.php';
