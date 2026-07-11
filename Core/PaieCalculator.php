@@ -29,7 +29,7 @@ class PaieCalculator
 
     public function calculateIr(float $sni): float
     {
-        $brackets = $this->db->query("SELECT * FROM bareme_ir ORDER BY min")->fetchAll();
+        $brackets = $this->db->query("SELECT * FROM bareme_ir WHERE type = 'mensuel' ORDER BY min")->fetchAll();
         foreach ($brackets as $b) {
             if ($sni >= (float) $b['min'] && $sni <= (float) $b['max']) {
                 $ir = $sni * (float) $b['taux'] / 100 - (float) $b['deduction'];
