@@ -504,4 +504,39 @@ addCol($p, 'paie_retenues', "type ENUM('avance','pret','sanction','autre') NOT N
 addCol($p, 'paies', 'jours_conge DECIMAL(4,1) NOT NULL DEFAULT 0.00 AFTER jours_travailles');
 addCol($p, 'paies', 'jours_feries DECIMAL(4,1) NOT NULL DEFAULT 0.00 AFTER jours_conge');
 
+// === Table conges ===
+$p->exec("CREATE TABLE IF NOT EXISTS conges (
+    id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    societe_id      INT UNSIGNED        NOT NULL,
+    salarie_id      INT UNSIGNED        NOT NULL,
+    date_debut      DATE                NOT NULL,
+    date_fin        DATE                NOT NULL,
+    nb_jours        DECIMAL(5,1)        NOT NULL,
+    type_conge      ENUM('paye','sans_solde','maladie','maternite','exceptionnel','autre') NOT NULL DEFAULT 'paye',
+    observation     TEXT,
+    statut          ENUM('en_attente','valide','refuse','annule') NOT NULL DEFAULT 'en_attente',
+    created_at      DATETIME            NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at      DATETIME            NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (societe_id) REFERENCES societes(id) ON DELETE CASCADE,
+    FOREIGN KEY (salarie_id) REFERENCES salaries(id) ON DELETE CASCADE
+) ENGINE=InnoDB");
+echo "   + table conges\n";
+
+// === Table conges_soldes ===
+$p->exec("CREATE TABLE IF NOT EXISTS conges_soldes (
+    id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    societe_id      INT UNSIGNED        NOT NULL,
+    salarie_id      INT UNSIGNED        NOT NULL,
+    annee           INT                 NOT NULL,
+    solde_initial   DECIMAL(5,1)        NOT NULL DEFAULT 0.0,
+    conges_pris     DECIMAL(5,1)        NOT NULL DEFAULT 0.0,
+    report          DECIMAL(5,1)        NOT NULL DEFAULT 0.0,
+    created_at      DATETIME            NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at      DATETIME            NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (societe_id) REFERENCES societes(id) ON DELETE CASCADE,
+    FOREIGN KEY (salarie_id) REFERENCES salaries(id) ON DELETE CASCADE,
+    UNIQUE KEY unique_salarie_annee (salarie_id, annee)
+) ENGINE=InnoDB");
+echo "   + table conges_soldes\n";
+
 echo "\nMigrations terminées.\n";

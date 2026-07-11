@@ -103,6 +103,49 @@ Net  = salaire - (CNSS + AMO + IR)
 - **Pour les modales** : le `color-scheme: dark` est déjà couvert par la règle globale. Aucun style supplémentaire n'est nécessaire dans la modale.
 - **Ne pas utiliser** de bibliothèque JS de date picker (flatpickr, datepicker, etc.) — le `<input type="date">` natif suffit en dark mode avec `color-scheme: dark`.
 
+## Règles CSS — Dark Mode Global (controls natifs)
+- **Tous les champs de formulaire** (`<input>`, `<select>`, `<textarea>`) doivent être en dark mode natif.
+- **Pas de CSS supplémentaire** nécessaire sur chaque champ individuellement — le dark mode est couvert par :
+  - `<meta name="color-scheme" content="dark">` dans `<head>` (layout.php)
+  - `color-scheme: dark !important` sur `*` dans `style.css`
+- **Cela couvre** : dropdowns natifs des `<select>`, date pickers, scrollbars, autocomplétion, focus rings.
+- **Règle CSS** : tout `<select>` doit porter `class="form-control"` pour la flèche custom SVG (déjà dans style.css).
+- **Custom Select JS** : tout `<select class="form-control">` est automatiquement remplacé par un composant custom dark (`assets/js/custom-select.js` + CSS dans `style.css`). Le composant gère : recherche, navigation clavier, groupes (optgroup), synchronisation avec le `<select>` natif caché pour le form submit.
+- **Opt-out** : ajouter `class="no-custom"` pour garder le `<select>` natif (ex: selects inline dans les tableaux).
+- **Pattern correct pour les modales** :
+  ```html
+  <select name="xxx" class="form-control" required>
+      <option value="1">Option 1</option>
+  </select>
+  <input type="date" name="xxx" class="form-control">
+  <textarea name="xxx" class="form-control" rows="3"></textarea>
+  ```
+- **Ne jamais créer** un `<select>` sans `class="form-control"`.
+- **Ne jamais créer** un `<input type="date">` sans `class="form-control"`.
+
+## Règles CSS — Grilles de formulaires (hauteur uniforme)
+- **Tout `<div class="form-group">` est un flex container** (`display: flex; flex-direction: column` dans `style.css`). Les enfants directs (label + input/select/textarea) s'étirent automatiquement à la hauteur du grid row.
+- **Pattern correct pour un grid de formulaire** (2 ou 3 colonnes) :
+  ```html
+  <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:0.75rem;">
+      <div class="form-group">
+          <label>Champ 1</label>
+          <input type="text" name="champ1" class="form-control" required>
+      </div>
+      <div class="form-group">
+          <label>Champ 2</label>
+          <select name="champ2" class="form-control" required>...</select>
+      </div>
+      <div class="form-group">
+          <label>Champ 3</label>
+          <input type="date" name="champ3" class="form-control" required>
+      </div>
+  </div>
+  ```
+- **Ne jamais définir `height` ou `min-height` manuellement** sur les `.form-group` ou les `.form-control` dans un grid — la hauteur uniforme est assurée par le flexbox + grid auto-row.
+- **Le custom select** (`.cs-wrapper`) utilise `display: flex; flex: 1` pour matcher la hauteur des `<input>` natifs. Ne pas modifier ce comportement.
+- **Pour un formulaire entier** : retirer `max-width` du `<form>` pour que le grid s'étende sur toute la largeur de la card.
+
 ## Règles Modales — Boutons « Ajouter »
 - **Tout bouton « Ajouter » doit ouvrir une modale Bootstrap**, jamais un formulaire inline dans le `card-header`.
 - Le formulaire d'ajout se trouve dans un `<div class="modal fade" id="...Modal">` avec `modal-dialog-centered`.

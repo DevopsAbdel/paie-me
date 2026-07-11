@@ -11,6 +11,7 @@ use Controllers\DamancomController;
 use Controllers\IrController;
 use Controllers\ComptabiliteController;
 use Controllers\SourceLegaleController;
+use Controllers\CongeController;
 
 Router::get('/',                       [AuthController::class, 'login']);
 Router::get('/login',                  [AuthController::class, 'login']);
@@ -87,3 +88,14 @@ Router::post('/comptabilite/export',   [ComptabiliteController::class, 'export']
 
 Router::get('/societes/{id}/sources-legales', [SourceLegaleController::class, 'index']);
 Router::post('/societes/{id}/sources-legales', [SourceLegaleController::class, 'index']);
+
+Router::get('/societes/{id}/conges',                  [CongeController::class, 'index']);
+Router::get('/societes/{id}/conges/nouveau',            [CongeController::class, 'nouveau']);
+Router::post('/societes/{id}/conges/nouveau',           [CongeController::class, 'nouveau']);
+Router::get('/societes/{id}/conges/modifier/{id2}',     [CongeController::class, 'modifier']);
+Router::post('/societes/{id}/conges/modifier/{id2}',    [CongeController::class, 'modifier']);
+Router::get('/societes/{id}/conges/supprimer/{id2}',    [CongeController::class, 'supprimer']);
+Router::get('/societes/{id}/conges/solde-initial',      [CongeController::class, 'soldeInitial']);
+Router::post('/societes/{id}/conges/solde-initial',     [CongeController::class, 'soldeInitial']);
+Router::get('/societes/{id}/conges/attestation',        [CongeController::class, 'attestation']);
+Router::get('/societes/{id}/conges/attestation/pdf/{id2}', [CongeController::class, 'pdf']);

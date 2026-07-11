@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark">
     <title><?= $browserTitle ?? $title ?? 'Paie Me' ?> — Paie Me</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="/paie-me/assets/css/style.css?v=<?= filemtime(__DIR__ . '/../assets/css/style.css') ?>">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+<script src="/paie-me/assets/js/custom-select.js"></script>
 </head>
 <body>
 
@@ -39,6 +41,12 @@
             <a href="/paie-me/societes/<?= $ctx['id'] ?>/salaries" class="<?= str_contains($_SERVER['REQUEST_URI'], '/salaries') && !str_contains($_SERVER['REQUEST_URI'], 'create') && !str_contains($_SERVER['REQUEST_URI'], 'edit') ? 'active' : '' ?>">
                 <span class="icon" data-lucide="users"></span>
                 <span>Salariés</span>
+            </a>
+        </li>
+        <li>
+            <a href="/paie-me/societes/<?= $ctx['id'] ?>/conges" class="<?= str_contains($_SERVER['REQUEST_URI'], '/conges') ? 'active' : '' ?>">
+                <span class="icon" data-lucide="calendar-off"></span>
+                <span>Congés</span>
             </a>
         </li>
         <li>
@@ -182,6 +190,7 @@
 <div class="toast-container" id="toastContainer"></div>
 
 <script>lucide.createIcons();</script>
+<script>if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', () => initCustomSelects()); } else { initCustomSelects(); }</script>
 <?php if (isset($pageScripts)): foreach ((array)$pageScripts as $s): ?>
 <script src="<?= htmlspecialchars($s) ?>"></script>
 <?php endforeach; endif; ?>

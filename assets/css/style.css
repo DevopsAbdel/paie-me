@@ -10,12 +10,14 @@
     --danger:    #ef4444;
     --success:   #22c55e;
     --warning:   #f59e0b;
+    color-scheme: dark !important;
 }
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    color-scheme: dark !important;
 }
 
 body {
@@ -385,6 +387,11 @@ table tbody tr:hover {
     margin-bottom: 1.25rem;
 }
 
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
 .form-group label {
     display: block;
     font-size: 0.875rem;
@@ -395,6 +402,7 @@ table tbody tr:hover {
 
 .form-control {
     width: 100%;
+    flex: 1;
     padding: 0.625rem 0.875rem;
     background: var(--bg-primary);
     border: 1px solid var(--border);
@@ -423,18 +431,6 @@ select.form-control {
     background-repeat: no-repeat;
     background-position: right 0.75rem center;
     background-size: 12px 8px;
-}
-
-input[type="date"].form-control,
-input[type="time"].form-control,
-input[type="datetime-local"].form-control,
-input[type="date"].form-control-inline,
-input[type="time"].form-control-inline,
-input[type="datetime-local"].form-control-inline,
-input[type="date"],
-input[type="time"],
-input[type="datetime-local"] {
-    color-scheme: dark;
 }
 
 .form-row {
@@ -819,4 +815,133 @@ body:has(.login-wrapper) {
 }
 .toast-container:empty {
     display: none;
+}
+
+/* ============================================================
+   Custom Select — dropdown 100% dark mode
+   ============================================================ */
+.cs-wrapper {
+    position: relative;
+    display: flex;
+    flex: 1;
+    width: 100%;
+    outline: none;
+}
+.cs-display {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-height: 2.25rem;
+    padding: 0.625rem 2.25rem 0.625rem 0.875rem;
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.cs-display.cs-placeholder {
+    color: var(--text-muted);
+}
+.cs-wrapper:focus .cs-display,
+.cs-wrapper.cs-open .cs-display {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+.cs-chevron {
+    position: absolute;
+    right: 0.625rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    transition: transform 0.2s;
+}
+.cs-wrapper.cs-open .cs-chevron {
+    transform: translateY(-50%) rotate(180deg);
+}
+.cs-list {
+    display: none;
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    z-index: 1050;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    overflow: hidden;
+    max-height: 320px;
+    flex-direction: column;
+}
+.cs-list.open {
+    display: flex;
+}
+.cs-search-wrap {
+    padding: 0.5rem;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+}
+.cs-search {
+    width: 100%;
+    padding: 0.375rem 0.625rem;
+    background: var(--bg-primary);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-size: 0.8125rem;
+    outline: none;
+    color-scheme: dark !important;
+}
+.cs-search:focus {
+    border-color: var(--accent);
+}
+.cs-options {
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+    max-height: 260px;
+}
+.cs-option {
+    padding: 0.5rem 0.75rem;
+    color: var(--text);
+    font-size: 0.8125rem;
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+}
+.cs-option:hover,
+.cs-option:focus {
+    background: var(--bg-hover);
+    outline: none;
+}
+.cs-option.selected {
+    background: rgba(59, 130, 246, 0.15);
+    color: var(--accent);
+    font-weight: 600;
+}
+.cs-option.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+.cs-group-label {
+    padding: 0.5rem 0.75rem 0.25rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+.cs-empty {
+    padding: 1rem;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.8125rem;
 }
