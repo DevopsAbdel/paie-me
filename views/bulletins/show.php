@@ -6,50 +6,42 @@ $netLabel = $cfg['net_label'] ?? 'Net à payer';
 $netColor = $cfg['net_color'] ?? $couleur;
 
 $values = [
-    'salaire_base'          => (float)($b['salaire_base'] ?? 0),
-    'prime_anciennete'      => (float)($b['prime_anciennete'] ?? 0),
-    'indemnite_transport'   => (float)($b['indemnite_transport'] ?? 0),
-    'indemnite_panier'      => (float)($b['indemnite_panier'] ?? 0),
-    'indemnite_representation' => (float)($b['indemnite_representation'] ?? 0),
-    'avantage_logement'     => (float)($b['avantage_logement'] ?? 0),
-    'heures_sup'            => (float)($b['montant_heures_sup'] ?? 0),
-    'salaire_brut'          => (float)($b['salaire_brut'] ?? 0),
-    'sbi'                   => (float)($b['sbi'] ?? 0),
-    'cnss_salariale'        => (float)($b['cnss_salariale'] ?? 0),
-    'amo_salariale'         => (float)($b['amo_salariale'] ?? 0),
-    'frais_professionnels'  => (float)($b['frais_professionnels'] ?? 0),
-    'sni'                   => (float)($b['sni'] ?? 0),
-    'ir'                    => (float)($b['ir'] ?? 0),
-    'deductions_familiales' => (float)($b['deductions_familiales'] ?? 0),
-    'cnss_patronale'        => (float)($b['cnss_patronale'] ?? 0),
-    'amo_patronale'         => (float)($b['amo_patronale'] ?? 0),
-    'allocation_familiale'  => (float)($b['allocation_familiale'] ?? 0),
-    'prestation_sociale'    => (float)($b['prestation_sociale'] ?? 0),
-    'taxe_formation'        => (float)($b['taxe_formation'] ?? 0),
-    'net_a_payer'           => (float)($b['net_a_payer'] ?? 0),
+    '100' => (float)($b['salaire_base'] ?? 0),
+    '204' => (float)($b['prime_anciennete'] ?? 0),
+    '330' => (float)($b['indemnite_transport'] ?? 0),
+    '346' => (float)($b['indemnite_panier'] ?? 0),
+    '331' => (float)($b['indemnite_representation'] ?? 0),
+    '340' => (float)($b['avantage_logement'] ?? 0),
+    '201' => 0,
+    '202' => 0,
+    '203' => (float)($b['montant_heures_sup'] ?? 0),
+    'SB'  => (float)($b['salaire_brut'] ?? 0),
+    '400' => (float)($b['cnss_salariale'] ?? 0),
+    '410' => (float)($b['amo_salariale'] ?? 0),
+    '420' => 0,
+    '501' => (float)($b['frais_professionnels'] ?? 0),
+    '502' => (float)($b['sni'] ?? 0),
+    '600' => (float)($b['ir'] ?? 0),
+    '601' => (float)($b['deductions_familiales'] ?? 0),
+    '400P' => (float)($b['cnss_patronale'] ?? 0),
+    '410P' => (float)($b['amo_patronale'] ?? 0),
 ];
 
 $bases = [
-    'cnss_salariale'       => min($values['salaire_brut'], 6000),
-    'cnss_patronale'       => min($values['salaire_brut'], 6000),
-    'amo_salariale'        => $values['salaire_brut'],
-    'amo_patronale'        => $values['salaire_brut'],
-    'frais_professionnels' => $values['sni'],
-    'ir'                   => $values['sni'],
-    'allocation_familiale' => $values['salaire_brut'],
-    'prestation_sociale'   => $values['salaire_brut'],
-    'taxe_formation'       => $values['salaire_brut'],
+    '400' => min($values['SB'] ?? $values['100'] ?? 0, 6000),
+    '400P' => min($values['SB'] ?? $values['100'] ?? 0, 6000),
+    '410' => $values['SB'] ?? $values['100'] ?? 0,
+    '410P' => $values['SB'] ?? $values['100'] ?? 0,
+    '501' => $values['502'] ?? 0,
+    '600' => $values['502'] ?? 0,
 ];
 
 $taux = [
-    'cnss_salariale'       => '4,48 %',
-    'cnss_patronale'       => '8,98 %',
-    'amo_salariale'        => '2,26 %',
-    'amo_patronale'        => '4,52 %',
-    'frais_professionnels' => '20 %',
-    'allocation_familiale' => '6,40 %',
-    'prestation_sociale'   => '0,99 %',
-    'taxe_formation'       => '1,60 %',
+    '400'  => '4,48 %',
+    '400P' => '8,98 %',
+    '410'  => '2,26 %',
+    '410P' => '4,52 %',
+    '501'  => '20 %',
 ];
 ?>
 
@@ -119,7 +111,6 @@ $taux = [
                 <?php
                     $code = $ligne['code'];
                     $val = $values[$code] ?? 0;
-                    if ($val == 0 && !isset($values[$code])) continue;
                     $isConditionnel = $ligne['conditionnel'] ?? false;
                     if ($isConditionnel && $val == 0) continue;
                 ?>
