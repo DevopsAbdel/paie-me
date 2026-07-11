@@ -130,10 +130,7 @@ $taux = [
         </tr>
         <tr>
             <td style="padding:0.25rem 0.5rem;"><strong>CNSS:</strong> <?= htmlspecialchars($b['cnss_num']) ?></td>
-            <td style="padding:0.25rem 0.5rem;">&nbsp;</td>
-        </tr>
-        <tr>
-            <td style="padding:0.25rem 0.5rem;" colspan="2"><strong>Poste:</strong> <?= htmlspecialchars($b['fonction_nom'] ?? $b['poste']) ?></td>
+            <td style="padding:0.25rem 0.5rem;"><strong>Poste:</strong> <?= htmlspecialchars($b['fonction_nom'] ?? $b['poste']) ?></td>
         </tr>
     </table>
 
