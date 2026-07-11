@@ -384,6 +384,7 @@ table tbody tr:hover {
 .table-actions {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 0.35rem;
     white-space: nowrap;
 }
