@@ -191,6 +191,8 @@ $taux = [
     </table>
     <?php endforeach; ?>
 
+    <div class="net"><?= htmlspecialchars($netLabel) ?> : <?= number_format($b['net_a_payer'], 2, ',', ' ') ?> MAD</div>
+
     <div class="section-title">Cumuls annuels</div>
     <table style="width:100%; border-collapse:collapse; font-size:8px; margin-bottom:4px;">
         <tr>
@@ -239,8 +241,6 @@ $taux = [
             <td colspan="2">&nbsp;</td>
         </tr>
     </table>
-
-    <div class="net"><?= htmlspecialchars($netLabel) ?> : <?= number_format($b['net_a_payer'], 2, ',', ' ') ?> MAD</div>
 
     <div style="margin-top:16px; font-size:7px; color:#333; padding-top:6px; border-top:0.5px solid #ccc;">
         <p style="margin:0 0 2px 0;">Fait à <?= htmlspecialchars($b['ville'] ?? '_______') ?>, le <?= date('d/m/Y') ?></p>
