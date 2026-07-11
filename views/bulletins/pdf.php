@@ -11,6 +11,22 @@ $tauxCnssP = (float)($cnssParams['taux_cnss_patronal'] ?? 8.98);
 $tauxAmoS  = (float)($cnssParams['taux_amo_salarial'] ?? 2.26);
 $tauxAmoP  = (float)($cnssParams['taux_amo_patronal'] ?? 4.11);
 
+$salaireBase = (float)($b['salaire_base'] ?? 0);
+$joursTrav = (int)($b['jours_travailles'] ?? 26);
+$heuresMensuelles = 191;
+$tauxHoraire = $joursTrav > 0 ? $salaireBase / $heuresMensuelles : 0;
+
+$dateFin = date('Y-m-t', strtotime(sprintf('%04d-%02d-01', $b['annee'], $b['mois'])));
+$tauxAncPct = 0;
+if (!empty($b['date_embauche'])) {
+    $annees = (int)(new DateTime($b['date_embauche']))->diff(new DateTime($dateFin))->format('%y');
+    if ($annees >= 25) $tauxAncPct = 25;
+    elseif ($annees >= 20) $tauxAncPct = 20;
+    elseif ($annees >= 12) $tauxAncPct = 15;
+    elseif ($annees >= 5) $tauxAncPct = 10;
+    elseif ($annees >= 2) $tauxAncPct = 5;
+}
+
 $values = [
     '100' => (float)($b['salaire_base'] ?? 0),
     '204' => (float)($b['prime_anciennete'] ?? 0),
@@ -37,6 +53,11 @@ $sbiAnnuel = (float)($b['sbi'] ?? 0) * 12;
 $fpTaux = $sbiAnnuel <= 78000 ? '35%' : '25%';
 
 $bases = [
+    '100' => $salaireBase,
+    '204' => $salaireBase,
+    '201' => $tauxHoraire,
+    '202' => $tauxHoraire,
+    '203' => $tauxHoraire,
     '400' => min($values['SB'] ?? $values['100'] ?? 0, $plafond),
     '400P' => min($values['SB'] ?? $values['100'] ?? 0, $plafond),
     '410' => $values['SB'] ?? $values['100'] ?? 0,
@@ -46,6 +67,11 @@ $bases = [
 ];
 
 $taux = [
+    '100'  => number_format($tauxHoraire, 2, ',', ' ') . ' DH/h',
+    '204'  => ($tauxAncPct > 0 ? $tauxAncPct . '%' : '—'),
+    '201'  => '25%',
+    '202'  => '50%',
+    '203'  => '100%',
     '400'  => number_format($tauxCnssS, 2, ',', ' ') . '%',
     '400P' => number_format($tauxCnssP, 2, ',', ' ') . '%',
     '410'  => number_format($tauxAmoS, 2, ',', ' ') . '%',
@@ -109,8 +135,14 @@ $taux = [
             <p><strong>Poste:</strong> <?= htmlspecialchars($b['fonction_nom'] ?? $b['poste']) ?></p>
         </div>
         <div class="infos-right">
-            <p><strong>Date embauche:</strong> <?= $b['date_embauche'] ?></p>
-            <p><strong>Situation:</strong> <?= htmlspecialchars($b['situation_familiale'] ?? '') ?> | <?= (int)($b['nb_enfants'] ?? 0) ?> enfant(s)</p>
+            <p><strong>Durée de travail:</strong> <?= $joursTrav ?> jour(s) / <?= $heuresMensuelles ?> heures</p>
+            <?php if ((float)($b['jours_conge'] ?? 0) > 0): ?>
+            <p><strong>Jours congé:</strong> <?= number_format((float)$b['jours_conge'], 1, ',', ' ') ?> jour(s)</p>
+            <?php endif; ?>
+            <?php if ((float)($b['jours_feries'] ?? 0) > 0): ?>
+            <p><strong>Jours fériés:</strong> <?= number_format((float)$b['jours_feries'], 1, ',', ' ') ?> jour(s)</p>
+            <?php endif; ?>
+            <p><strong>Situation:</strong> <?= htmlspecialchars($b['situation_familiale'] ?? 'Célibataire') ?> | <?= (int)($b['nb_enfants'] ?? 0) ?> enfant(s)</p>
         </div>
     </div>
 
