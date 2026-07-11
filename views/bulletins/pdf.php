@@ -124,7 +124,7 @@ $taux = [
             </td>
             <td style="vertical-align:middle; padding-bottom:8px; text-align:right; white-space:nowrap;">
                 <h2 style="font-size:11px; margin:0; color:<?= $couleur ?>;"><?= htmlspecialchars($b['numero']) ?></h2>
-                <p style="margin:1px 0; font-size:8px; color:#666;">Période: <?= str_pad($b['mois'], 2, '0', STR_PAD_LEFT) . '/' . $b['annee'] ?></p>
+                <p style="margin:1px 0; font-size:8px; color:#666;"><strong>Période:</strong> <?= str_pad($b['mois'], 2, '0', STR_PAD_LEFT) . '/' . $b['annee'] ?></p>
                 <p style="margin:1px 0; font-size:8px; color:#666;">Émis le: <?= date('d/m/Y', strtotime($b['date_emission'])) ?></p>
             </td>
         </tr>
