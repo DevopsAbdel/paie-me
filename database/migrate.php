@@ -399,11 +399,16 @@ $p->exec("CREATE TABLE IF NOT EXISTS conge_annuel (
     jours_par_mois  DECIMAL(4,2)        NOT NULL DEFAULT 1.50,
     report_autorise TINYINT(1)          NOT NULL DEFAULT 1,
     report_max      TINYINT UNSIGNED    NOT NULL DEFAULT 15,
+    delai_anciennete TINYINT UNSIGNED   NOT NULL DEFAULT 6,
+    report_max_annees TINYINT UNSIGNED  NOT NULL DEFAULT 2,
     created_at      DATETIME            NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at      DATETIME            NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (societe_id) REFERENCES societes(id) ON DELETE CASCADE
 ) ENGINE=InnoDB");
 echo "   + table conge_annuel\n";
+
+try { $p->exec("ALTER TABLE conge_annuel ADD COLUMN delai_anciennete TINYINT UNSIGNED NOT NULL DEFAULT 6 AFTER report_max"); echo "   + delai_anciennete ajouté\n"; } catch (\Exception $e) {}
+try { $p->exec("ALTER TABLE conge_annuel ADD COLUMN report_max_annees TINYINT UNSIGNED NOT NULL DEFAULT 2 AFTER delai_anciennete"); echo "   + report_max_annees ajouté\n"; } catch (\Exception $e) {}
 
 // === Table droit_conge (tranches d'ancienneté pour congé payé) ===
 $p->exec("CREATE TABLE IF NOT EXISTS droit_conge (

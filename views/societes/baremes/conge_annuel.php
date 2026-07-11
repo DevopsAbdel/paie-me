@@ -9,7 +9,12 @@
         Des jours supplémentaires sont accordés selon l'ancienneté du salarié.
     </p>
 
-    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:0.75rem; max-width:600px; margin-bottom:1rem;">
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:0.75rem; max-width:800px; margin-bottom:1rem;">
+        <div class="form-group">
+            <label>Délai d'ancienneté (mois)</label>
+            <input type="number" name="delai_anciennete" value="<?= htmlspecialchars($conge['delai_anciennete'] ?? '6') ?>" class="form-control" min="0">
+            <small style="color:var(--text-muted); font-size:0.7rem;">Mois avant éligibilité au congé payé (défaut : 6)</small>
+        </div>
         <div class="form-group">
             <label>Report autorisé</label>
             <select name="report_autorise" class="form-control">
@@ -20,6 +25,11 @@
         <div class="form-group">
             <label>Report max (jours)</label>
             <input type="number" name="report_max" value="<?= htmlspecialchars($conge['report_max'] ?? '15') ?>" class="form-control" min="0">
+        </div>
+        <div class="form-group">
+            <label>Report max (années)</label>
+            <input type="number" name="report_max_annees" value="<?= htmlspecialchars($conge['report_max_annees'] ?? '2') ?>" class="form-control" min="0">
+            <small style="color:var(--text-muted); font-size:0.7rem;">Années consécutives max (défaut : 2)</small>
         </div>
     </div>
 

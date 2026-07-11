@@ -71,6 +71,34 @@ class CongeController extends Controller
             $statut    = $_POST['statut'] ?? 'en_attente';
 
             if ($salarieId && $dateDebut && $dateFin && $nbJours > 0) {
+                if ($type === 'paye') {
+                    $congeAnnuel = $this->db->query("SELECT * FROM conge_annuel WHERE societe_id = $id")->fetch();
+                    $delai = (int) ($congeAnnuel['delai_anciennete'] ?? 6);
+
+                    $salarie = $this->db->query("SELECT date_embauche FROM salaries WHERE id = $salarieId")->fetch();
+                    if ($salarie && $salarie['date_embauche']) {
+                        $embauche = new \DateTime($salarie['date_embauche']);
+                        $debut = new \DateTime($dateDebut);
+                        $moisAnciennete = ($embauche->diff($debut)->m) + ($embauche->diff($debut)->y * 12);
+                        if ($moisAnciennete < $delai) {
+                            Session::setFlash('error', "Le salarié n'a pas assez d'ancienneté. Congé payé autorisé après {$delai} mois de travail (actuellement {$moisAnciennete} mois).");
+                            $this->redirect('/paie-me/societes/' . $id . '/conges/nouveau');
+                        }
+                    }
+
+                    $reportMaxAnnees = (int) ($congeAnnuel['report_max_annees'] ?? 2);
+                    if ($reportMaxAnnees > 0) {
+                        $annee = (int) date('Y', strtotime($dateDebut));
+                        $prevReport = $this->db->query("SELECT report FROM conges_soldes WHERE salarie_id = $salarieId AND annee = " . ($annee - 1))->fetch();
+                        if ($prevReport && (float) $prevReport['report'] > 0) {
+                            $prevPrevReport = $this->db->query("SELECT report FROM conges_soldes WHERE salarie_id = $salarieId AND annee = " . ($annee - 2))->fetch();
+                            if ($prevPrevReport && (float) $prevPrevReport['report'] > 0) {
+                                Session::setFlash('error', "Le report de congé est limité à {$reportMaxAnnees} années consécutives. Le report ne peut plus être reporté.");
+                                $this->redirect('/paie-me/societes/' . $id . '/conges/nouveau');
+                            }
+                        }
+                    }
+                }
                 $stmt = $this->db->prepare("
                     INSERT INTO conges (societe_id, salarie_id, date_debut, date_fin, nb_jours, type_conge, observation, statut)
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
@@ -139,6 +167,35 @@ class CongeController extends Controller
             $type      = $_POST['type_conge'] ?? $conge['type_conge'];
             $obs       = trim($_POST['observation'] ?? '');
             $statut    = $_POST['statut'] ?? $conge['statut'];
+
+            if ($type === 'paye') {
+                $congeAnnuel = $this->db->query("SELECT * FROM conge_annuel WHERE societe_id = $id")->fetch();
+                $delai = (int) ($congeAnnuel['delai_anciennete'] ?? 6);
+
+                $salarie = $this->db->query("SELECT date_embauche FROM salaries WHERE id = {$conge['salarie_id']}")->fetch();
+                if ($salarie && $salarie['date_embauche']) {
+                    $embauche = new \DateTime($salarie['date_embauche']);
+                    $debut = new \DateTime($dateDebut);
+                    $moisAnciennete = ($embauche->diff($debut)->m) + ($embauche->diff($debut)->y * 12);
+                    if ($moisAnciennete < $delai) {
+                        Session::setFlash('error', "Le salarié n'a pas assez d'ancienneté. Congé payé autorisé après {$delai} mois de travail (actuellement {$moisAnciennete} mois).");
+                        $this->redirect('/paie-me/societes/' . $id . '/conges/modifier/' . $congeId);
+                    }
+                }
+
+                $reportMaxAnnees = (int) ($congeAnnuel['report_max_annees'] ?? 2);
+                if ($reportMaxAnnees > 0) {
+                    $annee = (int) date('Y', strtotime($dateDebut));
+                    $prevReport = $this->db->query("SELECT report FROM conges_soldes WHERE salarie_id = {$conge['salarie_id']} AND annee = " . ($annee - 1))->fetch();
+                    if ($prevReport && (float) $prevReport['report'] > 0) {
+                        $prevPrevReport = $this->db->query("SELECT report FROM conges_soldes WHERE salarie_id = {$conge['salarie_id']} AND annee = " . ($annee - 2))->fetch();
+                        if ($prevPrevReport && (float) $prevPrevReport['report'] > 0) {
+                            Session::setFlash('error', "Le report de congé est limité à {$reportMaxAnnees} années consécutives. Le report ne peut plus être reporté.");
+                            $this->redirect('/paie-me/societes/' . $id . '/conges/modifier/' . $congeId);
+                        }
+                    }
+                }
+            }
 
             $diff = $nbJours - $anciensJours;
             $stmt = $this->db->prepare("
