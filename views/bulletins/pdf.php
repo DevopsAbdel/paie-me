@@ -118,7 +118,7 @@ $netFg = '#111827';
     <table class="details">
         <tr>
             <?php foreach ($section['colonnes'] as $col): ?>
-            <th<?= $col !== 'Libellé' ? ' class="right"' : '' ?>><?= htmlspecialchars($col) ?></th>
+            <th<?= !in_array($col, ['Libellé', 'Code']) ? ' class="right"' : '' ?>><?= htmlspecialchars($col) ?></th>
             <?php endforeach; ?>
         </tr>
         <?php foreach ($section['lignes'] as $ligne): ?>
@@ -130,8 +130,9 @@ $netFg = '#111827';
             if ($isConditionnel && $val == 0) continue;
         ?>
         <tr>
+            <td style="font-size:10px; color:#666;"><?= htmlspecialchars($code) ?></td>
             <td><?= htmlspecialchars($ligne['label']) ?></td>
-            <?php for ($i = 1; $i < count($section['colonnes']); $i++): ?>
+            <?php for ($i = 2; $i < count($section['colonnes']); $i++): ?>
                 <?php if ($section['colonnes'][$i] === 'Base'): ?>
                     <td class="right"><?= isset($bases[$code]) ? number_format($bases[$code], 2, ',', ' ') : '—' ?></td>
                 <?php elseif ($section['colonnes'][$i] === 'Taux'): ?>
@@ -144,8 +145,9 @@ $netFg = '#111827';
         <?php endforeach; ?>
         <?php if (!empty($section['total'])): ?>
         <tr class="bold">
+            <td></td>
             <td><?= htmlspecialchars($section['total']['label']) ?></td>
-            <?php for ($i = 1; $i < count($section['colonnes']); $i++): ?>
+            <?php for ($i = 2; $i < count($section['colonnes']); $i++): ?>
                 <?php if ($section['colonnes'][$i] === 'Base' || $section['colonnes'][$i] === 'Taux'): ?>
                     <td class="right"></td>
                 <?php else: ?>

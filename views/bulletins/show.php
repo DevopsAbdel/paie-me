@@ -124,8 +124,9 @@ $taux = [
                     if ($isConditionnel && $val == 0) continue;
                 ?>
                 <tr>
+                    <td style="color:var(--text-muted); font-size:0.8rem;"><?= htmlspecialchars($code) ?></td>
                     <td><?= htmlspecialchars($ligne['label']) ?></td>
-                    <?php for ($i = 1; $i < count($section['colonnes']); $i++): ?>
+                    <?php for ($i = 2; $i < count($section['colonnes']); $i++): ?>
                         <?php if ($section['colonnes'][$i] === 'Base'): ?>
                             <td style="text-align:right;"><?= isset($bases[$code]) ? number_format($bases[$code], 2, ',', ' ') : '—' ?></td>
                         <?php elseif ($section['colonnes'][$i] === 'Taux'): ?>
@@ -138,8 +139,9 @@ $taux = [
                 <?php endforeach; ?>
                 <?php if (!empty($section['total'])): ?>
                 <tr style="font-weight:bold; border-top:2px solid <?= $couleur ?>;">
+                    <td></td>
                     <td><?= htmlspecialchars($section['total']['label']) ?></td>
-                    <?php for ($i = 1; $i < count($section['colonnes']); $i++): ?>
+                    <?php for ($i = 2; $i < count($section['colonnes']); $i++): ?>
                         <?php if ($section['colonnes'][$i] === 'Base' || $section['colonnes'][$i] === 'Taux'): ?>
                             <td></td>
                         <?php else: ?>

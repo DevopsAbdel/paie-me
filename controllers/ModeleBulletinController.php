@@ -153,7 +153,7 @@ class ModeleBulletinController extends Controller
             'sections' => [
                 [
                     'titre' => 'Éléments du salaire',
-                    'colonnes' => ['Libellé', 'Base', 'Taux', 'Montant'],
+                    'colonnes' => ['Code', 'Libellé', 'Base', 'Taux', 'Montant'],
                     'lignes' => [
                         ['code' => 'salaire_base', 'label' => 'Salaire de base', 'type' => 'gain', 'show_base' => true, 'show_taux' => true],
                         ['code' => 'prime_anciennete', 'label' => "Prime d'ancienneté", 'type' => 'gain', 'show_base' => true, 'show_taux' => true, 'conditionnel' => true],
@@ -167,7 +167,7 @@ class ModeleBulletinController extends Controller
                 ],
                 [
                     'titre' => 'Cotisations salariales',
-                    'colonnes' => ['Libellé', 'Base', 'Taux', 'Montant'],
+                    'colonnes' => ['Code', 'Libellé', 'Base', 'Taux', 'Montant'],
                     'lignes' => [
                         ['code' => 'cnss_salariale', 'label' => 'Cotisation CNSS', 'type' => 'retenue', 'show_base' => true, 'show_taux' => true],
                         ['code' => 'amo_salariale', 'label' => 'Cotisation AMO', 'type' => 'retenue', 'show_base' => true, 'show_taux' => true],
@@ -177,7 +177,7 @@ class ModeleBulletinController extends Controller
                 ],
                 [
                     'titre' => 'Impôt sur le revenu',
-                    'colonnes' => ['Libellé', 'Base', 'Taux', 'Montant'],
+                    'colonnes' => ['Code', 'Libellé', 'Base', 'Taux', 'Montant'],
                     'lignes' => [
                         ['code' => 'ir', 'label' => 'Impôt sur le revenu (IR)', 'type' => 'retenue', 'show_base' => true, 'show_taux' => true],
                         ['code' => 'deductions_familiales', 'label' => 'Déductions charges de famille', 'type' => 'gain', 'conditionnel' => true],
@@ -186,7 +186,7 @@ class ModeleBulletinController extends Controller
                 ],
                 [
                     'titre' => 'Cotisations patronales',
-                    'colonnes' => ['Libellé', 'Base', 'Taux', 'Montant'],
+                    'colonnes' => ['Code', 'Libellé', 'Base', 'Taux', 'Montant'],
                     'lignes' => [
                         ['code' => 'cnss_patronale', 'label' => 'Cotisation CNSS patronale', 'type' => 'patronale', 'show_base' => true, 'show_taux' => true],
                         ['code' => 'amo_patronale', 'label' => 'Cotisation AMO patronale', 'type' => 'patronale', 'show_base' => true, 'show_taux' => true],
