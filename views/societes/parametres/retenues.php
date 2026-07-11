@@ -1,18 +1,7 @@
 <div class="card">
     <div class="card-header" style="display:flex; justify-content:space-between; align-items:center; gap:1rem;">
         <h3 style="margin:0;">Retenues</h3>
-        <form method="post" action="<?= $baseUrl ?>/retenues" style="display:flex; gap:0.5rem; align-items:center;">
-            <?= \Core\Session::csrfField() ?>
-            <input type="hidden" name="sous_tab" value="retenues">
-            <input type="text" name="code" class="form-control" placeholder="Code" style="width:100px;" required>
-            <input type="text" name="libelle" class="form-control" placeholder="Libellé" style="width:180px;" required>
-            <select name="type_montant" class="form-control" style="width:130px;">
-                <option value="fixe">Fixe</option>
-                <option value="proportionnel">Proportionnel</option>
-            </select>
-            <input type="number" name="valeur_defaut" class="form-control" placeholder="Valeur défaut" style="width:120px;" step="0.01">
-            <button type="submit" class="btn btn-primary btn-sm">Ajouter</button>
-        </form>
+        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#ajoutRetenue">+ Ajouter</button>
     </div>
     <div style="overflow-x:auto;">
         <table>
@@ -43,5 +32,50 @@
                 <?php endif; ?>
             </tbody>
         </table>
+    </div>
+</div>
+
+<!-- Modal Ajouter retenue -->
+<div class="modal fade" id="ajoutRetenue" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="background:var(--bg-surface); color:var(--text); border:1px solid var(--border); border-radius:12px;">
+            <form method="post" action="<?= $baseUrl ?>/retenues">
+                <?= \Core\Session::csrfField() ?>
+                <input type="hidden" name="sous_tab" value="retenues">
+                <div class="modal-header" style="border-bottom:1px solid var(--border);">
+                    <h5 class="modal-title">Nouvelle retenue</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                        <div class="form-group">
+                            <label class="form-label" style="font-size:0.75rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em;">Code</label>
+                            <input type="text" name="code" class="form-control" placeholder="RET_AVANCE" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" style="font-size:0.75rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em;">Libellé</label>
+                            <input type="text" name="libelle" class="form-control" placeholder="Avance sur salaire" required>
+                        </div>
+                    </div>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem;">
+                        <div class="form-group">
+                            <label class="form-label" style="font-size:0.75rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em;">Type de montant</label>
+                            <select name="type_montant" class="form-control">
+                                <option value="fixe">Fixe</option>
+                                <option value="proportionnel">Proportionnel</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" style="font-size:0.75rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em;">Valeur défaut</label>
+                            <input type="number" name="valeur_defaut" class="form-control" step="0.01" placeholder="0.00">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="border-top:1px solid var(--border);">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary btn-sm">Enregistrer</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>

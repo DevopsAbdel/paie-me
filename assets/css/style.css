@@ -427,7 +427,13 @@ select.form-control {
 
 input[type="date"].form-control,
 input[type="time"].form-control,
-input[type="datetime-local"].form-control {
+input[type="datetime-local"].form-control,
+input[type="date"].form-control-inline,
+input[type="time"].form-control-inline,
+input[type="datetime-local"].form-control-inline,
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"] {
     color-scheme: dark;
 }
 

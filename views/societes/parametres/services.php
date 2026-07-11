@@ -1,13 +1,7 @@
 <div class="card">
     <div class="card-header" style="display:flex; justify-content:space-between; align-items:center; gap:1rem;">
         <h3 style="margin:0;">Services</h3>
-        <form method="post" action="<?= $baseUrl ?>/services" style="display:flex; gap:0.5rem; align-items:center;">
-            <?= \Core\Session::csrfField() ?>
-            <input type="hidden" name="sous_tab" value="services">
-            <input type="text" name="service_nom" class="form-control" placeholder="Nom du service" style="width:180px;" required>
-            <input type="text" name="service_description" class="form-control" placeholder="Description" style="width:240px;">
-            <button type="submit" class="btn btn-primary btn-sm">Ajouter</button>
-        </form>
+        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#ajoutService">+ Ajouter</button>
     </div>
     <div style="overflow-x:auto;">
         <table>
@@ -34,22 +28,40 @@
     </div>
 </div>
 
+<!-- Modal Ajouter service -->
+<div class="modal fade" id="ajoutService" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="background:var(--bg-surface); color:var(--text); border:1px solid var(--border); border-radius:12px;">
+            <form method="post" action="<?= $baseUrl ?>/services">
+                <?= \Core\Session::csrfField() ?>
+                <input type="hidden" name="sous_tab" value="services">
+                <div class="modal-header" style="border-bottom:1px solid var(--border);">
+                    <h5 class="modal-title">Nouveau service</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group" style="margin-bottom:1rem;">
+                        <label class="form-label" style="font-size:0.75rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em;">Nom du service</label>
+                        <input type="text" name="service_nom" class="form-control" placeholder="Ressources humaines" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" style="font-size:0.75rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em;">Description</label>
+                        <input type="text" name="service_description" class="form-control" placeholder="Gestion du personnel">
+                    </div>
+                </div>
+                <div class="modal-footer" style="border-top:1px solid var(--border);">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary btn-sm">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <div class="card" style="margin-top:1.5rem;">
     <div class="card-header" style="display:flex; justify-content:space-between; align-items:center; gap:1rem;">
         <h3 style="margin:0;">Fonctions (postes)</h3>
-        <form method="post" action="<?= $baseUrl ?>/services" style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;">
-            <?= \Core\Session::csrfField() ?>
-            <input type="hidden" name="sous_tab" value="services">
-            <select name="fonction_service_id" class="form-control" style="width:160px;">
-                <option value="">— Tous services —</option>
-                <?php foreach ($services as $sv): ?>
-                <option value="<?= $sv['id'] ?>"><?= htmlspecialchars($sv['nom']) ?></option>
-                <?php endforeach; ?>
-            </select>
-            <input type="text" name="fonction_nom" class="form-control" placeholder="Nom de la fonction" style="width:180px;" required>
-            <input type="text" name="fonction_description" class="form-control" placeholder="Description" style="width:200px;">
-            <button type="submit" class="btn btn-primary btn-sm">Ajouter</button>
-        </form>
+        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#ajoutFonction">+ Ajouter</button>
     </div>
     <div style="overflow-x:auto;">
         <table>
@@ -74,5 +86,44 @@
                 <?php endif; ?>
             </tbody>
         </table>
+    </div>
+</div>
+
+<!-- Modal Ajouter fonction -->
+<div class="modal fade" id="ajoutFonction" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="background:var(--bg-surface); color:var(--text); border:1px solid var(--border); border-radius:12px;">
+            <form method="post" action="<?= $baseUrl ?>/services">
+                <?= \Core\Session::csrfField() ?>
+                <input type="hidden" name="sous_tab" value="services">
+                <div class="modal-header" style="border-bottom:1px solid var(--border);">
+                    <h5 class="modal-title">Nouvelle fonction</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group" style="margin-bottom:1rem;">
+                        <label class="form-label" style="font-size:0.75rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em;">Service</label>
+                        <select name="fonction_service_id" class="form-control">
+                            <option value="">— Tous services —</option>
+                            <?php foreach ($services as $sv): ?>
+                            <option value="<?= $sv['id'] ?>"><?= htmlspecialchars($sv['nom']) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin-bottom:1rem;">
+                        <label class="form-label" style="font-size:0.75rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em;">Nom de la fonction</label>
+                        <input type="text" name="fonction_nom" class="form-control" placeholder="Développeur PHP" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" style="font-size:0.75rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em;">Description</label>
+                        <input type="text" name="fonction_description" class="form-control" placeholder="Développement et maintenance">
+                    </div>
+                </div>
+                <div class="modal-footer" style="border-top:1px solid var(--border);">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary btn-sm">Enregistrer</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>

@@ -88,6 +88,97 @@ Net  = salaire - (CNSS + AMO + IR)
 - **Ne jamais créer un `<select>` sans `class="form-control"`** — sinon la flèche est absente et le select est difficilement distinguishable d'un champ texte en dark mode.
 - Exemple correct : `<select name="type" class="form-control" required>...</select>`
 
+## Règles CSS — Date/Time Pickers (dark mode)
+- Tout `<input type="date">`, `<input type="time">` et `<input type="datetime-local">` **doit** avoir `color-scheme: dark` pour que le sélecteur natif du navigateur s'affiche en mode sombre.
+- Cette règle est déjà appliquée dans `style.css:428` pour toutes les classes (`form-control`, `form-control-inline`, ou sans classe).
+- **Ne jamais créer un champ date/time sans la classe `form-control`** (ou `form-control-inline` pour les tableaux) — sinon le picker reste en mode clair.
+- **Pattern correct :**
+  ```html
+  <!-- Champ date dans un formulaire -->
+  <input type="date" name="date_effet" class="form-control" value="2026-01-01">
+
+  <!-- Champ date dans un tableau éditable -->
+  <input type="date" name="date_effet[]" class="form-control-inline" value="2026-01-01" style="width:140px;">
+  ```
+- **Pour les modales** : le `color-scheme: dark` est déjà couvert par la règle globale. Aucun style supplémentaire n'est nécessaire dans la modale.
+- **Ne pas utiliser** de bibliothèque JS de date picker (flatpickr, datepicker, etc.) — le `<input type="date">` natif suffit en dark mode avec `color-scheme: dark`.
+
+## Règles Modales — Boutons « Ajouter »
+- **Tout bouton « Ajouter » doit ouvrir une modale Bootstrap**, jamais un formulaire inline dans le `card-header`.
+- Le formulaire d'ajout se trouve dans un `<div class="modal fade" id="...Modal">` avec `modal-dialog-centered`.
+- Le bouton déclencheur utilise `data-bs-toggle="modal"` et `data-bs-target="#...Modal"`, ou un `onclick="new bootstrap.Modal(document.getElementById('...Modal')).show()"`.
+- **Pattern HTML standard :**
+  ```html
+  <!-- Bouton -->
+  <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#ajoutXxx">
+      + Ajouter
+  </button>
+
+  <!-- Modal -->
+  <div class="modal fade" id="ajoutXxx" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content" style="background:var(--bg-surface); color:var(--text); border:1px solid var(--border); border-radius:12px;">
+              <form method="post" action="<?= $baseUrl ?>/xxx">
+                  <?= \Core\Session::csrfField() ?>
+                  <input type="hidden" name="sous_tab" value="xxx">
+                  <div class="modal-header" style="border-bottom:1px solid var(--border);">
+                      <h5 class="modal-title">Nouveau(x) xxx</h5>
+                      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                  </div>
+                  <div class="modal-body">
+                      <!-- champs du formulaire -->
+                  </div>
+                  <div class="modal-footer" style="border-top:1px solid var(--border);">
+                      <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Annuler</button>
+                      <button type="submit" class="btn btn-primary btn-sm">Enregistrer</button>
+                  </div>
+              </form>
+          </div>
+      </div>
+  </div>
+  ```
+- **Ne jamais laisser un formulaire d'ajout en inline** dans le `card-header` — toujours dans une modale.
+- **Exception** : les formulaires de configuration pure (Enregistrer la config, ex: congé annuel, heures sup) restent en inline.
+- **Cette règle s'applique à toutes les pages existantes et futures.**
+- Pages concernées (checklist) :
+  - `baremes/smig_smag.php` — Ajouter bareme SMIG/SMAG → modale
+  - `baremes/jours_feries.php` — Ajouter jour férié → modale
+  - `parametres/services.php` — Ajouter service + Ajouter fonction → 2 modales
+  - `parametres/retenues.php` — Ajouter retenue → modale
+  - `parametres/attestations.php` — Ajouter attestation → modale
+  - `parametres/gains.php` — déjà modale ✅
+
+## Règles CSS — Icônes d'actions (tableaux)
+- **Toute colonne « Actions »** dans un tableau utilise des icônes outlined (stroke-only, pas de fill) via SVG inline.
+- Les icônes sont dans un `<div class="table-actions">` pour l'alignement flex.
+- **Pas de texte** — uniquement des icônes SVG avec `title="..."` pour le tooltip natif au hover.
+- Chaque type d'action a une couleur dédiée via `.btn-icon.btn-{type}` :
+  | Classe | Couleur | Usage | Icône SVG |
+  |--------|---------|-------|-----------|
+  | `btn-view` | `#3b82f6` (bleu) | Voir / détails | Oeil (`eye`) |
+  | `btn-edit` | `#eab308` (jaune) | Modifier | Crayon (`edit`) |
+  | `btn-delete` | `#ef4444` (rouge) | Supprimer | Corbeille (`trash-2`) |
+- Au hover, chaque icône affiche un fond teinté correspondant (ex: `rgba(239,68,68,0.12)` pour delete).
+- **Pattern HTML standard :**
+  ```html
+  <td>
+      <div class="table-actions">
+          <button type="button" class="btn-icon btn-view" title="Voir les détails" onclick="voirXxx(<?= (int)$x['id'] ?>)">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+          <button type="button" class="btn-icon btn-edit" title="Modifier" onclick="openModal(<?= (int)$x['id'] ?>)">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <a href="<?= $baseUrl ?>/xxx?delete_xxx=<?= $x['id'] ?>" class="btn-icon btn-delete" title="Supprimer" onclick="return confirm('Supprimer ?')">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+          </a>
+      </div>
+  </td>
+  ```
+- **Ne jamais utiliser** du texte brut (ex: « Supprimer », « Modifier ») dans les colonnes d'actions — toujours des icônes outlined.
+- **Ne jamais utiliser** d'icônes avec `fill` (solid) — uniquement `stroke` pour un rendu outlined léger.
+- Le `title` est obligatoire pour l'accessibilité et l'info-bulle au survol.
+
 ## Encodage UTF-8 — RÈGLE CRITIQUE
 - **Tous les fichiers PHP, SQL, CSS, JS** doivent être **sauvés en UTF-8 sans BOM**.
 - **Toute donnée contenant des accents français** (`é`, `è`, `ê`, `ë`, `à`, `â`, `ù`, `û`, `ô`, `î`, `ç`, `É`, `È`, etc.) doit être **validée** avant insertion.
@@ -117,6 +208,11 @@ Net  = salaire - (CNSS + AMO + IR)
   - Récupération des overrides dans `calculate()` pour préserver indemnités + gains pendant recalcul
 - Créé table `paie_gains` (paie_id, rubrique_id, montant) dans schema.sql + migrate.php
 - `calculate()` mémorise et restore les overrides de 4 indemnités + paie_gains + heures_sup pendant DELETE/INSERT
+- **Règle Modales** ajoutée dans AGENTS.md : tout bouton "Ajouter" doit ouvrir une modale Bootstrap, jamais de formulaire inline dans le card-header
+- **Règle Date/Time Pickers** ajoutée dans AGENTS.md : tous les `<input type="date">` doivent avoir `color-scheme: dark` via la classe `form-control`
+- **Fix CSS** : `color-scheme: dark` étendu à tous les date/time inputs dans `style.css:428` (y compris `form-control-inline` et sans classe)
+- **Règle Icônes d'actions** ajoutée dans AGENTS.md : colonnes Actions = icônes outlined SVG (stroke-only) avec `title` tooltip au hover, 3 couleurs dédiées (view=bleu, edit=jaune, delete=rouge)
+- **5 vues converties** Ajouter → modale : smig_smag, jours_feries, retenues, services (x2), attestations
 
 ### Pending
 - (none)
