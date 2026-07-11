@@ -193,17 +193,14 @@ $taux = [
 
     <div class="net"><?= htmlspecialchars($netLabel) ?> : <?= number_format($b['net_a_payer'], 2, ',', ' ') ?> MAD</div>
 
-    <div style="margin-top:16px; display:flex; justify-content:space-between; align-items:flex-start; font-size:7px; color:#333; padding-top:6px; border-top:0.5px solid #ccc;">
-        <div style="text-align:left;">
-            <p style="margin:0 0 2px 0;">Fait à <?= htmlspecialchars($b['ville'] ?? '_______') ?>, le <?= date('d/m/Y') ?></p>
-            <div style="margin-top:14px;">
+    <div style="margin-top:16px; font-size:7px; color:#333; padding-top:6px; border-top:0.5px solid #ccc;">
+        <p style="margin:0 0 2px 0;">Fait à <?= htmlspecialchars($b['ville'] ?? '_______') ?>, le <?= date('d/m/Y') ?></p>
+        <div style="margin-top:14px; display:flex; justify-content:space-between; align-items:flex-start;">
+            <div style="text-align:left;">
                 <div style="border-bottom:0.5px solid #999; width:130px; margin:0 0 3px 0;"></div>
                 <strong>Cachet et signature<br>du responsable RH</strong>
             </div>
-        </div>
-        <div style="text-align:right;">
-            <p style="margin:0 0 2px 0;">&nbsp;</p>
-            <div style="margin-top:14px;">
+            <div style="text-align:right;">
                 <div style="border-bottom:0.5px solid #999; width:130px; margin:0 0 3px auto;"></div>
                 <strong>Émargement<br>du salarié</strong>
             </div>
