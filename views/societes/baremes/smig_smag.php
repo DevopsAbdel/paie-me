@@ -4,21 +4,21 @@
         <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#ajoutBaremeSmigSmag">+ Ajouter</button>
     </div>
     <div style="overflow-x:auto;">
-        <form method="post" action="<?= $baseUrl ?>/smig_smag">
+        <form method="post" action="<?= $baseUrl ?>/smig_smag" id="smigSmagForm">
             <?= \Core\Session::csrfField() ?>
             <input type="hidden" name="sous_tab" value="smig_smag">
-            <table>
+            <table class="data-table">
                 <thead>
                     <tr>
-                        <th>Année</th>
-                        <th>Type</th>
-                        <th>Taux horaire (MAD/h)</th>
-                        <th>Taux mensuel (MAD/mois)</th>
-                        <th>Date d'effet</th>
-                        <th></th>
+                        <th style="text-align:center;">Année</th>
+                        <th style="text-align:center;">Type</th>
+                        <th style="text-align:center;">Taux horaire (MAD/h)</th>
+                        <th style="text-align:center;">Taux mensuel (MAD/mois)</th>
+                        <th style="text-align:center;">Date d'effet</th>
+                        <th id="sm-actions-header" style="width:60px; text-align:center; display:none;"></th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="sm-tbody">
                     <?php if (empty($baremeSmigSmag)): ?>
                     <tr>
                         <td colspan="6" style="text-align:center; color:var(--text-muted); padding:2rem;">
@@ -27,35 +27,35 @@
                     </tr>
                     <?php else: ?>
                     <?php foreach ($baremeSmigSmag as $b): ?>
-                    <tr>
-                        <td style="font-weight:600;"><?= (int) $b['annee'] ?></td>
-                        <td><span class="badge badge-<?= $b['type'] === 'SMIG' ? 'primary' : 'info' ?>"><?= htmlspecialchars($b['type']) ?></span></td>
-                        <td>
-                            <input type="hidden" name="bareme_id[]" value="<?= $b['id'] ?>">
-                            <input type="number" step="0.01" name="horaire[]" class="form-control-inline" value="<?= $b['horaire'] ?>" style="width:110px;">
-                        </td>
-                        <td>
-                            <input type="number" step="0.01" name="mensuel[]" class="form-control-inline" value="<?= $b['mensuel'] ?>" style="width:110px;">
-                        </td>
-                        <td>
-                            <input type="date" name="date_effet[]" class="form-control-inline" value="<?= htmlspecialchars($b['date_effet'] ?? '') ?>" style="width:140px;">
-                        </td>
-                        <td>
-                            <a href="<?= $baseUrl ?>/smig_smag?delete_bareme=<?= $b['id'] ?>" class="btn-icon btn-delete" title="Supprimer" onclick="return confirm('Supprimer ce barème ?')">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
-                            </a>
+                    <tr data-id="<?= $b['id'] ?>" data-horaire="<?= $b['horaire'] ?>" data-mensuel="<?= $b['mensuel'] ?>" data-date="<?= htmlspecialchars($b['date_effet'] ?? '') ?>">
+                        <td style="text-align:center; font-weight:600;"><?= (int) $b['annee'] ?></td>
+                        <td style="text-align:center;"><span class="badge badge-<?= $b['type'] === 'SMIG' ? 'primary' : 'info' ?>"><?= htmlspecialchars($b['type']) ?></span></td>
+                        <td style="text-align:right;"><?= number_format((float)$b['horaire'], 2, ',', ' ') ?></td>
+                        <td style="text-align:right;"><?= number_format((float)$b['mensuel'], 2, ',', ' ') ?></td>
+                        <td style="text-align:center;"><?= htmlspecialchars($b['date_effet'] ?? '—') ?></td>
+                        <td class="sm-edit-action" style="width:60px; text-align:center; display:none;">
+                            <div class="table-actions">
+                                <button type="button" class="btn-icon btn-delete" title="Supprimer" onclick="this.closest('tr').remove()">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                                </button>
+                            </div>
                         </td>
                     </tr>
                     <?php endforeach; ?>
                     <?php endif; ?>
                 </tbody>
             </table>
-            <?php if (!empty($baremeSmigSmag)): ?>
-            <div style="padding:0.75rem 1rem; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between;">
-                <button type="submit" class="btn btn-success">Enregistrer les modifications</button>
-                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalCalculSalaire" style="font-size:0.8rem;">Calculer SMIG/SMAG</button>
+            <div style="padding:0.5rem 0; display:flex; align-items:center; gap:0.5rem;">
+                <button type="button" id="sm-btn-edit" class="btn btn-sm btn-secondary" onclick="smToggleEdit(true)" style="font-size:0.75rem;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle; margin-right:0.25rem;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    Modifier
+                </button>
+                <button type="button" id="sm-btn-save" class="btn btn-sm btn-success" onclick="document.getElementById('smigSmagForm').submit()" style="font-size:0.75rem; display:none;">Enregistrer les modifications</button>
+                <button type="button" id="sm-btn-cancel" class="btn btn-sm btn-danger" onclick="location.reload()" style="font-size:0.75rem; display:none;">Annuler</button>
+                <span style="margin-left:auto;">
+                    <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#modalCalculSalaire" style="font-size:0.75rem;">Calculer SMIG/SMAG</button>
+                </span>
             </div>
-            <?php endif; ?>
         </form>
     </div>
 </div>
@@ -174,18 +174,38 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const sel = document.getElementById('calcType');
-    const joursInput = document.getElementById('calcJours');
-    const tauxH = document.getElementById('calcTauxH');
-    const tauxM = document.getElementById('calcTauxM');
-    const baseEl = document.getElementById('calcBase');
-    const tauxJ = document.getElementById('calcTauxJ');
-    const resultat = document.getElementById('calcResultat');
-    const detail = document.getElementById('calcDetail');
-    const resultatBox = document.getElementById('calcResultatBox');
+function smToggleEdit(edit) {
+    document.getElementById('sm-btn-edit').style.display = edit ? 'none' : '';
+    document.getElementById('sm-btn-save').style.display = edit ? '' : 'none';
+    document.getElementById('sm-btn-cancel').style.display = edit ? '' : 'none';
+    document.getElementById('sm-actions-header').style.display = edit ? '' : 'none';
 
-    const themes = {
+    document.querySelectorAll('#sm-tbody tr').forEach(function(row) {
+        if (edit && row.dataset.id) {
+            var id = row.dataset.id;
+            var horaire = row.dataset.horaire;
+            var mensuel = row.dataset.mensuel;
+            var dateEffet = row.dataset.date;
+            var tds = row.querySelectorAll('td');
+            tds[2].innerHTML = '<input type="hidden" name="bareme_id[]" value="' + id + '"><input type="number" step="0.01" name="horaire[]" class="form-control-inline" value="' + horaire + '" style="width:100px; text-align:right;">';
+            tds[3].innerHTML = '<input type="number" step="0.01" name="mensuel[]" class="form-control-inline" value="' + mensuel + '" style="width:100px; text-align:right;">';
+            tds[4].innerHTML = '<input type="date" name="date_effet[]" class="form-control-inline" value="' + dateEffet + '" style="width:140px;">';
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    var sel = document.getElementById('calcType');
+    var joursInput = document.getElementById('calcJours');
+    var tauxH = document.getElementById('calcTauxH');
+    var tauxM = document.getElementById('calcTauxM');
+    var baseEl = document.getElementById('calcBase');
+    var tauxJ = document.getElementById('calcTauxJ');
+    var resultat = document.getElementById('calcResultat');
+    var detail = document.getElementById('calcDetail');
+    var resultatBox = document.getElementById('calcResultatBox');
+
+    var themes = {
         SMIG: { gradient: 'linear-gradient(135deg, #059669 0%, #10b981 100%)', shadow: 'rgba(16,185,129,0.3)' },
         SMAG: { gradient: 'linear-gradient(135deg, #0284c7 0%, #38bdf8 100%)', shadow: 'rgba(56,189,248,0.3)' }
     };
@@ -195,28 +215,21 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function calculer() {
-        const opt = sel.options[sel.selectedIndex];
-        const type = sel.value;
-        const horaire = parseFloat(opt.dataset.horaire) || 0;
-        const mensuel = parseFloat(opt.dataset.mensuel) || 0;
-        const jours = parseFloat(joursInput.value) || 0;
-        const annee = opt.dataset.annee || '';
+        var opt = sel.options[sel.selectedIndex];
+        var type = sel.value;
+        var horaire = parseFloat(opt.dataset.horaire) || 0;
+        var mensuel = parseFloat(opt.dataset.mensuel) || 0;
+        var jours = parseFloat(joursInput.value) || 0;
+        var annee = opt.dataset.annee || '';
 
-        const t = themes[type] || themes.SMIG;
+        var t = themes[type] || themes.SMIG;
         resultatBox.style.background = t.gradient;
         resultatBox.style.boxShadow = '0 4px 15px ' + t.shadow;
 
-        let baseLabel = '', tauxJVal = 0, salaire = 0;
-
-        if (type === 'SMIG') {
-            baseLabel = '191 h/mois (art. 184)';
-            tauxJVal = mensuel / 26;
-            salaire = mensuel / 26 * jours;
-        } else {
-            baseLabel = '26 jours/mois';
-            tauxJVal = mensuel / 26;
-            salaire = mensuel / 26 * jours;
-        }
+        var baseLabel = '', tauxJVal = 0, salaire = 0;
+        baseLabel = '26 jours/mois';
+        tauxJVal = mensuel / 26;
+        salaire = mensuel / 26 * jours;
 
         tauxH.textContent = horaire > 0 ? fmt(horaire) + ' MAD/h' : '—';
         tauxM.textContent = mensuel > 0 ? fmt(mensuel) + ' MAD' : '—';
@@ -232,20 +245,3 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 <?php endif; ?>
-
-<style>
-.form-control-inline {
-    width:80px;
-    padding:0.2rem 0.3rem;
-    font-size:0.75rem;
-    background:var(--bg-surface);
-    border:1px solid var(--border);
-    border-radius:3px;
-    color:var(--text);
-    text-align:right;
-}
-.form-control-inline:focus {
-    border-color:var(--accent);
-    outline:none;
-}
-</style>
