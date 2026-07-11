@@ -194,51 +194,25 @@ $taux = [
     <div class="net"><?= htmlspecialchars($netLabel) ?> : <?= number_format($b['net_a_payer'], 2, ',', ' ') ?> MAD</div>
 
     <div class="section-title">Cumuls annuels</div>
-    <table style="width:100%; border-collapse:collapse; font-size:8px; margin-bottom:4px;">
+    <table style="width:100%; border-collapse:collapse; font-size:7px; margin-bottom:4px;">
         <tr>
-            <td style="padding:1.5px 5px; width:50%;">Salaire brut</td>
-            <td style="padding:1.5px 5px; text-align:right; width:25%;"><?= number_format($cumuls['cumul_brut'], 2, ',', ' ') ?></td>
-            <td style="padding:1.5px 5px; width:25%;">&nbsp;</td>
+            <td style="padding:1.5px 3px; width:20%;"><strong>Brut:</strong> <?= number_format($cumuls['cumul_brut'], 2, ',', ' ') ?></td>
+            <td style="padding:1.5px 3px; width:20%;"><strong>CNSS:</strong> <?= number_format($cumuls['cumul_cnss'], 2, ',', ' ') ?></td>
+            <td style="padding:1.5px 3px; width:20%;"><strong>AMO:</strong> <?= number_format($cumuls['cumul_amo'], 2, ',', ' ') ?></td>
+            <td style="padding:1.5px 3px; width:20%;"><strong>FP:</strong> <?= number_format($cumuls['cumul_fp'], 2, ',', ' ') ?></td>
+            <td style="padding:1.5px 3px; width:20%;"><strong>IR:</strong> <?= number_format($cumuls['cumul_ir'], 2, ',', ' ') ?></td>
         </tr>
         <tr>
-            <td style="padding:1.5px 5px;">CNSS (part salariale)</td>
-            <td style="padding:1.5px 5px; text-align:right;"><?= number_format($cumuls['cumul_cnss'], 2, ',', ' ') ?></td>
-            <td style="padding:1.5px 5px;">Indemnité transport</td>
-            <td style="padding:1.5px 5px; text-align:right;"><?= number_format($cumuls['cumul_transport'], 2, ',', ' ') ?></td>
+            <td style="padding:1.5px 3px;"><strong>Mutuelle:</strong> <?= number_format($cumuls['cumul_mutuelle'], 2, ',', ' ') ?></td>
+            <td style="padding:1.5px 3px;"><strong>Transport:</strong> <?= number_format($cumuls['cumul_transport'], 2, ',', ' ') ?></td>
+            <td style="padding:1.5px 3px;"><strong>Panier:</strong> <?= number_format($cumuls['cumul_panier'], 2, ',', ' ') ?></td>
+            <td style="padding:1.5px 3px;"><strong>Repr.:</strong> <?= number_format($cumuls['cumul_representation'], 2, ',', ' ') ?></td>
+            <td style="padding:1.5px 3px;"><strong>SNI:</strong> <?= number_format($cumuls['cumul_sni'], 2, ',', ' ') ?></td>
         </tr>
-        <tr>
-            <td style="padding:1.5px 5px;">AMO (part salariale)</td>
-            <td style="padding:1.5px 5px; text-align:right;"><?= number_format($cumuls['cumul_amo'], 2, ',', ' ') ?></td>
-            <td style="padding:1.5px 5px;">Indemnité panier</td>
-            <td style="padding:1.5px 5px; text-align:right;"><?= number_format($cumuls['cumul_panier'], 2, ',', ' ') ?></td>
-        </tr>
-        <tr>
-            <td style="padding:1.5px 5px;">Mutuelle</td>
-            <td style="padding:1.5px 5px; text-align:right;"><?= number_format($cumuls['cumul_mutuelle'], 2, ',', ' ') ?></td>
-            <td style="padding:1.5px 5px;">Indemnité représentation</td>
-            <td style="padding:1.5px 5px; text-align:right;"><?= number_format($cumuls['cumul_representation'], 2, ',', ' ') ?></td>
-        </tr>
-        <tr>
-            <td style="padding:1.5px 5px;">Frais professionnels</td>
-            <td style="padding:1.5px 5px; text-align:right;"><?= number_format($cumuls['cumul_fp'], 2, ',', ' ') ?></td>
-            <td style="padding:1.5px 5px;">Jours congé consommés</td>
-            <td style="padding:1.5px 5px; text-align:right;"><?= number_format($cumuls['jours_conge_consommes'], 1, ',', ' ') ?></td>
-        </tr>
-        <tr>
-            <td style="padding:1.5px 5px;">Impôt sur le revenu (IR)</td>
-            <td style="padding:1.5px 5px; text-align:right;"><?= number_format($cumuls['cumul_ir'], 2, ',', ' ') ?></td>
-            <td style="padding:1.5px 5px;">Jours congé restants</td>
-            <td style="padding:1.5px 5px; text-align:right;"><?= number_format($cumuls['jours_conge_restants'], 1, ',', ' ') ?></td>
-        </tr>
-        <tr>
-            <td style="padding:1.5px 5px;">SNI</td>
-            <td style="padding:1.5px 5px; text-align:right;"><?= number_format($cumuls['cumul_sni'], 2, ',', ' ') ?></td>
-            <td colspan="2">&nbsp;</td>
-        </tr>
-        <tr style="font-weight:bold; border-top:1px solid #999;">
-            <td style="padding:2px 5px;">Net à payer cumulé</td>
-            <td style="padding:2px 5px; text-align:right;"><?= number_format($cumuls['cumul_net'], 2, ',', ' ') ?></td>
-            <td colspan="2">&nbsp;</td>
+        <tr style="border-top:1px solid #999;">
+            <td colspan="3" style="padding:1.5px 3px; font-weight:bold; font-size:8px;"><?= htmlspecialchars($netLabel) ?> cumulé: <?= number_format($cumuls['cumul_net'], 2, ',', ' ') ?> MAD</td>
+            <td style="padding:1.5px 3px;"><strong>Congés:</strong> <?= number_format($cumuls['jours_conge_consommes'], 1, ',', ' ') ?> / <?= number_format($cumuls['jours_conge_restants'], 1, ',', ' ') ?> jr</td>
+            <td style="padding:1.5px 3px;">&nbsp;</td>
         </tr>
     </table>
 
