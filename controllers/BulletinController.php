@@ -91,7 +91,7 @@ class BulletinController extends Controller
         $societe = str_replace(' ', '', strtr(mb_strtolower($bulletin['raison_sociale']), $translit));
         $nomFichier = $bulletin['annee'] . '-' . $mois . '_' . $nom . '_' . $prenom . '_' . $societe . '.pdf';
 
-        $dompdf->stream($nomFichier, ['Attachment' => false]);
+        $dompdf->stream($nomFichier, ['Attachment' => true]);
         exit;
     }
 
