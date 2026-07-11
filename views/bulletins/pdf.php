@@ -147,10 +147,10 @@ $taux = [
         </tr>
     </table>
 
-    <div style="border-bottom:2px solid <?= $couleur ?>; margin-bottom:6px;"></div>
+    <div style="border-bottom:2px solid <?= $couleur ?>; margin-bottom:10px;"></div>
 
     <?php foreach ($sections as $section): ?>
-    <p class="section-title"><?= htmlspecialchars($section['titre']) ?></p>
+    <p class="section-title" style="margin-top:10px;"><?= htmlspecialchars($section['titre']) ?></p>
     <table class="details">
         <tr>
             <?php foreach ($section['colonnes'] as $col): ?>
