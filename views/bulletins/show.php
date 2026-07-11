@@ -197,20 +197,4 @@ $taux = [
         <strong style="font-size:1.25rem; color:<?= $netColor ?>;"><?= number_format($b['net_a_payer'], 2, ',', ' ') ?> MAD</strong>
     </div>
 
-    <div style="margin-top:2rem; padding-top:1rem; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:flex-start;">
-        <div style="width:45%;">
-            <p style="margin:0 0 2px 0; color:var(--text-muted);">Fait à <?= htmlspecialchars($b['ville'] ?? '_______') ?>, le <?= date('d/m/Y') ?></p>
-            <div style="margin-top:20px; text-align:center;">
-                <div style="border-bottom:1px solid var(--text-muted); width:140px; margin:0 auto 4px;"></div>
-                <strong style="font-size:0.8125rem;">Cachet et signature<br>du responsable RH</strong>
-            </div>
-        </div>
-        <div style="width:45%; text-align:right;">
-            <div style="margin-top:20px; text-align:center; float:right;">
-                <div style="border-bottom:1px solid var(--text-muted); width:140px; margin:0 auto 4px;"></div>
-                <strong style="font-size:0.8125rem;">Émargement<br>du salarié</strong>
-            </div>
-        </div>
-    </div>
-
 </div>
