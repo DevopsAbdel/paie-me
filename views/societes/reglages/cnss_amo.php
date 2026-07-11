@@ -99,6 +99,6 @@
 </div>
 
 <div style="margin-top:0.75rem; display:flex; justify-content:flex-end;">
-    <button type="submit" class="btn btn-primary">Enregistrer les taux</button>
+    <button type="submit" class="btn btn-success">Enregistrer les taux</button>
 </div>
 </form>

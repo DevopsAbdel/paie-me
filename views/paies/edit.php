@@ -455,7 +455,7 @@ function overLimit(?float $valeur, ?float $plafond): bool
                 <span>Fermer la fenêtre après l'enregistrement</span>
             </label>
             <div style="display:flex;gap:0.5rem;align-items:center;">
-                <button type="submit" class="btn btn-primary">Enregistrer</button>
+                <button type="submit" class="btn btn-success">Enregistrer</button>
                 <button type="submit" name="recalculer" value="1" class="btn btn-secondary btn-sm" onclick="return confirm('Recalculer cette paie ? Les modifications seront sauvegardées avant le calcul.')">Recalculer la paie</button>
                 <a href="/paie-me/paies/<?= $paie['periode_id'] ?>/lignes" class="btn btn-secondary btn-sm">Retour</a>
             </div>

@@ -32,6 +32,6 @@
 </div>
 
 <div style="margin-top:1rem; display:flex; justify-content:flex-end;">
-    <button type="submit" class="btn btn-primary">Enregistrer</button>
+    <button type="submit" class="btn btn-success">Enregistrer</button>
 </div>
 </form>

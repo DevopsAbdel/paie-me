@@ -99,13 +99,13 @@
             Modifier
         </button>
         <button type="button" id="dc-btn-add" class="btn btn-sm btn-secondary" onclick="dcAjouter()" style="font-size:0.75rem; display:none;">+ Ajouter une tranche</button>
-        <button type="button" id="dc-btn-save" class="btn btn-sm" onclick="document.getElementById('congeAnnuelForm').submit()" style="font-size:0.75rem; display:none; background:rgba(34,197,94,0.15); color:#4ade80; border:1px solid rgba(34,197,94,0.3);">Enregistrer les modifications</button>
-        <button type="button" id="dc-btn-cancel" class="btn btn-sm" onclick="dcToggleEdit(false)" style="font-size:0.75rem; display:none; background:rgba(239,68,68,0.12); color:#f87171; border:1px solid rgba(239,68,68,0.25);">Annuler</button>
+        <button type="button" id="dc-btn-save" class="btn btn-sm btn-success" onclick="document.getElementById('congeAnnuelForm').submit()" style="font-size:0.75rem; display:none;">Enregistrer les modifications</button>
+        <button type="button" id="dc-btn-cancel" class="btn btn-sm btn-danger" onclick="dcToggleEdit(false)" style="font-size:0.75rem; display:none;">Annuler</button>
     </div>
 </div>
 
 <div style="margin-top:1rem; display:flex; justify-content:flex-end;">
-    <button type="submit" class="btn btn-primary">Enregistrer</button>
+    <button type="submit" class="btn btn-success">Enregistrer</button>
 </div>
 </form>
 

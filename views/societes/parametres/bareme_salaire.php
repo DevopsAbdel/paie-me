@@ -64,7 +64,7 @@
             </table>
             <?php if (!empty($baremeSmigSmag)): ?>
             <div style="padding:0.75rem 1rem; border-top:1px solid var(--border);">
-                <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
+                <button type="submit" class="btn btn-success">Enregistrer les modifications</button>
             </div>
             <?php endif; ?>
         </form>

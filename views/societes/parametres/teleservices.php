@@ -46,6 +46,6 @@
     <small style="color:var(--text-muted); font-size:0.75rem;">Caisse Interprofessionnelle Marocaine de Retraite.</small>
 </div>
 <div style="margin-top:1rem; padding-top:1rem; border-top:1px solid var(--border);">
-    <button type="submit" class="btn btn-primary">Enregistrer les accès</button>
+    <button type="submit" class="btn btn-success">Enregistrer les accès</button>
 </div>
 </form>

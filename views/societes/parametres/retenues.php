@@ -75,7 +75,7 @@
                 </div>
                 <div class="modal-footer" style="border-top:1px solid var(--border);">
                     <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Annuler</button>
-                    <button type="submit" class="btn btn-primary btn-sm">Enregistrer</button>
+                    <button type="submit" class="btn btn-success btn-sm">Enregistrer</button>
                 </div>
             </form>
         </div>

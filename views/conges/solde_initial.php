@@ -15,7 +15,7 @@
                     <?php endfor; ?>
                 </select>
             </div>
-            <button type="submit" class="btn btn-primary btn-sm" style="margin-top:1.1rem;">Enregistrer les soldes</button>
+            <button type="submit" class="btn btn-success btn-sm" style="margin-top:1.1rem;">Enregistrer les soldes</button>
         </div>
 
         <div style="overflow-x:auto;">

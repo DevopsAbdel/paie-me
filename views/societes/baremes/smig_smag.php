@@ -52,7 +52,7 @@
             </table>
             <?php if (!empty($baremeSmigSmag)): ?>
             <div style="padding:0.75rem 1rem; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between;">
-                <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
+                <button type="submit" class="btn btn-success">Enregistrer les modifications</button>
                 <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalCalculSalaire" style="font-size:0.8rem;">Calculer SMIG/SMAG</button>
             </div>
             <?php endif; ?>
@@ -97,7 +97,7 @@
                 </div>
                 <div class="modal-footer" style="border-top:1px solid var(--border);">
                     <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Annuler</button>
-                    <button type="submit" class="btn btn-primary btn-sm">Enregistrer</button>
+                    <button type="submit" class="btn btn-success btn-sm">Enregistrer</button>
                 </div>
             </form>
         </div>

@@ -52,7 +52,7 @@
         </div>
     </div>
     <div style="margin-top:1rem; padding-top:1rem; border-top:1px solid var(--border);">
-        <button type="submit" class="btn btn-primary">Enregistrer</button>
+        <button type="submit" class="btn btn-success">Enregistrer</button>
     </div>
 </div>
 </form>

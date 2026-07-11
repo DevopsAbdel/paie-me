@@ -442,7 +442,7 @@
         </div>
 
         <div style="display:flex; gap:0.75rem; margin-top:1rem;">
-            <button type="submit" class="btn btn-primary">Enregistrer</button>
+            <button type="submit" class="btn btn-success">Enregistrer</button>
             <a href="/paie-me/salaries" class="btn btn-secondary">Annuler</a>
         </div>
     </form>

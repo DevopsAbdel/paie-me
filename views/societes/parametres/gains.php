@@ -269,7 +269,7 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary btn-sm" id="gainCloseBtn" data-bs-dismiss="modal">Annuler</button>
                     <button type="button" class="btn btn-secondary btn-sm" id="gainCloseReadonlyBtn" data-bs-dismiss="modal" style="display:none;">Fermer</button>
-                    <button type="submit" class="btn btn-primary btn-sm" id="gainSubmitBtn">Enregistrer</button>
+                    <button type="submit" class="btn btn-success btn-sm" id="gainSubmitBtn">Enregistrer</button>
                 </div>
             </form>
         </div>
