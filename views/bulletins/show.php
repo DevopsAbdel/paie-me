@@ -197,23 +197,4 @@ $taux = [
         <strong style="font-size:1.25rem; color:<?= $netColor ?>;"><?= number_format($b['net_a_payer'], 2, ',', ' ') ?> MAD</strong>
     </div>
 
-    <?php if ($cfg['show_footer'] ?? true): ?>
-    <div style="margin-top:2rem; padding-top:1rem; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
-        <div style="display:flex; align-items:center; gap:0.5rem;">
-            <div style="width:32px; height:32px; background:<?= $couleur ?>; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:0.75rem; font-weight:700; color:#fff;">
-                <?= strtoupper(mb_substr($b['raison_sociale'], 0, 2)) ?>
-            </div>
-            <span style="font-size:0.8125rem; color:var(--text-muted);"><?= htmlspecialchars($b['raison_sociale']) ?></span>
-        </div>
-        <div style="text-align:right; font-size:0.75rem; color:var(--text-muted);">
-            <?= htmlspecialchars($b['adresse'] ?? '') ?>
-            <?php if ($b['telephone']): ?> | Tél: <?= htmlspecialchars($b['telephone']) ?><?php endif; ?>
-            <?php if ($b['email']): ?> | <?= htmlspecialchars($b['email']) ?><?php endif; ?>
-            <br>
-            ICE: <?= htmlspecialchars($b['ice']) ?> | IF: <?= htmlspecialchars($b['if_fiscal']) ?> | CNSS: <?= htmlspecialchars($b['cnss_societe']) ?>
-            <?php if ($b['banque']): ?> | <?= htmlspecialchars($b['banque']) ?> <?php endif; ?>
-            <?php if ($b['rib']): ?>| RIB: <?= htmlspecialchars($b['rib']) ?><?php endif; ?>
-        </div>
-    </div>
-    <?php endif; ?>
 </div>

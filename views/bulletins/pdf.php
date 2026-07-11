@@ -193,20 +193,5 @@ $taux = [
 
     <div class="net"><?= htmlspecialchars($netLabel) ?> : <?= number_format($b['net_a_payer'], 2, ',', ' ') ?> MAD</div>
 
-    <?php if ($cfg['show_footer'] ?? true): ?>
-    <div class="footer">
-        <div style="display:flex; align-items:center; gap:4px;">
-            <div class="footer-logo"><?= strtoupper(mb_substr($b['raison_sociale'], 0, 2)) ?></div>
-            <span><?= htmlspecialchars($b['raison_sociale']) ?></span>
-        </div>
-        <div style="text-align:right;">
-            <?= htmlspecialchars($b['adresse'] ?? '') ?><?php if ($b['telephone']): ?> | Tél: <?= htmlspecialchars($b['telephone']) ?><?php endif; ?>
-            <?php if ($b['email']): ?> | <?= htmlspecialchars($b['email']) ?><?php endif; ?>
-            | ICE: <?= htmlspecialchars($b['ice']) ?> | IF: <?= htmlspecialchars($b['if_fiscal']) ?>
-            <?php if ($b['banque']): ?> | <?= htmlspecialchars($b['banque']) ?><?php endif; ?>
-            <?php if ($b['rib']): ?> | RIB: <?= htmlspecialchars($b['rib']) ?><?php endif; ?>
-        </div>
-    </div>
-    <?php endif; ?>
 </body>
 </html>
