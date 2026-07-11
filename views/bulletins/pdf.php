@@ -130,18 +130,25 @@ $taux = [
         </tr>
     </table>
 
-    <table style="width:100%; border-collapse:collapse; margin-bottom:6px;">
+    <table style="width:100%; border-collapse:collapse; margin-bottom:6px; font-size:8px;">
         <tr>
-            <td style="font-size:8px; padding:0;">
-                <p style="margin:1px 0;"><strong>Salarié:</strong> <?= htmlspecialchars($b['nom_famille'] . ' ' . $b['prenom']) ?></p>
-                <p style="margin:1px 0;"><strong>Matricule:</strong> <?= htmlspecialchars($b['matricule']) ?></p>
-                <p style="margin:1px 0;"><strong>CIN:</strong> <?= htmlspecialchars($b['cin']) ?></p>
-                <p style="margin:1px 0;"><strong>CNSS:</strong> <?= htmlspecialchars($b['cnss_num']) ?></p>
-                <p style="margin:1px 0;"><strong>Poste:</strong> <?= htmlspecialchars($b['fonction_nom'] ?? $b['poste']) ?></p>
-                <p style="margin:1px 0;"><strong>Date d'embauche:</strong> <?= $b['date_embauche'] ?></p>
-                <p style="margin:1px 0;"><strong>Durée de travail:</strong> <?= $joursTrav ?> jour(s) / <?= $heuresMensuelles ?> heures</p>
-                <p style="margin:1px 0;"><strong>Situation:</strong> <?= htmlspecialchars($b['situation_familiale'] ?? 'Célibataire') ?> | <?= (int)($b['nb_enfants'] ?? 0) ?> enfant(s)</p>
-            </td>
+            <td style="padding:1px 0; width:50%;"><strong>Salarié:</strong> <?= htmlspecialchars($b['nom_famille'] . ' ' . $b['prenom']) ?></td>
+            <td style="padding:1px 0; width:50%;"><strong>Durée de travail:</strong> <?= $joursTrav ?> jour(s) / <?= $heuresMensuelles ?> heures</td>
+        </tr>
+        <tr>
+            <td style="padding:1px 0;"><strong>Matricule:</strong> <?= htmlspecialchars($b['matricule']) ?></td>
+            <td style="padding:1px 0;"><strong>Date d'embauche:</strong> <?= $b['date_embauche'] ?></td>
+        </tr>
+        <tr>
+            <td style="padding:1px 0;"><strong>CIN:</strong> <?= htmlspecialchars($b['cin']) ?></td>
+            <td style="padding:1px 0;"><strong>Situation:</strong> <?= htmlspecialchars($b['situation_familiale'] ?? 'Célibataire') ?> | <?= (int)($b['nb_enfants'] ?? 0) ?> enfant(s)</td>
+        </tr>
+        <tr>
+            <td style="padding:1px 0;"><strong>CNSS:</strong> <?= htmlspecialchars($b['cnss_num']) ?></td>
+            <td style="padding:1px 0;">&nbsp;</td>
+        </tr>
+        <tr>
+            <td style="padding:1px 0;" colspan="2"><strong>Poste:</strong> <?= htmlspecialchars($b['fonction_nom'] ?? $b['poste']) ?></td>
         </tr>
     </table>
 

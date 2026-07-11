@@ -115,19 +115,25 @@ $taux = [
         </div>
     </div>
 
-    <table>
+    <table style="width:100%; border-collapse:collapse;">
         <tr>
-            <td style="padding:0.5rem 1rem;">
-                <strong>Salarié:</strong> <?= htmlspecialchars($b['nom_famille'] . ' ' . $b['prenom']) ?><br>
-                <strong>Matricule:</strong> <?= htmlspecialchars($b['matricule']) ?><br>
-                <strong>CIN:</strong> <?= htmlspecialchars($b['cin']) ?><br>
-                <strong>CNSS:</strong> <?= htmlspecialchars($b['cnss_num']) ?><br>
-                <strong>Poste:</strong> <?= htmlspecialchars($b['fonction_nom'] ?? $b['poste']) ?><br>
-                <strong>Date d'embauche:</strong> <?= $b['date_embauche'] ?><br>
-                <strong>Durée de travail:</strong> <?= $joursTrav ?> jour(s) / <?= $heuresMensuelles ?> heures<br>
-                <strong>Situation:</strong> <?= htmlspecialchars($b['situation_familiale'] ?? 'Célibataire') ?>
-                | <?= (int)($b['nb_enfants'] ?? 0) ?> enfant(s)
-            </td>
+            <td style="padding:0.25rem 0.5rem; width:50%;"><strong>Salarié:</strong> <?= htmlspecialchars($b['nom_famille'] . ' ' . $b['prenom']) ?></td>
+            <td style="padding:0.25rem 0.5rem; width:50%;"><strong>Durée de travail:</strong> <?= $joursTrav ?> jour(s) / <?= $heuresMensuelles ?> heures</td>
+        </tr>
+        <tr>
+            <td style="padding:0.25rem 0.5rem;"><strong>Matricule:</strong> <?= htmlspecialchars($b['matricule']) ?></td>
+            <td style="padding:0.25rem 0.5rem;"><strong>Date d'embauche:</strong> <?= $b['date_embauche'] ?></td>
+        </tr>
+        <tr>
+            <td style="padding:0.25rem 0.5rem;"><strong>CIN:</strong> <?= htmlspecialchars($b['cin']) ?></td>
+            <td style="padding:0.25rem 0.5rem;"><strong>Situation:</strong> <?= htmlspecialchars($b['situation_familiale'] ?? 'Célibataire') ?> | <?= (int)($b['nb_enfants'] ?? 0) ?> enfant(s)</td>
+        </tr>
+        <tr>
+            <td style="padding:0.25rem 0.5rem;"><strong>CNSS:</strong> <?= htmlspecialchars($b['cnss_num']) ?></td>
+            <td style="padding:0.25rem 0.5rem;">&nbsp;</td>
+        </tr>
+        <tr>
+            <td style="padding:0.25rem 0.5rem;" colspan="2"><strong>Poste:</strong> <?= htmlspecialchars($b['fonction_nom'] ?? $b['poste']) ?></td>
         </tr>
     </table>
 
