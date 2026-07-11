@@ -16,6 +16,7 @@
         <div class="form-group">
             <label>Délai d'ancienneté (mois)</label>
             <input type="number" name="delai_anciennete" value="<?= htmlspecialchars($conge['delai_anciennete'] ?? '6') ?>" class="form-control" min="0">
+            <small style="color:var(--text-muted); font-size:0.7rem; margin-top:0.25rem; display:block;">Mois avant éligibilité (défaut : 6)</small>
         </div>
         <div class="form-group">
             <label>Report autorisé</label>
@@ -23,17 +24,19 @@
                 <option value="1" <?= ($conge['report_autorise'] ?? 1) ? 'selected' : '' ?>>Oui</option>
                 <option value="0" <?= !($conge['report_autorise'] ?? 1) ? 'selected' : '' ?>>Non</option>
             </select>
+            <small style="font-size:0.7rem;">&nbsp;</small>
         </div>
         <div class="form-group">
             <label>Report max (jours)</label>
             <input type="number" name="report_max" value="<?= htmlspecialchars($conge['report_max'] ?? '15') ?>" class="form-control" min="0">
+            <small style="font-size:0.7rem;">&nbsp;</small>
         </div>
         <div class="form-group">
             <label>Report max (années consécutives)</label>
             <input type="number" name="report_max_annees" value="<?= htmlspecialchars($conge['report_max_annees'] ?? '2') ?>" class="form-control" min="0">
+            <small style="color:var(--text-muted); font-size:0.7rem; margin-top:0.25rem; display:block;">Années consécutives max (défaut : 2)</small>
         </div>
     </div>
-    <div style="margin-top:0.35rem; font-size:0.75rem; color:var(--text-muted);">Délai d'ancienneté : mois avant éligibilité au congé payé (défaut : 6). Report max années : années consécutives max pour le report (défaut : 2).</div>
 
     <h4 class="form-section-title">Droit au congé annuel payé par ancienneté</h4>
     <hr class="form-section-sep">

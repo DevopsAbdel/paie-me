@@ -175,6 +175,19 @@ Net  = salaire - (CNSS + AMO + IR)
   </div>
   ```
 - **Ne jamais définir `height` ou `min-height` manuellement** sur les `.form-group` ou les `.form-control` dans un grid — la hauteur uniforme est assurée par le flexbox + grid auto-row.
+- **Règle `<small>` (texte d'aide) dans un grid** : si UN seul champ du grid a un `<small>`, les autres champs doivent aussi avoir un `<small>` (même vide avec `&nbsp;`) pour que la hauteur reste uniforme. Sinon le champ avec `<small>` sera plus grand que les autres.
+  ```html
+  <div class="form-group">
+      <label>Champ avec aide</label>
+      <input type="number" name="champ1" class="form-control">
+      <small style="color:var(--text-muted); font-size:0.7rem; margin-top:0.25rem; display:block;">Texte d'aide ici</small>
+  </div>
+  <div class="form-group">
+      <label>Champ sans aide</label>
+      <input type="text" name="champ2" class="form-control">
+      <small style="font-size:0.7rem;">&nbsp;</small>
+  </div>
+  ```
 - **Le custom select** (`.cs-wrapper`) utilise `display: flex; flex: 1` pour matcher la hauteur des `<input>` natifs. Ne pas modifier ce comportement.
 - **Pour un formulaire entier** : retirer `max-width` du `<form>` pour que le grid s'étende sur toute la largeur de la card.
 
