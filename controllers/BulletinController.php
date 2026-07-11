@@ -86,9 +86,9 @@ class BulletinController extends Controller
 
         $mois = str_pad($bulletin['mois'], 2, '0', STR_PAD_LEFT);
         $translit = ['À'=>'A','Á'=>'A','Â'=>'A','Ã'=>'A','Ä'=>'A','Å'=>'A','Æ'=>'AE','Ç'=>'C','È'=>'E','É'=>'E','Ê'=>'E','Ë'=>'E','Ì'=>'I','Í'=>'I','Î'=>'I','Ï'=>'I','Ð'=>'D','Ñ'=>'N','Ò'=>'O','Ó'=>'O','Ô'=>'O','Õ'=>'O','Ö'=>'O','Ø'=>'OE','Ù'=>'U','Ú'=>'U','Û'=>'U','Ü'=>'U','Ý'=>'Y','Þ'=>'TH','ß'=>'ss','à'=>'a','á'=>'a','â'=>'a','ã'=>'a','ä'=>'a','å'=>'a','æ'=>'ae','ç'=>'c','è'=>'e','é'=>'e','ê'=>'e','ë'=>'e','ì'=>'i','í'=>'i','î'=>'i','ï'=>'i','ð'=>'d','ñ'=>'n','ò'=>'o','ó'=>'o','ô'=>'o','õ'=>'o','ö'=>'o','ø'=>'oe','ù'=>'u','ú'=>'u','û'=>'u','ü'=>'u','ý'=>'y','þ'=>'th','ÿ'=>'y'];
-        $prenom = str_replace(' ', '', strtr(mb_strtolower($bulletin['prenom']), $translit));
-        $nom = str_replace(' ', '', strtr(mb_strtolower($bulletin['nom_famille']), $translit));
-        $societe = str_replace(' ', '', strtr(mb_strtolower($bulletin['raison_sociale']), $translit));
+        $prenom = str_replace(' ', '_', strtr($bulletin['prenom'], $translit));
+        $nom = str_replace(' ', '_', strtr($bulletin['nom_famille'], $translit));
+        $societe = str_replace(' ', '_', strtr($bulletin['raison_sociale'], $translit));
         $nomFichier = $bulletin['annee'] . '-' . $mois . '_' . $nom . '_' . $prenom . '_' . $societe . '.pdf';
 
         $dompdf->stream($nomFichier, ['Attachment' => true]);
