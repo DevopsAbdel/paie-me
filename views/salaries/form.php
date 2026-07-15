@@ -204,7 +204,7 @@
             </div>
         </div>
 
-        <h4 class="form-section-title">Indemnités et avantages</h4>
+        <h4 class="form-section-title">Gains automatiques</h4>
         <hr class="form-section-sep">
         <div class="table-wrapper">
             <table class="edit-paie-table" id="indemnites-table">
@@ -303,47 +303,6 @@
         </div>
         <div style="padding:0.5rem 0;">
             <button type="button" class="btn btn-sm btn-secondary" onclick="document.getElementById('indemniteModal').style.display='flex'" style="font-size:0.75rem;">+ Ajouter une indemnité</button>
-        </div>
-
-        <h4 class="form-section-title">Gains automatiques</h4>
-        <hr class="form-section-sep">
-        <small style="display:block; color:var(--text-muted); font-size:0.7rem; margin-bottom:0.75rem;">Gains qui seront automatiquement appliqués lors du calcul de la paie pour ce salarié.</small>
-        <div class="table-wrapper">
-            <table class="edit-paie-table" id="gains-table">
-                <thead>
-                    <tr>
-                        <th style="width:12%; text-align:center;">CODE</th>
-                        <th style="width:35%; text-align:center;">LIBELLÉ</th>
-                        <th style="width:15%; text-align:center;">TYPE</th>
-                        <th style="width:18%; text-align:center;">MONTANT (DH)</th>
-                        <th style="width:20%; text-align:center;"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($gainsCustom as $gc): ?>
-                    <tr class="gain-custom-row">
-                        <td class="code"><?= htmlspecialchars($gc['code']) ?></td>
-                        <td>
-                            <input type="hidden" name="gain_custom_rubrique_id[]" value="<?= (int)$gc['rubrique_id'] ?>">
-                            <?= htmlspecialchars($gc['libelle']) ?>
-                        </td>
-                        <td style="font-size:0.72rem;color:var(--text-muted);">Fixe</td>
-                        <td><input type="number" step="0.01" min="0" name="gain_custom_montant[]" class="form-control-inline" value="<?= $gc['montant'] ?>"></td>
-                        <td>
-                            <div class="table-actions">
-                                <button type="button" class="btn-icon btn-delete" title="Supprimer le gain" onclick="this.closest('tr').remove()">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
-                    <tr id="gains-custom-container"></tr>
-                </tbody>
-            </table>
-        </div>
-        <div style="padding:0.5rem 0;">
-            <button type="button" class="btn btn-sm btn-secondary" onclick="document.getElementById('gainModal').style.display='flex'" style="font-size:0.75rem;">+ Ajouter un gain</button>
         </div>
 
         <!-- Modale Gain -->
