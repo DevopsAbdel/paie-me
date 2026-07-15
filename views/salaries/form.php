@@ -16,6 +16,14 @@
                 <label>Prénom *</label>
                 <input type="text" name="prenom" class="form-control" value="<?= $salarie['prenom'] ?? '' ?>" required>
             </div>
+            <div class="form-group">
+                <label>Sexe</label>
+                <select name="sexe" class="form-control">
+                    <option value="">— Sélectionner —</option>
+                    <option value="M" <?= ($salarie['sexe'] ?? '') === 'M' ? 'selected' : '' ?>>Masculin</option>
+                    <option value="F" <?= ($salarie['sexe'] ?? '') === 'F' ? 'selected' : '' ?>>Féminin</option>
+                </select>
+            </div>
         </div>
         <div class="form-row">
             <div class="form-group">
@@ -69,6 +77,10 @@
             <div class="form-group">
                 <label>Date de naissance</label>
                 <input type="date" name="date_naissance" class="form-control" value="<?= $salarie['date_naissance'] ?? '' ?>">
+            </div>
+            <div class="form-group">
+                <label>Lieu de naissance</label>
+                <input type="text" name="lieu_naissance" class="form-control" value="<?= $salarie['lieu_naissance'] ?? '' ?>">
             </div>
             <div class="form-group">
                 <label>CIN</label>
@@ -125,8 +137,12 @@
         </div>
         <div class="form-row">
             <div class="form-group">
-                <label>Matricule *</label>
-                <input type="text" name="matricule" class="form-control" value="<?= $salarie['matricule'] ?? '' ?>" required>
+                <label>Matricule</label>
+                <?php if ($salarie): ?>
+                <input type="text" name="matricule" class="form-control" value="<?= $salarie['matricule'] ?? '' ?>">
+                <?php else: ?>
+                <input type="text" name="matricule" class="form-control" value="" placeholder="Généré automatiquement" style="cursor:not-allowed; opacity:0.65;" readonly>
+                <?php endif; ?>
             </div>
             <div class="form-group">
                 <label>Date d'embauche</label>
@@ -148,6 +164,8 @@
                     <option value="CDD" <?= ($salarie['type_contrat'] ?? '') === 'CDD' ? 'selected' : '' ?>>CDD</option>
                     <option value="stage" <?= ($salarie['type_contrat'] ?? '') === 'stage' ? 'selected' : '' ?>>Stage</option>
                     <option value="interim" <?= ($salarie['type_contrat'] ?? '') === 'interim' ? 'selected' : '' ?>>Intérim</option>
+                    <option value="anapec" <?= ($salarie['type_contrat'] ?? '') === 'anapec' ? 'selected' : '' ?>>ANAPEC</option>
+                    <option value="tahfiz" <?= ($salarie['type_contrat'] ?? '') === 'tahfiz' ? 'selected' : '' ?>>TAHFIZ</option>
                 </select>
             </div>
             <div class="form-group">

@@ -745,4 +745,12 @@ foreach ($allModeles as $m) {
 }
 if ($fixed > 0) echo "   + $fixed modèle(s) corrigé(s) (codes → numériques)\n";
 
+// === Sexo, lieu de naissance, type contrat ANAPEC/TAHFIZ ===
+addCol($p, 'salaries', "sexe ENUM('M', 'F') DEFAULT NULL AFTER matricule");
+addCol($p, 'salaries', 'lieu_naissance VARCHAR(100) DEFAULT NULL AFTER date_naissance');
+try {
+    $p->exec("ALTER TABLE salaries MODIFY COLUMN type_contrat ENUM('CDI', 'CDD', 'stage', 'interim', 'anapec', 'tahfiz') NOT NULL DEFAULT 'CDI'");
+    echo "   + type_contrat: ANAPEC & TAHFIZ ajoutés\n";
+} catch (\PDOException $e) {}
+
 echo "\nMigrations terminées.\n";

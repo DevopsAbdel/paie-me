@@ -398,7 +398,7 @@ class SocieteController extends Controller
             'delete_fonction'   => ['table' => 'fonctions',           'tab' => 'services'],
             'delete_gain'       => ['table' => 'rubriques_gains',      'tab' => 'gains'],
             'delete_retenue'    => ['table' => 'rubriques_retenues',   'tab' => 'retenues'],
-            'delete_organisme'  => ['table' => 'organismes',           'tab' => 'organismes'],
+            'delete_organisme'  => ['table' => 'organismes',           'tab' => 'organismes_sociaux'],
             'delete_attestation' => ['table' => 'modeles_attestation', 'tab' => 'attestations'],
 
         ];
@@ -560,7 +560,7 @@ class SocieteController extends Controller
                     $stmt->execute([$id, $_POST['code'], $_POST['libelle'], $_POST['type_montant'] ?? 'fixe', $_POST['valeur_defaut'] ?? 0]);
                     Session::setFlash('success', 'Retenue ajoutée.');
                 }
-            } elseif ($sousTab === 'organismes') {
+            } elseif ($sousTab === 'organismes' || $sousTab === 'organismes_sociaux') {
                 if (!empty($_POST['nom'])) {
                     $stmt = $this->db->prepare("INSERT INTO organismes (societe_id, nom, type, login, mot_de_passe) VALUES (?, ?, ?, ?, ?)");
                     $stmt->execute([$id, $_POST['nom'], $_POST['type'] ?? 'autre', $_POST['login'] ?? '', $_POST['mot_de_passe'] ?? '']);
@@ -618,6 +618,8 @@ class SocieteController extends Controller
             'gains'          => 'Rubriques de gains',
             'retenues'       => 'Rubriques de retenues',
             'attestations'   => 'Modèles d\'attestation',
+            'cnss_amo'       => 'CNSS et AMO',
+            'organismes_sociaux' => 'Organismes Sociaux',
             'journal'        => 'Journal de comptabilisation',
         ];
         $subView = 'banque';
@@ -803,92 +805,6 @@ class SocieteController extends Controller
             'joursFeries'   => $joursFeries,
             'heuresSup'     => $heuresSup,
             'baremeSmigSmag' => $baremeSmigSmag,
-        ]);
-    }
-
-    public function reglages(int $id, string $sous_tab = 'cnss_amo'): void
-    {
-        $userId = Session::get('user_id');
-        $societe = $this->db->query("SELECT * FROM societes WHERE id = $id AND user_id = $userId")->fetch();
-
-        if (!$societe) {
-            Session::setFlash('error', 'Société introuvable.');
-            $this->redirect('/paie-me/societes');
-        }
-
-        Session::set('societe_context', [
-            'id'             => $societe['id'],
-            'raison_sociale' => $societe['raison_sociale'],
-            'ice'            => $societe['ice'],
-            'cnss'           => $societe['cnss'],
-        ]);
-
-        if (isset($_GET['delete_organisme'])) {
-            $this->db->exec("DELETE FROM organismes WHERE id = " . (int)$_GET['delete_organisme'] . " AND societe_id = $id");
-            Session::setFlash('success', 'Organisme supprimé.');
-            $this->redirect('/paie-me/societes/' . $id . '/reglages/organismes_sociaux');
-        }
-
-        if ($this->isPost()) {
-            $this->checkCsrf();
-            $sousTab = $_POST['sous_tab'] ?? 'cnss_amo';
-
-            if ($sousTab === 'cnss_amo') {
-                $stmt = $this->db->prepare("
-                    INSERT INTO parametres_cnss_amo (societe_id, plafond_cnss, taux_cnss_salarial, taux_cnss_patronal, taux_amo_salarial, taux_amo_patronal, taux_amo_total, taux_allocations_familiales, taux_prestations_sociales, taxe_formation, participation_amo, taux_penalites_cnss, taux_penalites_tfp, taux_penalites_amo, penalite_cnss_premier_mois, penalite_cnss_mois_suivants, penalite_amo_taux, astreinte_cnss_par_salarie, astreinte_amo_par_salarie)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                    ON DUPLICATE KEY UPDATE plafond_cnss=VALUES(plafond_cnss), taux_cnss_salarial=VALUES(taux_cnss_salarial), taux_cnss_patronal=VALUES(taux_cnss_patronal), taux_amo_salarial=VALUES(taux_amo_salarial), taux_amo_patronal=VALUES(taux_amo_patronal), taux_amo_total=VALUES(taux_amo_total), taux_allocations_familiales=VALUES(taux_allocations_familiales), taux_prestations_sociales=VALUES(taux_prestations_sociales), taxe_formation=VALUES(taxe_formation), participation_amo=VALUES(participation_amo), taux_penalites_cnss=VALUES(taux_penalites_cnss), taux_penalites_tfp=VALUES(taux_penalites_tfp), taux_penalites_amo=VALUES(taux_penalites_amo), penalite_cnss_premier_mois=VALUES(penalite_cnss_premier_mois), penalite_cnss_mois_suivants=VALUES(penalite_cnss_mois_suivants), penalite_amo_taux=VALUES(penalite_amo_taux), astreinte_cnss_par_salarie=VALUES(astreinte_cnss_par_salarie), astreinte_amo_par_salarie=VALUES(astreinte_amo_par_salarie)
-                ");
-                $stmt->execute([
-                    $id,
-                    $_POST['plafond_cnss'] ?? 6000,
-                    $_POST['taux_cnss_salarial'] ?? 4.48,
-                    $_POST['taux_cnss_patronal'] ?? 8.98,
-                    $_POST['taux_amo_salarial'] ?? 2.26,
-                    $_POST['taux_amo_patronal'] ?? 4.11,
-                    $_POST['taux_amo_total'] ?? 6.37,
-                    $_POST['taux_allocations_familiales'] ?? 6.40,
-                    $_POST['taux_prestations_sociales'] ?? 13.46,
-                    $_POST['taxe_formation'] ?? 1.60,
-                    $_POST['participation_amo'] ?? 1.85,
-                    $_POST['taux_penalites_cnss'] ?? 0,
-                    $_POST['taux_penalites_tfp'] ?? 0,
-                    $_POST['taux_penalites_amo'] ?? 0,
-                    $_POST['penalite_cnss_premier_mois'] ?? 3.00,
-                    $_POST['penalite_cnss_mois_suivants'] ?? 0.50,
-                    $_POST['penalite_amo_taux'] ?? 1.00,
-                    $_POST['astreinte_cnss_par_salarie'] ?? 50.00,
-                    $_POST['astreinte_amo_par_salarie'] ?? 100.00,
-                ]);
-                Session::setFlash('success', 'Taux CNSS/AMO mis à jour.');
-            } elseif ($sousTab === 'organismes_sociaux') {
-                if (!empty($_POST['nom'])) {
-                    $stmt = $this->db->prepare("INSERT INTO organismes (societe_id, nom, type, login, mot_de_passe) VALUES (?, ?, ?, ?, ?)");
-                    $stmt->execute([$id, $_POST['nom'], $_POST['type'] ?? 'autre', $_POST['login'] ?? '', $_POST['mot_de_passe'] ?? '']);
-                    Session::setFlash('success', 'Organisme ajouté.');
-                }
-            }
-
-            $this->redirect('/paie-me/societes/' . $id . '/reglages/' . $sousTab);
-        }
-
-        $cnssParams = $this->db->query("SELECT * FROM parametres_cnss_amo WHERE societe_id = $id")->fetch();
-        if (!$cnssParams) $cnssParams = ['plafond_cnss'=>6000,'taux_cnss_salarial'=>4.48,'taux_cnss_patronal'=>8.98,'taux_amo_salarial'=>2.26,'taux_amo_patronal'=>4.11,'taux_amo_total'=>6.37,'taux_allocations_familiales'=>6.40,'taux_prestations_sociales'=>13.46,'taxe_formation'=>1.60,'participation_amo'=>1.85,'taux_penalites_cnss'=>0,'taux_penalites_tfp'=>0,'taux_penalites_amo'=>0,'penalite_cnss_premier_mois'=>3.00,'penalite_cnss_mois_suivants'=>0.50,'penalite_amo_taux'=>1.00,'astreinte_cnss_par_salarie'=>50.00,'astreinte_amo_par_salarie'=>100.00];
-        $organismes = $this->db->query("SELECT * FROM organismes WHERE societe_id = $id ORDER BY nom")->fetchAll();
-
-        $titles = [
-            'cnss_amo'          => 'CNSS et AMO',
-            'organismes_sociaux' => 'Organismes Sociaux',
-        ];
-        $subView = in_array($sous_tab, array_keys($titles)) ? $sous_tab : 'cnss_amo';
-        $baseUrl = '/paie-me/societes/' . $id . '/reglages';
-
-        $this->render('societes/reglages/' . $subView . '.php', [
-            'title'       => $titles[$subView] . ' — ' . $societe['raison_sociale'],
-            'societe'     => $societe,
-            'baseUrl'     => $baseUrl,
-            'cnssParams'  => $cnssParams,
-            'organismes'  => $organismes,
         ]);
     }
 

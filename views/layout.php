@@ -103,19 +103,6 @@
             <?php endif; ?>
         </li>
         <li>
-            <a href="/paie-me/societes/<?= $ctx['id'] ?>/reglages" class="<?= str_contains($_SERVER['REQUEST_URI'], '/reglages') ? 'active' : '' ?>" style="<?= str_contains($_SERVER['REQUEST_URI'], '/reglages') ? 'border-left:3px solid var(--accent);' : '' ?>">
-                <span class="icon" data-lucide="sliders"></span>
-                <span>Réglages</span>
-            </a>
-            <?php if (str_contains($_SERVER['REQUEST_URI'], '/reglages')): ?>
-            <ul style="list-style:none; padding:0; margin:0.25rem 0 0 1.5rem; font-size:0.8125rem;">
-                <?php $baseR = '/paie-me/societes/' . $ctx['id'] . '/reglages/'; $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH); ?>
-                <li><a href="<?= $baseR ?>cnss_amo" style="display:block; padding:0.3rem 0.5rem; color:<?= str_contains($uri, '/cnss_amo')?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">CNSS et AMO</a></li>
-                <li><a href="<?= $baseR ?>organismes_sociaux" style="display:block; padding:0.3rem 0.5rem; color:<?= str_contains($uri, '/organismes_sociaux')?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">Organismes Sociaux</a></li>
-            </ul>
-            <?php endif; ?>
-        </li>
-        <li>
             <a href="/paie-me/societes/<?= $ctx['id'] ?>/parametres" class="<?= str_contains($_SERVER['REQUEST_URI'], '/parametres') ? 'active' : '' ?>" style="<?= str_contains($_SERVER['REQUEST_URI'], '/parametres') ? 'border-left:3px solid var(--accent);' : '' ?>">
                 <span class="icon" data-lucide="settings"></span>
                 <span>Paramètres</span>
@@ -131,6 +118,8 @@
                 <li><a href="<?= $baseP ?>gains" style="display:block; padding:0.3rem 0.5rem; color:<?= str_contains($uri, '/gains')?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">Gains</a></li>
                 <li><a href="<?= $baseP ?>retenues" style="display:block; padding:0.3rem 0.5rem; color:<?= str_contains($uri, '/retenues')?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">Retenues</a></li>
                 <li><a href="<?= $baseP ?>attestations" style="display:block; padding:0.3rem 0.5rem; color:<?= str_contains($uri, '/attestations')?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">Attestations</a></li>
+                <li><a href="<?= $baseP ?>cnss_amo" style="display:block; padding:0.3rem 0.5rem; color:<?= str_contains($uri, '/cnss_amo')?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">CNSS et AMO</a></li>
+                <li><a href="<?= $baseP ?>organismes_sociaux" style="display:block; padding:0.3rem 0.5rem; color:<?= str_contains($uri, '/organismes_sociaux')?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">Organismes Sociaux</a></li>
                 <li><a href="<?= $baseP ?>codification" style="display:block; padding:0.3rem 0.5rem; color:<?= str_contains($uri, '/codification')?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">Codification</a></li>
                 <li><a href="<?= $baseP ?>journal" style="display:block; padding:0.3rem 0.5rem; color:<?= str_contains($uri, '/journal')?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">Journal comptable</a></li>
             </ul>
