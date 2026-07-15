@@ -146,6 +146,20 @@ class BulletinController extends Controller
 
     private function getTemplate(int $societeId): array
     {
+        $socStmt = $this->db->prepare("SELECT modele_bulletin_id FROM societes WHERE id = ?");
+        $socStmt->execute([$societeId]);
+        $societe = $socStmt->fetch();
+
+        if (!empty($societe['modele_bulletin_id'])) {
+            $stmt = $this->db->prepare("SELECT * FROM modeles_bulletins WHERE id = ? AND societe_id = ?");
+            $stmt->execute([$societe['modele_bulletin_id'], $societeId]);
+            $template = $stmt->fetch();
+            if ($template) {
+                $template['config'] = json_decode($template['config'], true) ?: [];
+                return $template;
+            }
+        }
+
         $stmt = $this->db->prepare("SELECT * FROM modeles_bulletins WHERE societe_id = ? ORDER BY defaut DESC LIMIT 1");
         $stmt->execute([$societeId]);
         $template = $stmt->fetch();

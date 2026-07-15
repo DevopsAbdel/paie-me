@@ -103,6 +103,10 @@ Router::get('/societes/{id}/conges/attestation/pdf/{id2}', [CongeController::cla
 
 Router::get('/societes/{id}/modeles-bulletins', [ModeleBulletinController::class, 'index']);
 Router::post('/societes/{id}/modeles-bulletins', [ModeleBulletinController::class, 'store']);
+Router::get('/societes/{id}/modeles-bulletins/{id2}/editor', [ModeleBulletinController::class, 'editor']);
+Router::post('/societes/{id}/modeles-bulletins/{id2}/config', [ModeleBulletinController::class, 'updateConfig']);
+Router::get('/societes/{id}/modeles-bulletins/{id2}/preview', [ModeleBulletinController::class, 'preview']);
+Router::get('/societes/{id}/modeles-bulletins/{id2}/duplicate', [ModeleBulletinController::class, 'duplicate']);
 Router::get('/societes/{id}/modeles-bulletins/{id2}/delete', [ModeleBulletinController::class, 'delete']);
 Router::get('/societes/{id}/modeles-bulletins/{id2}/assign', [ModeleBulletinController::class, 'assign']);
 Router::post('/societes/{id}/modeles-bulletins/{id2}/update', [ModeleBulletinController::class, 'update']);

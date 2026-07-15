@@ -145,6 +145,191 @@ class ModeleBulletinController extends Controller
         $this->redirect('/paie-me/societes/' . $id . '/modeles-bulletins');
     }
 
+    public function editor(int $id, int $id2): void
+    {
+        $userId = Session::get('user_id');
+
+        $societe = $this->db->prepare("SELECT * FROM societes WHERE id = ? AND user_id = ?");
+        $societe->execute([$id, $userId]);
+        $societe = $societe->fetch();
+        if (!$societe) {
+            Session::setFlash('error', 'Société introuvable.');
+            $this->redirect('/paie-me/societes');
+        }
+
+        $modele = $this->db->prepare("SELECT * FROM modeles_bulletins WHERE id = ? AND societe_id = ?");
+        $modele->execute([$id2, $id]);
+        $modele = $modele->fetch();
+        if (!$modele) {
+            Session::setFlash('error', 'Modèle introuvable.');
+            $this->redirect('/paie-me/societes/' . $id . '/modeles-bulletins');
+        }
+
+        $config = json_decode($modele['config'], true) ?: $this->getDefaultConfig();
+
+        $this->render('modeles_bulletins/editor.php', [
+            'title'    => 'Éditeur — ' . $modele['nom'],
+            'societe'  => $societe,
+            'modele'   => $modele,
+            'config'   => $config,
+            'baseUrl'  => '/paie-me/societes/' . $id . '/modeles-bulletins',
+        ]);
+    }
+
+    public function updateConfig(int $id, int $id2): void
+    {
+        $userId = Session::get('user_id');
+
+        $check = $this->db->prepare("SELECT id FROM societes WHERE id = ? AND user_id = ?");
+        $check->execute([$id, $userId]);
+        if (!$check->fetch()) {
+            Session::setFlash('error', 'Accès refusé.');
+            $this->redirect('/paie-me/societes');
+        }
+
+        $raw = file_get_contents('php://input');
+        $config = json_decode($raw, true);
+
+        if (!is_array($config) || empty($config['sections'])) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Configuration invalide.']);
+            return;
+        }
+
+        $nom = trim($config['nom'] ?? '');
+        $description = trim($config['description'] ?? '');
+        unset($config['nom'], $config['description']);
+
+        if (!empty($nom)) {
+            $this->db->prepare("UPDATE modeles_bulletins SET nom = ?, description = ?, config = ? WHERE id = ? AND societe_id = ?")
+                ->execute([$nom, $description, json_encode($config), $id2, $id]);
+        } else {
+            $this->db->prepare("UPDATE modeles_bulletins SET config = ? WHERE id = ? AND societe_id = ?")
+                ->execute([json_encode($config), $id2, $id]);
+        }
+
+        http_response_code(200);
+        echo json_encode(['success' => true]);
+    }
+
+    public function preview(int $id, int $id2): void
+    {
+        $userId = Session::get('user_id');
+
+        $societe = $this->db->prepare("SELECT * FROM societes WHERE id = ? AND user_id = ?");
+        $societe->execute([$id, $userId]);
+        $societe = $societe->fetch();
+        if (!$societe) {
+            Session::setFlash('error', 'Société introuvable.');
+            $this->redirect('/paie-me/societes');
+        }
+
+        $modele = $this->db->prepare("SELECT * FROM modeles_bulletins WHERE id = ? AND societe_id = ?");
+        $modele->execute([$id2, $id]);
+        $modele = $modele->fetch();
+        if (!$modele) {
+            Session::setFlash('error', 'Modèle introuvable.');
+            $this->redirect('/paie-me/societes/' . $id . '/modeles-bulletins');
+        }
+
+        $config = json_decode($modele['config'], true) ?: $this->getDefaultConfig();
+
+        $b = [
+            'raison_sociale' => $societe['raison_sociale'],
+            'ice' => $societe['ice'] ?? 'ICE000000000',
+            'if_fiscal' => $societe['if_fiscal'] ?? '00000000',
+            'cnss_societe' => $societe['cnss_societe'] ?? '0000000',
+            'rc' => $societe['rc'] ?? '',
+            'adresse' => $societe['adresse'] ?? '',
+            'telephone' => $societe['telephone'] ?? '',
+            'email' => $societe['email'] ?? '',
+            'ville' => $societe['ville'] ?? '',
+            'numero' => 'PREV-00001',
+            'mois' => date('m'),
+            'annee' => date('Y'),
+            'date_emission' => date('Y-m-d'),
+            'nom_famille' => 'Dupont',
+            'prenom' => 'Mohamed',
+            'matricule' => 'MAT-001',
+            'date_embauche' => '2018-03-15',
+            'cin' => 'BK 123456',
+            'cnss_num' => '198765432',
+            'situation_familiale' => 'Marié',
+            'nb_enfants' => 2,
+            'fonction_nom' => 'Ingénieur',
+            'poste' => 'Ingénieur',
+            'jours_travailles' => 26,
+            'salaire_base' => 8000,
+            'prime_anciennete' => 800,
+            'indemnite_transport' => 300,
+            'indemnite_panier' => 200,
+            'indemnite_representation' => 0,
+            'avantage_logement' => 0,
+            'montant_hs_25' => 0,
+            'montant_hs_50' => 0,
+            'montant_hs_100' => 0,
+            'salaire_brut' => 9300,
+            'cnss_salariale' => 358.40,
+            'amo_salariale' => 210.18,
+            'mutuelle' => 0,
+            'frais_professionnels' => 232.50,
+            'sni' => 8498.92,
+            'ir' => 1122.65,
+            'deductions_familiales' => 360,
+            'net_a_payer' => 7376.27,
+            'cnss_patronale' => 716.80,
+            'amo_patronale' => 382.23,
+            'sbi' => 8000,
+        ];
+
+        $cumuls = [
+            'cumul_brut' => 9300 * 7, 'cumul_cnss' => 358.40 * 7, 'cumul_amo' => 210.18 * 7,
+            'cumul_mutuelle' => 0, 'cumul_fp' => 232.50 * 7, 'cumul_ir' => 1122.65 * 7,
+            'cumul_sni' => 8498.92 * 7, 'cumul_net' => 7376.27 * 7, 'cumul_jours' => 26 * 7,
+            'cumul_transport' => 300 * 7, 'cumul_panier' => 200 * 7, 'cumul_representation' => 0,
+            'jours_conge_consommes' => 5, 'jours_conge_restants' => 21,
+        ];
+
+        $cnssParams = [
+            'plafond_cnss' => 6000,
+            'taux_cnss_salarial' => 4.48,
+            'taux_cnss_patronal' => 8.98,
+            'taux_amo_salarial' => 2.26,
+            'taux_amo_patronal' => 4.11,
+        ];
+
+        $template = ['config' => $config];
+
+        extract(['b' => $b, 'cumuls' => $cumuls, 'cnssParams' => $cnssParams, 'template' => $template]);
+        require __DIR__ . '/../views/modeles_bulletins/preview.php';
+    }
+
+    public function duplicate(int $id, int $id2): void
+    {
+        $userId = Session::get('user_id');
+
+        $check = $this->db->prepare("SELECT id FROM societes WHERE id = ? AND user_id = ?");
+        $check->execute([$id, $userId]);
+        if (!$check->fetch()) {
+            Session::setFlash('error', 'Accès refusé.');
+            $this->redirect('/paie-me/societes');
+        }
+
+        $modele = $this->db->prepare("SELECT * FROM modeles_bulletins WHERE id = ? AND societe_id = ?");
+        $modele->execute([$id2, $id]);
+        $modele = $modele->fetch();
+        if (!$modele) {
+            Session::setFlash('error', 'Modèle introuvable.');
+            $this->redirect('/paie-me/societes/' . $id . '/modeles-bulletins');
+        }
+
+        $stmt = $this->db->prepare("INSERT INTO modeles_bulletins (societe_id, nom, description, config, defaut) VALUES (?, ?, ?, ?, 0)");
+        $stmt->execute([$id, $modele['nom'] . ' (copie)', $modele['description'], $modele['config']]);
+
+        Session::setFlash('success', 'Modèle dupliqué.');
+        $this->redirect('/paie-me/societes/' . $id . '/modeles-bulletins');
+    }
+
     private function getDefaultConfig(): array
     {
         return [

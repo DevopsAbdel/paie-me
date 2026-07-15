@@ -647,47 +647,47 @@ if (!empty($societesSansModele)) {
         'couleur_primaire' => '#3b82f6',
         'sections' => [
             [
-                'titre' => 'Éléments du salaire',
-                'colonnes' => ['Libellé', 'Base', 'Taux', 'Montant'],
+                'titre' => 'Salaire et indemnités',
+                'colonnes' => ['Code', 'Libellé', 'Base', 'Taux', 'Montant'],
                 'lignes' => [
-                    ['code' => 'salaire_base', 'label' => 'Salaire de base', 'type' => 'gain', 'show_base' => true, 'show_taux' => true],
-                    ['code' => 'prime_anciennete', 'label' => "Prime d'ancienneté", 'type' => 'gain', 'show_base' => true, 'show_taux' => true, 'conditionnel' => true],
-                    ['code' => 'indemnite_transport', 'label' => 'Indemnité de transport', 'type' => 'gain', 'conditionnel' => true],
-                    ['code' => 'indemnite_panier', 'label' => 'Indemnité de panier', 'type' => 'gain', 'conditionnel' => true],
-                    ['code' => 'indemnite_representation', 'label' => 'Indemnité de représentation', 'type' => 'gain', 'conditionnel' => true],
-                    ['code' => 'avantage_logement', 'label' => 'Avantage logement', 'type' => 'gain', 'conditionnel' => true],
-                    ['code' => 'heures_sup', 'label' => 'Heures supplémentaires', 'type' => 'gain', 'show_base' => true, 'conditionnel' => true],
+                    ['code' => '100', 'label' => 'Salaire de base'],
+                    ['code' => '204', 'label' => "Prime d'ancienneté", 'show_base' => true, 'show_taux' => true, 'conditionnel' => true],
+                    ['code' => '330', 'label' => 'Indemnité de transport', 'conditionnel' => true],
+                    ['code' => '346', 'label' => 'Indemnité de panier', 'conditionnel' => true],
+                    ['code' => '331', 'label' => 'Indemnité de représentation', 'conditionnel' => true],
+                    ['code' => '340', 'label' => 'Avantage logement', 'conditionnel' => true],
+                    ['code' => '201', 'label' => 'Heures sup. 25%', 'show_base' => true, 'conditionnel' => true],
+                    ['code' => '202', 'label' => 'Heures sup. 50%', 'show_base' => true, 'conditionnel' => true],
+                    ['code' => '203', 'label' => 'Heures sup. 100%', 'show_base' => true, 'conditionnel' => true],
                 ],
-                'total' => ['code' => 'salaire_brut', 'label' => 'Salaire brut global (SBG)'],
+                'total' => ['code' => 'SB', 'label' => 'Salaire brut'],
             ],
             [
                 'titre' => 'Cotisations salariales',
-                'colonnes' => ['Libellé', 'Base', 'Taux', 'Montant'],
+                'colonnes' => ['Code', 'Libellé', 'Base', 'Taux', 'Montant'],
                 'lignes' => [
-                    ['code' => 'cnss_salariale', 'label' => 'Cotisation CNSS', 'type' => 'retenue', 'show_base' => true, 'show_taux' => true],
-                    ['code' => 'amo_salariale', 'label' => 'Cotisation AMO', 'type' => 'retenue', 'show_base' => true, 'show_taux' => true],
-                    ['code' => 'frais_professionnels', 'label' => 'Frais professionnels', 'type' => 'retenue', 'show_base' => true, 'show_taux' => true, 'conditionnel' => true],
+                    ['code' => '400', 'label' => 'CNSS (part salariale)', 'show_base' => true, 'show_taux' => true],
+                    ['code' => '410', 'label' => 'AMO (part salariale)', 'show_base' => true, 'show_taux' => true],
+                    ['code' => '420', 'label' => 'Mutuelle', 'conditionnel' => true],
+                    ['code' => '501', 'label' => 'Frais professionnels', 'show_base' => true, 'show_taux' => true],
                 ],
-                'total' => ['code' => 'sni', 'label' => 'Salaire net imposable (SNI)'],
+                'total' => ['code' => '502', 'label' => 'Salaire net imposable (SNI)'],
             ],
             [
                 'titre' => 'Impôt sur le revenu',
-                'colonnes' => ['Libellé', 'Base', 'Taux', 'Montant'],
+                'colonnes' => ['Code', 'Libellé', 'Base', 'Taux', 'Montant'],
                 'lignes' => [
-                    ['code' => 'ir', 'label' => 'Impôt sur le revenu (IR)', 'type' => 'retenue', 'show_base' => true, 'show_taux' => true],
-                    ['code' => 'deductions_familiales', 'label' => 'Déductions charges de famille', 'type' => 'gain', 'conditionnel' => true],
+                    ['code' => '600', 'label' => 'Impôt sur le revenu (IR)', 'show_base' => true, 'show_taux' => true],
+                    ['code' => '601', 'label' => 'Déductions charges de famille', 'conditionnel' => true],
                 ],
                 'total' => null,
             ],
             [
                 'titre' => 'Cotisations patronales',
-                'colonnes' => ['Libellé', 'Base', 'Taux', 'Montant'],
+                'colonnes' => ['Code', 'Libellé', 'Base', 'Taux', 'Montant'],
                 'lignes' => [
-                    ['code' => 'cnss_patronale', 'label' => 'Cotisation CNSS patronale', 'type' => 'patronale', 'show_base' => true, 'show_taux' => true],
-                    ['code' => 'amo_patronale', 'label' => 'Cotisation AMO patronale', 'type' => 'patronale', 'show_base' => true, 'show_taux' => true],
-                    ['code' => 'allocation_familiale', 'label' => 'Allocation familiale', 'type' => 'patronale', 'show_base' => true, 'show_taux' => true],
-                    ['code' => 'prestation_sociale', 'label' => 'Prestations sociales', 'type' => 'patronale', 'show_base' => true, 'show_taux' => true],
-                    ['code' => 'taxe_formation', 'label' => 'Taxe de formation professionnelle', 'type' => 'patronale', 'show_base' => true, 'show_taux' => true],
+                    ['code' => '400P', 'label' => 'CNSS (part patronale)', 'show_base' => true, 'show_taux' => true],
+                    ['code' => '410P', 'label' => 'AMO (part patronale)', 'show_base' => true, 'show_taux' => true],
                 ],
                 'total' => null,
             ],
@@ -702,5 +702,47 @@ if (!empty($societesSansModele)) {
     }
     echo "   + " . count($societesSansModele) . " modèle(s) par défaut inséré(s)\n";
 }
+
+// Fix existing models with old field-name codes → numeric codes
+$oldCodeMap = [
+    'salaire_base' => '100', 'prime_anciennete' => '204', 'indemnite_transport' => '330',
+    'indemnite_panier' => '346', 'indemnite_representation' => '331', 'avantage_logement' => '340',
+    'heures_sup' => '201', 'salaire_brut' => 'SB', 'cnss_salariale' => '400',
+    'amo_salariale' => '410', 'frais_professionnels' => '501', 'sni' => '502',
+    'ir' => '600', 'deductions_familiales' => '601', 'cnss_patronale' => '400P',
+    'amo_patronale' => '410P', 'allocation_familiale' => 'AF', 'prestation_sociale' => 'PS',
+    'taxe_formation' => 'TF', 'mutuelle' => '420',
+];
+$allModeles = $p->query("SELECT id, config FROM modeles_bulletins")->fetchAll(PDO::FETCH_ASSOC);
+$fixed = 0;
+foreach ($allModeles as $m) {
+    $cfg = json_decode($m['config'], true);
+    if (!is_array($cfg) || empty($cfg['sections'])) continue;
+    $changed = false;
+    foreach ($cfg['sections'] as &$section) {
+        if (!empty($section['total']) && isset($oldCodeMap[$section['total']['code'] ?? ''])) {
+            $section['total']['code'] = $oldCodeMap[$section['total']['code']];
+            $changed = true;
+        }
+        foreach ($section['lignes'] as &$ligne) {
+            if (isset($oldCodeMap[$ligne['code'] ?? ''])) {
+                $ligne['code'] = $oldCodeMap[$ligne['code']];
+                $changed = true;
+            }
+        }
+        unset($ligne);
+        if (!isset($section['colonnes'][0]) || $section['colonnes'][0] !== 'Code') {
+            array_unshift($section['colonnes'], 'Code');
+            $changed = true;
+        }
+    }
+    unset($section);
+    if ($changed) {
+        $upd = $p->prepare("UPDATE modeles_bulletins SET config = ? WHERE id = ?");
+        $upd->execute([json_encode($cfg), $m['id']]);
+        $fixed++;
+    }
+}
+if ($fixed > 0) echo "   + $fixed modèle(s) corrigé(s) (codes → numériques)\n";
 
 echo "\nMigrations terminées.\n";

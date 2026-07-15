@@ -16,7 +16,7 @@
                     <th>Description</th>
                     <th style="text-align:center;">Sections</th>
                     <th style="text-align:center;">Statut</th>
-                    <th style="width:140px; text-align:center;">Actions</th>
+                    <th style="width:160px; text-align:center;">Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -39,12 +39,15 @@
                     </td>
                     <td>
                         <div class="table-actions">
-                            <button type="button" class="btn-icon btn-view" title="Voir les détails" onclick="voirModele(<?= $m['id'] ?>)">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                            </button>
-                            <button type="button" class="btn-icon btn-edit" title="Modifier" onclick="editModele(<?= $m['id'] ?>, '<?= htmlspecialchars($m['nom'], ENT_QUOTES) ?>', '<?= htmlspecialchars($m['description'] ?? '', ENT_QUOTES) ?>')">
+                            <a href="<?= $baseUrl ?>/<?= $m['id'] ?>/editor" class="btn-icon btn-view" title="Ouvrir l'éditeur complet">
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                            </button>
+                            </a>
+                            <a href="<?= $baseUrl ?>/<?= $m['id'] ?>/preview" class="btn-icon btn-info" title="Aperçu A4" target="_blank">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                            </a>
+                            <a href="<?= $baseUrl ?>/<?= $m['id'] ?>/duplicate" class="btn-icon btn-info" title="Dupliquer le modèle" onclick="return confirm('Dupliquer ce modèle ?')">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                            </a>
                             <a href="<?= $baseUrl ?>/<?= $m['id'] ?>/delete" class="btn-icon btn-delete" title="Supprimer" onclick="return confirm('Supprimer ce modèle ?')">
                                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
                             </a>
@@ -86,91 +89,3 @@
         </div>
     </div>
 </div>
-
-<!-- Modal Modifier modèle -->
-<div class="modal fade" id="editModele" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content" style="background:var(--bg-surface); color:var(--text); border:1px solid var(--border); border-radius:12px;">
-            <form method="post" id="editModeleForm" action="">
-                <?= \Core\Session::csrfField() ?>
-                <div class="modal-header" style="border-bottom:1px solid var(--border);">
-                    <h5 class="modal-title">Modifier le modèle</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group" style="margin-bottom:1rem;">
-                        <label class="form-label" style="font-size:0.75rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em;">Nom du modèle</label>
-                        <input type="text" name="nom" id="editModeleNom" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" style="font-size:0.75rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em;">Description</label>
-                        <textarea name="description" id="editModeleDesc" class="form-control" rows="3"></textarea>
-                    </div>
-                </div>
-                <div class="modal-footer" style="border-top:1px solid var(--border);">
-                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Annuler</button>
-                    <button type="submit" class="btn btn-success btn-sm">Enregistrer</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- Modal Détails modèle -->
-<div class="modal fade" id="detailModele" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content" style="background:var(--bg-surface); color:var(--text); border:1px solid var(--border); border-radius:12px;">
-            <div class="modal-header" style="border-bottom:1px solid var(--border);">
-                <h5 class="modal-title" id="detailModeleTitle">Détails du modèle</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body" id="detailModeleBody">
-            </div>
-        </div>
-    </div>
-</div>
-
-<script>
-function editModele(id, nom, desc) {
-    var baseUrl = <?= json_encode($baseUrl) ?>;
-    document.getElementById('editModeleForm').action = baseUrl + '/' + id + '/update';
-    document.getElementById('editModeleNom').value = nom;
-    document.getElementById('editModeleDesc').value = desc;
-    new bootstrap.Modal(document.getElementById('editModele')).show();
-}
-
-function voirModele(id) {
-    var modeles = <?= json_encode(array_map(function($m) { return ['id' => $m['id'], 'nom' => $m['nom'], 'config' => $m['config']]; }, $modeles)); ?>;
-    var modele = modeles.find(function(m) { return m.id === id; });
-    if (!modele) return;
-
-    document.getElementById('detailModeleTitle').textContent = modele.nom;
-    var html = '';
-    var config = modele.config;
-    var sections = config.sections || [];
-
-    sections.forEach(function(section) {
-        html += '<h5 style="color:var(--accent); margin:1rem 0 0.5rem 0; font-size:0.9rem;">' + section.titre + '</h5>';
-        html += '<table class="data-table" style="font-size:0.8rem;"><thead><tr>';
-        section.colonnes.forEach(function(col) { html += '<th>' + col + '</th>'; });
-        html += '</tr></thead><tbody>';
-        section.lignes.forEach(function(ligne) {
-            html += '<tr><td>' + ligne.label + '</td>';
-            for (var i = 1; i < section.colonnes.length; i++) {
-                var key = ['base','taux','montant'][i-1];
-                html += '<td style="text-align:center;">' + (ligne['show_' + key] ? '✓' : '—') + '</td>';
-            }
-            html += '</tr>';
-        });
-        if (section.total) {
-            html += '<tr style="font-weight:600; border-top:2px solid var(--accent);"><td>' + section.total.label + '</td>';
-            for (var i = 1; i < section.colonnes.length; i++) { html += '<td></td>'; }
-            html += '</tr>';
-        }
-        html += '</tbody></table>';
-    });
-
-    document.getElementById('detailModeleBody').innerHTML = html;
-    new bootstrap.Modal(document.getElementById('detailModele')).show();
-}
-</script>
