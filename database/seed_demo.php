@@ -122,10 +122,25 @@ function seed_demo_database(PDO $pdo): array
         ->execute([$societeId]);
 
     // ── Barème SMIG / SMAG ──
-    $annee = (int) date('Y');
-    foreach (['SMIG' => [15.00, 3000.00], 'SMAG' => [67.00, 1447.20]] as $type => $vals) {
-        $pdo->prepare("INSERT INTO bareme_smig_smag (societe_id, annee, type, horaire, mensuel) VALUES (?, ?, ?, ?, ?)")
-            ->execute([$societeId, $annee, $type, $vals[0], $vals[1]]);
+    // Historique officiel 2021→2026 : SMIG = taux horaire × 191 h/mois ; SMAG = taux journalier × 26 j/mois
+    // (décrets 2.19.422, 2.22.606, 2.23.799, 2.24.1122, 2.25.983)
+    $baremesSmigSmag = [
+        ['SMIG', 2021, 14.13, 2698.83, '2021-01-01'],
+        ['SMAG', 2021, 73.05, 1899.30, '2021-01-01'],
+        ['SMIG', 2022, 14.81, 2828.71, '2022-01-01'],
+        ['SMAG', 2022, 76.70, 1994.20, '2022-01-01'],
+        ['SMIG', 2023, 15.55, 2970.05, '2023-01-01'],
+        ['SMAG', 2023, 84.37, 2193.62, '2023-01-01'],
+        ['SMIG', 2024, 16.29, 3111.39, '2024-01-01'],
+        ['SMAG', 2024, 88.58, 2303.08, '2024-01-01'],
+        ['SMIG', 2025, 17.10, 3266.10, '2025-01-01'],
+        ['SMAG', 2025, 93.00, 2418.00, '2025-04-01'],
+        ['SMIG', 2026, 17.92, 3422.72, '2026-01-01'],
+        ['SMAG', 2026, 97.44, 2533.44, '2026-04-01'],
+    ];
+    $insSmig = $pdo->prepare("INSERT INTO bareme_smig_smag (societe_id, annee, type, horaire, mensuel, date_effet) VALUES (?, ?, ?, ?, ?, ?)");
+    foreach ($baremesSmigSmag as $s) {
+        $insSmig->execute([$societeId, $s[1], $s[0], $s[2], $s[3], $s[4]]);
     }
 
     // ── Jours fériés fixes ──

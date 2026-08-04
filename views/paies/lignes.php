@@ -151,9 +151,9 @@
     cursor:pointer; padding:0.2rem 0.4rem; line-height:1;
 }
 .btn-close:hover { color:var(--text); }
-.ligne-salarie:hover td { background:rgba(59,130,246,0.06); }
+.ligne-salarie:hover td { background:rgba(139,92,246,0.18); }
 table tbody tr[data-href]:hover td,
-table tbody tr[onclick]:hover td { background:rgba(59,130,246,0.06); }
+table tbody tr[onclick]:hover td { background:rgba(139,92,246,0.18); }
 </style>
 
 <script>

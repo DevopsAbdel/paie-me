@@ -24,8 +24,8 @@
                     <input type="number" name="nouvelle_annee" class="form-control" placeholder="2026" style="width:90px;" min="2020" max="2035" required>
                 </div>
                 <div class="form-group" style="margin:0;">
-                    <label style="font-size:0.7rem; color:var(--text-muted);">Horaire</label>
-                    <input type="number" step="0.01" name="nouveau_horaire" class="form-control" placeholder="17.92" style="width:100px;" required>
+                    <label style="font-size:0.7rem; color:var(--text-muted);">Horaire / journalier</label>
+                    <input type="number" step="0.01" name="nouveau_horaire" class="form-control" placeholder="SMIG: 17.92 / SMAG: 97.44" style="width:120px;" required>
                 </div>
                 <div class="form-group" style="margin:0;">
                     <label style="font-size:0.7rem; color:var(--text-muted);">Mensuel</label>
@@ -38,7 +38,7 @@
                     <tr>
                         <th style="text-align:center;">Année</th>
                         <th style="text-align:center;">Type</th>
-                        <th style="text-align:center;">Taux horaire (MAD/h)</th>
+                        <th style="text-align:center;">Taux horaire / journalier (MAD)</th>
                         <th style="text-align:center;">Taux mensuel (MAD/mois)</th>
                         <th style="text-align:center;">Date d'effet</th>
                         <th id="bs-actions-header" style="width:60px; text-align:center; display:none;"></th>
@@ -56,7 +56,7 @@
                     <tr data-id="<?= $b['id'] ?>" data-horaire="<?= $b['horaire'] ?>" data-mensuel="<?= $b['mensuel'] ?>" data-date="<?= htmlspecialchars($b['date_effet'] ?? '') ?>">
                         <td style="text-align:center; font-weight:600;"><?= (int) $b['annee'] ?></td>
                         <td style="text-align:center;"><span class="badge badge-<?= $b['type'] === 'SMIG' ? 'primary' : 'info' ?>"><?= htmlspecialchars($b['type']) ?></span></td>
-                        <td style="text-align:right;"><?= number_format((float)$b['horaire'], 2, ',', ' ') ?></td>
+                        <td style="text-align:right;"><?= number_format((float)$b['horaire'], 2, ',', ' ') ?>&nbsp;<small style="color:var(--text-muted); font-size:0.7rem;"><?= $b['type'] === 'SMAG' ? 'MAD/j' : 'MAD/h' ?></small></td>
                         <td style="text-align:right;"><?= number_format((float)$b['mensuel'], 2, ',', ' ') ?></td>
                         <td style="text-align:center;"><?= htmlspecialchars($b['date_effet'] ?? '—') ?></td>
                         <td class="bs-edit-action" style="width:60px; text-align:center; display:none;">

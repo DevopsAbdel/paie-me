@@ -17,6 +17,9 @@
     $ctx = $_SESSION['societe_context'] ?? null;
 ?>
 <aside class="sidebar">
+    <button type="button" id="sidebarCollapseBtn" class="sidebar-collapse-btn" title="Replier le menu" aria-label="Replier le menu">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
     <div class="sidebar-brand">
         <?php if ($ctx): ?>
             <div style="width:40px;height:40px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;margin-bottom:4px;">
@@ -99,6 +102,9 @@
                 <li><a href="<?= $baseB ?>impot_revenu" style="display:block; padding:0.3rem 0.5rem; color:<?= str_contains($uri, '/impot_revenu')?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">Impôt sur le revenu</a></li>
                 <li><a href="<?= $baseB ?>heures_sup" style="display:block; padding:0.3rem 0.5rem; color:<?= str_contains($uri, '/heures_sup')?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">Heures sup</a></li>
                 <li><a href="<?= $baseB ?>smig_smag" style="display:block; padding:0.3rem 0.5rem; color:<?= str_contains($uri, '/smig_smag')?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">SMIG & SMAG</a></li>
+                <?php if (($_SESSION['user_role'] ?? '') === 'admin'): ?>
+                <li style="margin-top:0.35rem; padding-top:0.35rem; border-top:1px dashed var(--border);"><a href="<?= $baseB ?>reference" style="display:block; padding:0.3rem 0.5rem; color:<?= str_contains($uri, '/reference')?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">Barème de référence</a></li>
+                <?php endif; ?>
             </ul>
             <?php endif; ?>
         </li>
@@ -139,6 +145,14 @@
                 <span><?= $ctx ? 'Changer de société' : 'Sociétés' ?></span>
             </a>
         </li>
+        <?php if (($_SESSION['user_role'] ?? '') === 'admin'): ?>
+        <li>
+            <a href="/paie-me/admin" class="<?= str_contains($_SERVER['REQUEST_URI'], '/admin') ? 'active' : '' ?>">
+                <span class="icon" data-lucide="database"></span>
+                <span>Administration</span>
+            </a>
+        </li>
+        <?php endif; ?>
     </ul>
     <div class="sidebar-footer">
         <?php if ($ctx): ?>
@@ -161,7 +175,7 @@
         <h1>
             <?= $title ?? 'Paie Me' ?>
             <?php if (!empty($_SESSION['demo_mode'])): ?>
-                <span class="badge" style="background:rgba(34,211,238,0.15); color:#22d3ee; border:1px solid rgba(34,211,238,0.4); font-size:0.7rem; vertical-align:middle; margin-left:0.5rem;">MODE DÉMO</span>
+                <span class="badge" style="background:rgba(139,92,246,0.15); color:#a78bfa; border:1px solid rgba(139,92,246,0.4); font-size:0.7rem; vertical-align:middle; margin-left:0.5rem;">MODE DÉMO</span>
             <?php endif; ?>
         </h1>
         <div class="topbar-actions">
@@ -191,6 +205,8 @@
 
 <script>lucide.createIcons();</script>
 <script>if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', () => initCustomSelects()); } else { initCustomSelects(); }</script>
+<script src="/paie-me/assets/js/sidebar.js"></script>
+<script src="/paie-me/assets/js/table-tools.js"></script>
 <?php if (isset($pageScripts)): foreach ((array)$pageScripts as $s): ?>
 <script src="<?= htmlspecialchars($s) ?>"></script>
 <?php endforeach; endif; ?>

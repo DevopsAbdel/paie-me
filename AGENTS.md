@@ -8,7 +8,7 @@ Application web de gestion de paie marocaine (PHP 8+ / MySQL / Dark UI).
 - **Base de données** : MySQL (MariaDB via XAMPP)
 - **Frontend** : HTML5, CSS3, JavaScript vanilla
 - **Serveur** : Apache (XAMPP)
-- **UI** : Dark mode uniquement (bg: #0f172a, surface: #1e293b, accent: #3b82f6, text: #e2e8f0)
+- **UI** : Dark mode uniquement — thème **Scrimba Design — Dark Neutre + Violet** (bg: #0b0d12, surface: #14171f, hover: #1e222d, accent: #8b5cf6, text: #e8e9ee, muted: #a3a8b4, border: #232834, icônes actions: view=violet #8b5cf6 / edit=ambre #eab308 / delete=rouge / info=magenta #d946ef). Source : `DESIGN-scrimba-com.md`. Voir la skill globale `scrimba-design` pour le design system complet.
 
 ## Conventions
 - Utiliser PDO prepared statements pour toutes les requêtes SQL
@@ -284,6 +284,19 @@ Net  = salaire - (CNSS + AMO + IR)
 ## Progress (current session)
 
 ### Done
+- **Changement TOTAL de palette vers Dark Neutre + Violet** — palette finale dans `style.css` `:root` : bg `#0b0d12`, surface `#14171f`, hover `#1e222d`, élevé `#252a38`, **accent violet `#8b5cf6`**, hover `#a78bfa`, text `#e8e9ee`, muted `#a3a8b4`, border `#232834`, border-strong `#3a4150`
+- **Bouton primaire violet plein** `#8b5cf6` + texte blanc, hover `#a78bfa`, radius 6px ; secondaire = surface + bordure ardoise + texte clair
+- **Toutes les teintes bleu/cyan/navy supprimées** : `#1E90FF`, `#3b82f6`, `#3abff8`, `#22d3ee`, `#06b6d4`, `#1e293b`, `#334155`, `rgba(30,144,255,…)`, `rgba(58,191,248,…)` → violet/magenta dans l'UI écran
+- **Icônes d'actions recolorées** : view=violet `#8b5cf6`, edit=ambre `#eab308`, delete=rouge `#ef4444`, info=magenta `#d946ef` (style.css `.btn-icon`)
+- **Badges** : `badge-info` → magenta `#d946ef` ; badge MODE DÉMO (layout.php) → violet ; `sources_legales.php` borders loi→violet, arrêté→magenta
+- **Tints vues** : `edit.php`, `lignes.php`, `bcp.php` → `rgba(139,92,246,…)` ; tooltip info (`edit.php`) → `var(--bg-surface)`/`var(--text)`
+- **Typographie Scrimba** : headings weight **800** (topbar h1 2rem/800, card-header h3 800, stat-values 800), body 400, system-ui ; main-content padding 2.5rem ; radius boutons 6px / cards 12px
+- **Nav active** : bordure gauche 3px **violet `#8b5cf6`** sur fond `--bg-hover`
+- **Skill `scrimba-design` mise à jour** (`~/.claude/skills/scrimba-design/SKILL.md`) : palette graphite+violet, icônes recolorées, interdiction du bleu/cyan
+- **`DESIGN-scrimba-com.md`** : note « APPLIQUÉ (dark neutre) » mise à jour (thème light source, transposé dark graphite+violet)
+- **AGENTS.md** ligne UI mise à jour (palette finale + icônes actions + source `DESIGN-scrimba-com.md`)
+- **Fichiers PDF/print inchangés** (encre sombre papier) : `bulletins/pdf.php`, `modeles_bulletins/preview.php`, `conges/attestation*.php`, `modeles_bulletins/editor.php` (`$couleur` par société)
+- **Vérifié navigateur** : body `rgb(11,13,18)`, accent `#8b5cf6`, bouton primaire violet/texte blanc, icônes view violet + edit ambre, stat-values violettes
 - **Règle CSS select** ajoutée dans AGENTS.md : tout `<select>` doit porter `class="form-control"` pour la flèche custom SVG
 - **Fix CSS modal** : `background` → `background-color` dans `.modal-body .form-control` pour préserver la flèche SVG des selects en modal (style.css:728)
 - **Barème SMIG & SMAG déplacé** des Paramètres vers les Barèmes (sous-page `smig_smag`)
@@ -306,6 +319,26 @@ Net  = salaire - (CNSS + AMO + IR)
 - **seed_demo.php refactorisé** : logique extraite dans `seed_demo_database(PDO $pdo): array` (retourne des stats, sans echo/exit) ; usage CLI : `php database/seed_demo.php [dbname]`
 - **database/create_demo.php** : `create_demo_database(): PDO` crée la base démo si absente (CREATE DATABASE + import schema.sql avec `paie_me` → `paie_me_demo` + seed) ; idempotent (skip si sociétés existantes, n'importe le schéma que si table `users` absente)
 - **Badge « MODE DÉMO »** ajouté dans la topbar (layout.php) quand `demo_mode` est actif
+- **Barème de référence (base admin)** ajouté dans la page Barèmes :
+  - Sous-page `reference` : SMIG/SMAG (édition ligne par ligne), ancienneté, heures sup + note « barème IR déjà global »
+  - `societe_id` rendu **nullable** sur `bareme_smig_smag`, `bareme_anciennete`, `bareme_heures_sup` → lignes `societe_id IS NULL` = barème de référence
+  - Seed de référence (12 lignes SMIG/SMAG 2021-2026, 7 tranches ancienneté, 1 ligne heures sup) dans migrate.php
+  - Bouton « Appliquer à toutes les sociétés » (admin) : propage référence → toutes les sociétés (SMIG/SMAG = ON DUPLICATE KEY UPDATE, ancienneté = delete+insert, heures sup = upsert)
+  - Enregistrement par section (save) : delete+insert des lignes de référence
+  - Réservé au rôle `admin` (`Session::get('user_role')`), lien visible dans le sous-menu Barèmes uniquement pour l'admin
+- **7e demande** : flèche de collapse de la sidebar (bouton + persistance localStorage `paieSidebarCollapsed`) — `assets/js/sidebar.js` + classe `body.sidebar-collapsed` (72px)
+- **Tri sur toutes les tables** : `assets/js/table-tools.js` — tri clic avec indicateur ▲/▼, détection numérique/date (DD/MM/YYYY, MM/YYYY, ISO), colonne Actions et headers vides exclus
+- **Filtres sur les tables** : barre de filtre au-dessus de chaque table (`.table-toolbar`), insensible aux accents/casse, ligne « Aucun résultat », appliqué après tri (l'ordre trié est conservé)
+- **Protection des grilles éditables** : table-tools **désactive le tri** (garde le filtre) sur les tables contenant des champs visibles (`input:not([type="hidden"]), select, textarea` dans le tbody) pour ne pas casser l'appariement des `name="xxx[]"` au POST (baremes/reference, smig_smag…) ; les `input hidden` (CSRF des formulaires d'action) ne bloquent pas le tri
+- **Page d'administration** (`/admin`, réservée `admin`) :
+  - Carte **Bases de données** : statut des 2 bases (existence, nb tables, nb sociétés, taille, base « En cours »), boutons « + Créer / réinitialiser la démo » (drop+recreate), « Vider et re-seeder la démo », « Appliquer les migrations » (sur les 2 bases)
+  - Carte **Utilisateurs** : liste (nom, email, rôle, statut, créé le), modale d'ajout (nom/email/mdp ≥6/rôle), toggle actif/désactivé, suppression — avec CSRF, interdiction de se désactiver/se supprimer soi-même, refus de supprimer le dernier admin actif
+- **`database/create_demo.php`** : après le seed, applique aussi `migrate.php` (capturé via `ob_start`) pour aligner le schéma démo sur la base principale (ex: table `droit_conge` présente dans migrate.php mais absente de schema.sql)
+- **Vérifié navigateur** : collapse (72px + persistance après reload), admin (2 bases à 30 tables, « En cours »), CRUD utilisateur complet (création/toggle/suppression + flash), migrations + réinitialisation démo via l'UI, tri numérique « Net à payer » (asc/desc corrects), barème de référence inchangé après migration, accès non-admin à `/admin` redirigé vers `/dashboard` + lien sidebar masqué pour un gestionnaire
+- **Fix crash « utilisateur supprimé mais encore connecté »** :
+  - Cause : suppression d'un utilisateur via la page admin alors que sa session était active → le logout (ou toute action) échouait sur la FK `audit_log.user_id` / `societes.user_id` (fatal PDOException)
+  - Fix 1 (racine) : `index.php` vérifie après `Session::start()` que l'utilisateur de session existe toujours et est `actif = 1` (via `Core\Model::db()`, qui respecte `demo_mode`) ; sinon `Session::destroy()` + redirect `/login` — une session orpheline ne survit jamais à une suppression/désactivation
+  - Fix 2 (défense en profondeur) : `Core\Audit::log()` capture les `PDOException` (journalisation best-effort, ne bloque jamais l'application)
 
 ### Pending
 - (none)
@@ -320,3 +353,18 @@ Net  = salaire - (CNSS + AMO + IR)
 | `routes.php` | + route `GET /demo` |
 | `views/login.php` | + lien « Entrer en mode démo » |
 | `views/layout.php` | + badge « MODE DÉMO » dans la topbar |
+| `database/migrate.php` | `societe_id` nullable sur 3 tables baremes + seed du barème de référence (SMIG/SMAG, ancienneté, heures sup) |
+| `database/schema.sql` | 3 CREATE TABLE baremes : `societe_id INT UNSIGNED DEFAULT NULL` |
+| `controllers/SocieteController.php` | sous-tab `reference` : `handleReferencePost()` (save sections + apply propagation admin) ; GET charge `refSmigSmag`/`refAnciennete`/`refHeuresSup`/`isAdmin` |
+| `views/societes/baremes/reference.php` | nouveau : édition du barème de référence + bouton « Appliquer à toutes les sociétés » |
+| `views/layout.php` | + lien « Barème de référence » dans le sous-menu Barèmes (admin uniquement) |
+| `database/migrate.php` | refactor : boucle sur `paie_me` + `paie_me_demo` (crée la base + importe `schema.sql` si `users` absente) ; helpers `colExists`/`addCol` hors boucle |
+| `assets/js/sidebar.js` | nouveau : collapse sidebar + persistance localStorage `paieSidebarCollapsed` |
+| `assets/js/table-tools.js` | nouveau : tri + filtre auto sur toutes les tables (opt-out `data-table-tools="off"`), tri désactivé sur les grilles éditables |
+| `assets/css/style.css` | nouveaux blocs : `.sidebar-collapse-btn`, `body.sidebar-collapsed`, `.table-toolbar`, `.table-filter-input`, `.sort-ind`, `th.sortable` |
+| `controllers/AdminController.php` | nouveau : page admin (bases de données + utilisateurs) avec CSRF et garde-fous |
+| `views/admin/index.php` | nouveau : 2 cartes (Bases + Utilisateurs) + modale d'ajout utilisateur |
+| `views/layout.php` | + bouton collapse, + lien Administration (admin), includes `sidebar.js` + `table-tools.js` |
+| `routes.php` | + `use Controllers\AdminController` + `GET`/`POST /admin` |
+| `index.php` | + contrôle d'intégrité de session (utilisateur supprimé/désactivé → session détruite + redirect login) |
+| `Core/Audit.php` | `log()` best-effort : les `PDOException` sont capturées (jamais de fatal sur la journalisation) |

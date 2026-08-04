@@ -61,13 +61,13 @@ function fmt($n) { return number_format($n, 2, ',', ' '); }
             <tbody>
                 <tr><td>1</td><td>Allocations Familiales</td><td style="text-align:right;">—</td><td style="text-align:right; white-space:nowrap;"><?= fmt($masse_totale) ?></td><td style="text-align:right; white-space:nowrap;"><?= fmt($taux_af) ?> %</td><td style="text-align:right; font-weight:600; white-space:nowrap;"><?= fmt($mt_af) ?></td></tr>
                 <tr><td>2</td><td>Prestations sociales à court terme</td><td style="text-align:right; white-space:nowrap;"><?= fmt($plafond_cnss) ?></td><td style="text-align:right; white-space:nowrap;"><?= fmt($masse_plafonnee) ?></td><td style="text-align:right; white-space:nowrap;"><?= fmt($taux_ps) ?> %</td><td style="text-align:right; font-weight:600; white-space:nowrap;"><?= fmt($mt_ps) ?></td></tr>
-                <tr style="background:rgba(59,130,246,0.15); font-weight:700;"><td>3</td><td>Total des cotisations versées</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right; color:var(--accent); white-space:nowrap;"><?= fmt($total_cnss) ?></td></tr>
+                <tr style="background:rgba(139,92,246,0.18); font-weight:700;"><td>3</td><td>Total des cotisations versées</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right; color:var(--accent); white-space:nowrap;"><?= fmt($total_cnss) ?></td></tr>
                 <tr><td>4</td><td>Pénalités sur cotisations</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">0,00</td></tr>
                 <tr><td>5</td><td>Montant des AF reversées</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td></tr>
                 <tr><td>6</td><td>Astreintes</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">0,00</td></tr>
                 <tr><td>8</td><td>Taxe de la formation professionnelle</td><td style="text-align:right;">—</td><td style="text-align:right; white-space:nowrap;"><?= fmt($masse_totale) ?></td><td style="text-align:right; white-space:nowrap;"><?= fmt($taux_tfp) ?> %</td><td style="text-align:right; font-weight:600; white-space:nowrap;"><?= fmt($mt_tfp) ?></td></tr>
                 <tr><td>9</td><td>Pénalités TFP</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">0,00</td></tr>
-                <tr style="background:rgba(59,130,246,0.25); font-weight:700;"><td>10</td><td>Montant global du versement</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right; color:var(--accent); font-size:1rem; white-space:nowrap;"><?= fmt($total_premier) ?></td></tr>
+                <tr style="background:rgba(139,92,246,0.30); font-weight:700;"><td>10</td><td>Montant global du versement</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right; color:var(--accent); font-size:1rem; white-space:nowrap;"><?= fmt($total_premier) ?></td></tr>
             </tbody>
         </table>
     </div>
@@ -83,9 +83,9 @@ function fmt($n) { return number_format($n, 2, ',', ' '); }
             <tbody>
                 <tr><td>1</td><td>Participation AMO</td><td style="text-align:right;">—</td><td style="text-align:right; white-space:nowrap;"><?= fmt($masse_totale) ?></td><td style="text-align:right; white-space:nowrap;"><?= fmt($taux_part_amo) ?> %</td><td style="text-align:right; font-weight:600; white-space:nowrap;"><?= fmt($mt_part_amo) ?></td></tr>
                 <tr><td>2</td><td>Cotisation AMO</td><td style="text-align:right;">—</td><td style="text-align:right; white-space:nowrap;"><?= fmt($masse_totale) ?></td><td style="text-align:right; white-space:nowrap;"><?= fmt($taux_cot_amo) ?> %</td><td style="text-align:right; font-weight:600; white-space:nowrap;"><?= fmt($mt_cot_amo) ?></td></tr>
-                <tr style="background:rgba(59,130,246,0.15); font-weight:700;"><td>3</td><td>Total des cotisations versées AMO</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right; color:var(--accent); white-space:nowrap;"><?= fmt($total_amo) ?></td></tr>
+                <tr style="background:rgba(139,92,246,0.18); font-weight:700;"><td>3</td><td>Total des cotisations versées AMO</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right; color:var(--accent); white-space:nowrap;"><?= fmt($total_amo) ?></td></tr>
                 <tr><td>4</td><td>Pénalités sur cotisations AMO et astreintes</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">0,00</td></tr>
-                <tr style="background:rgba(59,130,246,0.25); font-weight:700;"><td>10</td><td>Montant global du versement</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right; color:var(--accent); font-size:1rem; white-space:nowrap;"><?= fmt($total_amo) ?></td></tr>
+                <tr style="background:rgba(139,92,246,0.30); font-weight:700;"><td>10</td><td>Montant global du versement</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right;">—</td><td style="text-align:right; color:var(--accent); font-size:1rem; white-space:nowrap;"><?= fmt($total_amo) ?></td></tr>
             </tbody>
         </table>
     </div>
@@ -113,9 +113,10 @@ function fmt($n) { return number_format($n, 2, ',', ' '); }
     </div>
 </div>
 
-<div class="card" style="margin-top:0.75rem; background:linear-gradient(135deg, rgba(59,130,246,0.15), rgba(59,130,246,0.05)); border-color:var(--accent);">
+<div class="card" style="margin-top:0.75rem; background:linear-gradient(135deg, rgba(139,92,246,0.18), rgba(139,92,246,0.12)); border-color:var(--accent);">
     <div class="card-header"><h3 style="color:var(--accent);">BCP — Montant global des versements (incluant TFP)</h3></div>
     <div style="text-align:center; padding:0.75rem;">
         <span style="font-size:1.5rem; font-weight:700; color:var(--accent);"><?= fmt($total_general) ?> MAD</span>
     </div>
 </div>
+

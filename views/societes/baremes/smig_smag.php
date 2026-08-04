@@ -12,7 +12,7 @@
                     <tr>
                         <th style="text-align:center;">Année</th>
                         <th style="text-align:center;">Type</th>
-                        <th style="text-align:center;">Taux horaire (MAD/h)</th>
+                        <th style="text-align:center;">Taux horaire / journalier (MAD)</th>
                         <th style="text-align:center;">Taux mensuel (MAD/mois)</th>
                         <th style="text-align:center;">Date d'effet</th>
                         <th id="sm-actions-header" style="width:60px; text-align:center; display:none;"></th>
@@ -30,7 +30,7 @@
                     <tr data-id="<?= $b['id'] ?>" data-horaire="<?= $b['horaire'] ?>" data-mensuel="<?= $b['mensuel'] ?>" data-date="<?= htmlspecialchars($b['date_effet'] ?? '') ?>">
                         <td style="text-align:center; font-weight:600;"><?= (int) $b['annee'] ?></td>
                         <td style="text-align:center;"><span class="badge badge-<?= $b['type'] === 'SMIG' ? 'primary' : 'info' ?>"><?= htmlspecialchars($b['type']) ?></span></td>
-                        <td style="text-align:right;"><?= number_format((float)$b['horaire'], 2, ',', ' ') ?></td>
+                        <td style="text-align:right;"><?= number_format((float)$b['horaire'], 2, ',', ' ') ?>&nbsp;<small style="color:var(--text-muted); font-size:0.7rem;"><?= $b['type'] === 'SMAG' ? 'MAD/j' : 'MAD/h' ?></small></td>
                         <td style="text-align:right;"><?= number_format((float)$b['mensuel'], 2, ',', ' ') ?></td>
                         <td style="text-align:center;"><?= htmlspecialchars($b['date_effet'] ?? '—') ?></td>
                         <td class="sm-edit-action" style="width:60px; text-align:center; display:none;">
@@ -86,8 +86,8 @@
                             <input type="number" name="nouvelle_annee" class="form-control" min="2020" max="2035" placeholder="2026" required>
                         </div>
                         <div class="form-group">
-                            <label class="form-label" style="font-size:0.75rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em;">Taux horaire (MAD/h)</label>
-                            <input type="number" step="0.01" name="nouveau_horaire" class="form-control" placeholder="17.92" required>
+                            <label class="form-label" style="font-size:0.75rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em;">Taux horaire / journalier (MAD)</label>
+                            <input type="number" step="0.01" name="nouveau_horaire" class="form-control" placeholder="SMIG: 17.92 / SMAG: 97.44" required>
                         </div>
                         <div class="form-group">
                             <label class="form-label" style="font-size:0.75rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em;">Taux mensuel (MAD/mois)</label>
@@ -146,7 +146,7 @@
 
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; margin-bottom:1.25rem;">
                     <div style="background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:0.75rem;">
-                        <div style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.25rem;">Taux horaire</div>
+                        <div style="font-size:0.7rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:0.25rem;">Taux de référence</div>
                         <div id="calcTauxH" style="font-size:1.05rem; font-weight:700; color:var(--accent);">—</div>
                     </div>
                     <div style="background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:0.75rem;">
@@ -227,11 +227,12 @@ document.addEventListener('DOMContentLoaded', function() {
         resultatBox.style.boxShadow = '0 4px 15px ' + t.shadow;
 
         var baseLabel = '', tauxJVal = 0, salaire = 0;
-        baseLabel = '26 jours/mois';
+        baseLabel = '26 jours/mois (base mensuelle)';
         tauxJVal = mensuel / 26;
         salaire = mensuel / 26 * jours;
 
-        tauxH.textContent = horaire > 0 ? fmt(horaire) + ' MAD/h' : '—';
+        var unitRef = (type === 'SMAG') ? ' MAD/j' : ' MAD/h';
+        tauxH.textContent = horaire > 0 ? fmt(horaire) + unitRef : '—';
         tauxM.textContent = mensuel > 0 ? fmt(mensuel) + ' MAD' : '—';
         baseEl.textContent = baseLabel;
         tauxJ.textContent = fmt(tauxJVal) + ' MAD/j';

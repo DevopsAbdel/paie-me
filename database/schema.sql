@@ -486,7 +486,7 @@ INSERT INTO rubriques_retenues (societe_id, is_global, code, libelle, type_monta
 -- -----------------------------------------------------------
 CREATE TABLE IF NOT EXISTS bareme_anciennete (
     id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    societe_id      INT UNSIGNED        NOT NULL,
+    societe_id      INT UNSIGNED        DEFAULT NULL,
     annees_min      TINYINT UNSIGNED    NOT NULL,
     annees_max      TINYINT UNSIGNED    NOT NULL,
     taux            DECIMAL(5,2)        NOT NULL,
@@ -528,7 +528,7 @@ CREATE TABLE IF NOT EXISTS jours_feries (
 -- -----------------------------------------------------------
 CREATE TABLE IF NOT EXISTS bareme_heures_sup (
     id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    societe_id      INT UNSIGNED        NOT NULL UNIQUE,
+    societe_id      INT UNSIGNED        DEFAULT NULL UNIQUE,
     taux_normal     DECIMAL(5,2)        NOT NULL DEFAULT 25.00,
     taux_majore     DECIMAL(5,2)        NOT NULL DEFAULT 50.00,
     taux_jour_ferie DECIMAL(5,2)        NOT NULL DEFAULT 100.00,
@@ -682,7 +682,7 @@ WHERE r.code = a.code AND r.societe_id IS NULL;
 -- -----------------------------------------------------------
 CREATE TABLE IF NOT EXISTS bareme_smig_smag (
     id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    societe_id      INT UNSIGNED        NOT NULL,
+    societe_id      INT UNSIGNED        DEFAULT NULL,
     annee           INT                 NOT NULL,
     type            ENUM('SMIG','SMAG') NOT NULL,
     horaire         DECIMAL(10,2)       NOT NULL DEFAULT 0.00,

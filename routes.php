@@ -3,6 +3,7 @@
 use Core\Router;
 use Controllers\AuthController;
 use Controllers\DashboardController;
+use Controllers\AdminController;
 use Controllers\SocieteController;
 use Controllers\SalarieController;
 use Controllers\PaieController;
@@ -21,6 +22,9 @@ Router::get('/demo',                   [AuthController::class, 'demo']);
 Router::get('/logout',                [AuthController::class, 'logout']);
 
 Router::get('/dashboard',              [DashboardController::class, 'index']);
+
+Router::get('/admin',                  [AdminController::class, 'index']);
+Router::post('/admin',                 [AdminController::class, 'index']);
 
 Router::get('/societes',               [SocieteController::class, 'index']);
 Router::get('/societes/clear-context', [SocieteController::class, 'clearContext']);

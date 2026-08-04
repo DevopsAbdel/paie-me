@@ -45,6 +45,12 @@ function create_demo_database(): PDO
 
     seed_demo_database($pdo);
 
+    // Applique les migrations pour mettre le schéma au niveau de la base principale
+    // (ex: table droit_conge créée par migrate.php et absente de schema.sql).
+    ob_start();
+    require_once __DIR__ . '/migrate.php';
+    ob_end_clean();
+
     return $pdo;
 }
 

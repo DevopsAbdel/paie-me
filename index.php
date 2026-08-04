@@ -28,6 +28,24 @@ use Core\Router;
 
 Session::start();
 
+// Intégrité de session : si l'utilisateur connecté a été supprimé ou désactivé
+// (ex: via la page admin), on invalide sa session pour éviter les erreurs de FK
+// (audit_log, societes) et l'accès d'un compte inactif.
+if (Session::has('user_id')) {
+    try {
+        $stmt = Core\Model::db()->prepare('SELECT actif FROM users WHERE id = ?');
+        $stmt->execute([(int) Session::get('user_id')]);
+        $user = $stmt->fetch();
+        if (!$user || (int) $user['actif'] !== 1) {
+            Session::destroy();
+            header('Location: /paie-me/login');
+            exit;
+        }
+    } catch (\Throwable $e) {
+        // Base indisponible : on ne bloque pas (la page s'occupera de l'erreur).
+    }
+}
+
 $app = require __DIR__ . '/config/app.php';
 date_default_timezone_set($app['timezone']);
 

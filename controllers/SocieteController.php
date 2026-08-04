@@ -99,6 +99,8 @@ class SocieteController extends Controller
 
         $societe['rib'] = Crypto::decrypt($societe['rib']);
 
+        $stats = $this->getStats((int) $id);
+
         $title = 'Infos ' . $societe['raison_sociale'] . ' ' . $societe['forme_juridique'] . ' — ICE: ' . $societe['ice'];
         $actions = '
             <a href="/paie-me/societes/' . $id . '/edit" class="btn btn-secondary btn-sm" style="font-size:0.75rem;">Modifier</a>
@@ -110,7 +112,32 @@ class SocieteController extends Controller
             'browserTitle' => 'Infos — ' . $societe['raison_sociale'],
             'actions'      => $actions,
             'societe'      => $societe,
+            'stats'        => $stats,
         ]);
+    }
+
+    private function getStats(int $societeId): array
+    {
+        $nbSalaries = (int) $this->db->query("SELECT COUNT(*) FROM salaries WHERE societe_id = $societeId AND actif = 1")->fetchColumn();
+        $nbPaies = (int) $this->db->query("SELECT COUNT(*) FROM paies WHERE societe_id = $societeId")->fetchColumn();
+        $masseSalariale = (float) $this->db->query("SELECT COALESCE(SUM(net_a_payer), 0) FROM paies WHERE societe_id = $societeId")->fetchColumn();
+        $nbPeriodes = (int) $this->db->query("SELECT COUNT(*) FROM periodes WHERE societe_id = $societeId")->fetchColumn();
+
+        $dernierePeriode = $this->db->query(
+            "SELECT p.mois, p.annee, p.cloturee
+             FROM periodes p
+             WHERE p.societe_id = $societeId
+             ORDER BY p.annee DESC, p.mois DESC
+             LIMIT 1"
+        )->fetch();
+
+        return [
+            'nb_salaries'    => $nbSalaries,
+            'nb_paies'       => $nbPaies,
+            'nb_periodes'    => $nbPeriodes,
+            'masse_salariale' => $masseSalariale,
+            'derniere_periode' => $dernierePeriode,
+        ];
     }
 
     public function salaries(int $id): void
@@ -770,6 +797,11 @@ class SocieteController extends Controller
                 Session::setFlash('success', 'Barème SMIG/SMAG mis à jour.');
             }
 
+            if ($sousTab === 'reference') {
+                $this->handleReferencePost($id);
+                return;
+            }
+
             $this->redirect('/paie-me/societes/' . $id . '/baremes/' . $sousTab);
         }
 
@@ -782,6 +814,11 @@ class SocieteController extends Controller
         $heuresSup     = $this->db->query("SELECT * FROM bareme_heures_sup WHERE societe_id = $id")->fetch();
         $baremeSmigSmag = $this->db->query("SELECT * FROM bareme_smig_smag WHERE societe_id = $id ORDER BY annee DESC, type")->fetchAll();
 
+        $refSmigSmag   = $this->db->query("SELECT * FROM bareme_smig_smag WHERE societe_id IS NULL ORDER BY annee DESC, type")->fetchAll();
+        $refAnciennete = $this->db->query("SELECT * FROM bareme_anciennete WHERE societe_id IS NULL ORDER BY annees_min")->fetchAll();
+        $refHeuresSup  = $this->db->query("SELECT * FROM bareme_heures_sup WHERE societe_id IS NULL")->fetch();
+        $isAdmin       = Session::get('user_role') === 'admin';
+
         $titles = [
             'anciennete'    => 'Barème d\'ancienneté',
             'conge_annuel'  => 'Congé annuel',
@@ -789,6 +826,7 @@ class SocieteController extends Controller
             'impot_revenu'  => 'Impôt sur le revenu',
             'heures_sup'    => 'Heures supplémentaires',
             'smig_smag'     => 'Barème SMIG & SMAG',
+            'reference'     => 'Barème de référence',
         ];
         $subView = in_array($sous_tab, array_keys($titles)) ? $sous_tab : 'anciennete';
         $baseUrl = '/paie-me/societes/' . $id . '/baremes';
@@ -805,7 +843,115 @@ class SocieteController extends Controller
             'joursFeries'   => $joursFeries,
             'heuresSup'     => $heuresSup,
             'baremeSmigSmag' => $baremeSmigSmag,
+            'refSmigSmag'   => $refSmigSmag,
+            'refAnciennete' => $refAnciennete,
+            'refHeuresSup'  => $refHeuresSup,
+            'isAdmin'       => $isAdmin,
         ]);
+    }
+
+    /**
+     * Gestion POST de la sous-page « Barème de référence » (réservé admin).
+     *  - ref_action = apply  → propage le barème de référence à toutes les sociétés
+     *  - ref_action = save   → enregistre la section du barème de référence (ref_type)
+     */
+    private function handleReferencePost(int $societeId): void
+    {
+        if (Session::get('user_role') !== 'admin') {
+            Session::setFlash('error', 'Seul un administrateur peut gérer le barème de référence.');
+            $this->redirect('/paie-me/societes/' . $societeId . '/baremes/reference');
+            return;
+        }
+
+        $refAction = $_POST['ref_action'] ?? 'save';
+
+        if ($refAction === 'apply') {
+            $societeIds = $this->db->query("SELECT id FROM societes ORDER BY id")->fetchAll(\PDO::FETCH_COLUMN);
+            if (empty($societeIds)) {
+                Session::setFlash('info', 'Aucune société à mettre à jour.');
+                $this->redirect('/paie-me/societes/' . $societeId . '/baremes/reference');
+                return;
+            }
+
+            $nbSoc = count($societeIds);
+
+            $refSmig = $this->db->query("SELECT * FROM bareme_smig_smag WHERE societe_id IS NULL")->fetchAll();
+            if ($refSmig) {
+                $ups = $this->db->prepare("INSERT INTO bareme_smig_smag (societe_id, annee, type, horaire, mensuel, date_effet)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                    ON DUPLICATE KEY UPDATE horaire=VALUES(horaire), mensuel=VALUES(mensuel), date_effet=VALUES(date_effet)");
+                foreach ($societeIds as $sid) {
+                    foreach ($refSmig as $r) {
+                        $ups->execute([$sid, $r['annee'], $r['type'], $r['horaire'], $r['mensuel'], $r['date_effet']]);
+                    }
+                }
+            }
+
+            $refAnc = $this->db->query("SELECT * FROM bareme_anciennete WHERE societe_id IS NULL ORDER BY annees_min")->fetchAll();
+            if ($refAnc) {
+                $del = $this->db->prepare("DELETE FROM bareme_anciennete WHERE societe_id = ?");
+                $ins = $this->db->prepare("INSERT INTO bareme_anciennete (societe_id, annees_min, annees_max, taux) VALUES (?, ?, ?, ?)");
+                foreach ($societeIds as $sid) {
+                    $del->execute([$sid]);
+                    foreach ($refAnc as $a) {
+                        $ins->execute([$sid, $a['annees_min'], $a['annees_max'], $a['taux']]);
+                    }
+                }
+            }
+
+            $refHs = $this->db->query("SELECT * FROM bareme_heures_sup WHERE societe_id IS NULL")->fetch();
+            if ($refHs) {
+                $ups = $this->db->prepare("INSERT INTO bareme_heures_sup (societe_id, taux_normal, taux_majore, taux_jour_ferie, seuil_heures)
+                    VALUES (?, ?, ?, ?, ?)
+                    ON DUPLICATE KEY UPDATE taux_normal=VALUES(taux_normal), taux_majore=VALUES(taux_majore), taux_jour_ferie=VALUES(taux_jour_ferie), seuil_heures=VALUES(seuil_heures)");
+                foreach ($societeIds as $sid) {
+                    $ups->execute([$sid, $refHs['taux_normal'], $refHs['taux_majore'], $refHs['taux_jour_ferie'], $refHs['seuil_heures']]);
+                }
+            }
+
+            Session::setFlash('success', 'Barème de référence appliqué à ' . $nbSoc . ' société(s).');
+            $this->redirect('/paie-me/societes/' . $societeId . '/baremes/reference');
+            return;
+        }
+
+        $refType = $_POST['ref_type'] ?? '';
+
+        if ($refType === 'smig') {
+            $this->db->exec("DELETE FROM bareme_smig_smag WHERE societe_id IS NULL");
+            if (!empty($_POST['ref_smig_annee'])) {
+                $ins = $this->db->prepare("INSERT INTO bareme_smig_smag (societe_id, annee, type, horaire, mensuel, date_effet) VALUES (NULL, ?, ?, ?, ?, ?)");
+                foreach ($_POST['ref_smig_annee'] as $k => $annee) {
+                    $annee = (int) $annee;
+                    $type = $_POST['ref_smig_type'][$k] ?? 'SMIG';
+                    if ($annee <= 0 || !in_array($type, ['SMIG', 'SMAG'])) continue;
+                    $dateEffet = !empty($_POST['ref_smig_date_effet'][$k]) ? $_POST['ref_smig_date_effet'][$k] : null;
+                    $ins->execute([$annee, $type, (float) ($_POST['ref_smig_horaire'][$k] ?? 0), (float) ($_POST['ref_smig_mensuel'][$k] ?? 0), $dateEffet]);
+                }
+            }
+            Session::setFlash('success', 'Barème de référence SMIG/SMAG enregistré.');
+        }
+
+        if ($refType === 'anciennete') {
+            $this->db->exec("DELETE FROM bareme_anciennete WHERE societe_id IS NULL");
+            if (!empty($_POST['ref_anc_min'])) {
+                $ins = $this->db->prepare("INSERT INTO bareme_anciennete (societe_id, annees_min, annees_max, taux) VALUES (NULL, ?, ?, ?)");
+                foreach ($_POST['ref_anc_min'] as $k => $min) {
+                    $taux = (float) ($_POST['ref_anc_taux'][$k] ?? 0);
+                    if ($taux < 0) continue;
+                    $ins->execute([(int) $min, (int) ($_POST['ref_anc_max'][$k] ?? 0), $taux]);
+                }
+            }
+            Session::setFlash('success', 'Barème de référence d\'ancienneté enregistré.');
+        }
+
+        if ($refType === 'heures_sup') {
+            $this->db->exec("DELETE FROM bareme_heures_sup WHERE societe_id IS NULL");
+            $stmt = $this->db->prepare("INSERT INTO bareme_heures_sup (societe_id, taux_normal, taux_majore, taux_jour_ferie, seuil_heures) VALUES (NULL, ?, ?, ?, ?)");
+            $stmt->execute([$_POST['ref_hs_taux_normal'] ?? 25, $_POST['ref_hs_taux_majore'] ?? 50, $_POST['ref_hs_taux_jour_ferie'] ?? 100, $_POST['ref_hs_seuil_heures'] ?? 8]);
+            Session::setFlash('success', 'Barème de référence heures sup enregistré.');
+        }
+
+        $this->redirect('/paie-me/societes/' . $societeId . '/baremes/reference');
     }
 
     private function getPostData(): array

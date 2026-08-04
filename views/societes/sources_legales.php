@@ -13,9 +13,9 @@
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; padding:1rem;">
         <?php
         $typeColors = [
-            'loi'        => ['badge' => 'badge-primary',   'border' => '#3b82f6'],
+            'loi'        => ['badge' => 'badge-primary',   'border' => '#8b5cf6'],
             'decret'     => ['badge' => 'badge-warning',   'border' => '#f59e0b'],
-            'arrete'     => ['badge' => 'badge-info',      'border' => '#06b6d4'],
+            'arrete'     => ['badge' => 'badge-info',      'border' => '#d946ef'],
             'note'       => ['badge' => 'badge-dark',      'border' => '#8b5cf6'],
             'convention' => ['badge' => 'badge-success',   'border' => '#10b981'],
         ];

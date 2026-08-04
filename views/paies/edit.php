@@ -569,7 +569,7 @@ function overLimit(?float $valeur, ?float $plafond): bool
 .edit-paie-table .taux { text-align:center; font-size:0.75rem; color:var(--text-muted); }
 .edit-paie-table .unite { text-align:center; font-size:0.7rem; color:var(--text-muted); width:55px; }
 .edit-paie-table .code { text-align:center; font-size:0.7rem; color:var(--text-muted); font-family:monospace; }
-.edit-paie-table .section-header td { padding:0.4rem 0.5rem 0.2rem; font-size:0.65rem; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:var(--accent); border-bottom:none; background:rgba(59,130,246,0.04); }
+.edit-paie-table .section-header td { padding:0.4rem 0.5rem 0.2rem; font-size:0.65rem; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-muted); border-bottom:none; background:rgba(139,92,246,0.12); }
 .edit-paie-table .total-row td { padding:0.4rem 0.5rem; border-top:1px solid var(--border); font-weight:600; }
 .edit-paie-table .recap-section td { border-top:1px solid var(--border); }
 .edit-paie-table .net-row td { border-top:2px solid var(--accent); }
@@ -579,23 +579,23 @@ function overLimit(?float $valeur, ?float $plafond): bool
 .row-over-limit td { background:rgba(239,68,68,0.06); }
 .montant.over-limit { color:#fca5a5; font-weight:600; }
 .plafond-label { display:block; font-size:0.6rem; color:var(--text-muted); white-space:nowrap; margin-top:0.1rem; }
-.info-icon { cursor:help; display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; border-radius:50%; background:rgba(59,130,246,0.12); color:#3b82f6; font-size:0; vertical-align:middle; margin-left:0.3rem; position:relative; transition:background 0.2s; }
-.info-icon:hover { background:rgba(59,130,246,0.25); }
+.info-icon { cursor:help; display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; border-radius:50%; background:rgba(139,92,246,0.18); color:var(--text-muted); font-size:0; vertical-align:middle; margin-left:0.3rem; position:relative; transition:background 0.2s; }
+.info-icon:hover { background:var(--accent-hover); }
 .info-icon svg { width:12px; height:12px; pointer-events:none; }
 .edit-paie-table-wrap { overflow:visible !important; }
-.info-icon .info-tooltip { display:none; position:fixed; background:#1e293b; color:#e2e8f0; padding:0.4rem 0.6rem; border-radius:6px; font-size:0.7rem; font-weight:400; white-space:nowrap; box-shadow:0 4px 12px rgba(0,0,0,0.3); z-index:9999; line-height:1.4; pointer-events:none; }
-.info-icon .info-tooltip::after { content:''; position:absolute; top:100%; left:50%; transform:translateX(-50%); border:5px solid transparent; border-top-color:#1e293b; }
+.info-icon .info-tooltip { display:none; position:fixed; background:var(--bg-surface); color:var(--text); padding:0.4rem 0.6rem; border-radius:6px; font-size:0.7rem; font-weight:400; white-space:nowrap; box-shadow:0 4px 12px rgba(0,0,0,0.3); z-index:9999; line-height:1.4; pointer-events:none; }
+.info-icon .info-tooltip::after { content:''; position:absolute; top:100%; left:50%; transform:translateX(-50%); border:5px solid transparent; border-top-color:var(--bg-surface); }
 .info-icon:hover .info-tooltip { display:block; }
 .form-select-inline { padding:0.2rem 0.3rem; font-size:0.72rem; background:var(--bg-surface); border:1px solid var(--border); border-radius:3px; color:var(--text); }
 .form-select-inline:focus { border-color:var(--accent); outline:none; }
 
 .gain-row { cursor:pointer; }
 .gain-row:hover { background:var(--bg-hover); }
-.gain-row.selected { background:rgba(59,130,246,0.15); }
+.gain-row.selected { background:rgba(139,92,246,0.18); }
 .gain-row.selected td { color:var(--accent); font-weight:500; }
 .retenue-row { cursor:pointer; }
 .retenue-row:hover { background:var(--bg-hover); }
-.retenue-row.selected { background:rgba(59,130,246,0.15); }
+.retenue-row.selected { background:rgba(139,92,246,0.18); }
 .retenue-row.selected td { color:var(--accent); font-weight:500; }
 </style>
 

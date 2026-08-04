@@ -2,11 +2,10 @@
 /**
  * Migration script — exécuter après chaque pull pour mettre à jour la base
  * Usage : php database/migrate.php
+ * Applique les migrations sur paie_me ET paie_me_demo (base démo / sandbox de dev).
  */
 
-$p = new PDO("mysql:host=127.0.0.1;dbname=paie_me;charset=utf8mb4", "root", "", [
-    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-]);
+$databases = ['paie_me', 'paie_me_demo'];
 
 function colExists(PDO $p, string $table, string $col): bool {
     return (bool) $p->query("SHOW COLUMNS FROM `$table` LIKE '$col'")->fetch();
@@ -20,7 +19,27 @@ function addCol(PDO $p, string $table, string $def): void {
     }
 }
 
-$count = 0;
+foreach ($databases as $dbname) {
+    echo "\n=== Migration de $dbname ===\n";
+
+    $p = new PDO("mysql:host=127.0.0.1;charset=utf8mb4", "root", "", [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+    ]);
+    $p->exec("CREATE DATABASE IF NOT EXISTS `$dbname` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+    $p->exec("USE `$dbname`");
+
+    // Si la base est vide (pas encore de schéma), on l'importe depuis schema.sql
+    $hasUsers = (int) $p->query(
+        "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = '$dbname' AND table_name = 'users'"
+    )->fetchColumn();
+    if ($hasUsers === 0) {
+        $schema = file_get_contents(__DIR__ . '/schema.sql');
+        $schema = str_replace('paie_me', $dbname, $schema);
+        $p->exec($schema);
+        echo "   + schéma importé depuis schema.sql\n";
+    }
+
+    $count = 0;
 
 // === rubriques_gains : colonnes ===
 addCol($p, 'rubriques_gains', 'is_global TINYINT(1) NOT NULL DEFAULT 0 AFTER societe_id');
@@ -753,4 +772,64 @@ try {
     echo "   + type_contrat: ANAPEC & TAHFIZ ajoutés\n";
 } catch (\PDOException $e) {}
 
-echo "\nMigrations terminées.\n";
+// === Barème de référence (base admin) : societe_id nullable (NULL = barème de référence) ===
+foreach (['bareme_smig_smag', 'bareme_anciennete', 'bareme_heures_sup'] as $t) {
+    $nul = $p->query("SHOW COLUMNS FROM `$t` LIKE 'societe_id'")->fetch();
+    if ($nul && $nul['Null'] !== 'YES') {
+        $p->exec("ALTER TABLE `$t` MODIFY COLUMN societe_id INT UNSIGNED DEFAULT NULL");
+        echo "   + societe_id nullable ($t)\n";
+    }
+}
+
+// --- Seed du barème de référence SMIG/SMAG (societe_id NULL) si absent ---
+$refCount = (int) $p->query("SELECT COUNT(*) FROM bareme_smig_smag WHERE societe_id IS NULL")->fetchColumn();
+if ($refCount === 0) {
+    $refSmig = [
+        [2021, 'SMIG', 14.13, 2698.83, '2021-01-01'],
+        [2021, 'SMAG', 73.05, 1899.30, '2021-01-01'],
+        [2022, 'SMIG', 14.81, 2828.71, '2022-01-01'],
+        [2022, 'SMAG', 76.70, 1994.20, '2022-01-01'],
+        [2023, 'SMIG', 15.55, 2970.05, '2023-01-01'],
+        [2023, 'SMAG', 84.37, 2193.62, '2023-01-01'],
+        [2024, 'SMIG', 16.29, 3111.39, '2024-01-01'],
+        [2024, 'SMAG', 88.58, 2303.08, '2024-01-01'],
+        [2025, 'SMIG', 17.10, 3266.10, '2025-01-01'],
+        [2025, 'SMAG', 93.00, 2418.00, '2025-04-01'],
+        [2026, 'SMIG', 17.92, 3422.72, '2026-01-01'],
+        [2026, 'SMAG', 97.44, 2533.44, '2026-04-01'],
+    ];
+    $ins = $p->prepare("INSERT INTO bareme_smig_smag (societe_id, annee, type, horaire, mensuel, date_effet) VALUES (NULL, ?, ?, ?, ?, ?)");
+    foreach ($refSmig as $r) {
+        $ins->execute($r);
+    }
+    echo "   + barème de référence SMIG/SMAG : " . count($refSmig) . " lignes\n";
+}
+
+// --- Seed du barème de référence d'ancienneté (societe_id NULL) si absent ---
+$refAnc = (int) $p->query("SELECT COUNT(*) FROM bareme_anciennete WHERE societe_id IS NULL")->fetchColumn();
+if ($refAnc === 0) {
+    $ancLegal = [
+        [0, 2, 0],
+        [2, 5, 5],
+        [5, 10, 10],
+        [10, 15, 15],
+        [15, 20, 20],
+        [20, 25, 25],
+        [25, 99, 30],
+    ];
+    $ins = $p->prepare("INSERT INTO bareme_anciennete (societe_id, annees_min, annees_max, taux) VALUES (NULL, ?, ?, ?)");
+    foreach ($ancLegal as $a) {
+        $ins->execute($a);
+    }
+    echo "   + barème de référence d'ancienneté : " . count($ancLegal) . " tranches\n";
+}
+
+// --- Seed du barème de référence heures sup (societe_id NULL) si absent ---
+$refHs = (int) $p->query("SELECT COUNT(*) FROM bareme_heures_sup WHERE societe_id IS NULL")->fetchColumn();
+if ($refHs === 0) {
+    $p->exec("INSERT INTO bareme_heures_sup (societe_id, taux_normal, taux_majore, taux_jour_ferie, seuil_heures) VALUES (NULL, 25.00, 50.00, 100.00, 8)");
+    echo "   + barème de référence heures sup : 1 ligne\n";
+}
+
+    echo "\nMigrations terminées ($dbname).\n";
+}
