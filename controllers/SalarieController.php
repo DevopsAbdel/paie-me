@@ -525,7 +525,46 @@ class SalarieController extends Controller
         }
         unset($col);
 
-        SpreadsheetService::streamTemplate($columns, 'modele_import_salaries.xlsx', []);
+        // Listes déroulantes du modèle (empêchent les valeurs non conformes à la base).
+        $validations = $this->buildTemplateValidations($ctx);
+
+        SpreadsheetService::streamTemplate($columns, 'modele_import_salaries.xlsx', [], $validations);
+    }
+
+    /** Valeurs autorisées des listes déroulantes du modèle d'import (enums + référentiels). */
+    private function buildTemplateValidations(?array $ctx): array
+    {
+        $validations = [];
+
+        // Enums : valeurs canoniques + variantes avec accents acceptées à l'import.
+        foreach (self::IMPORT_COLUMNS as $col) {
+            if (($col['type'] ?? '') !== 'enum') {
+                continue;
+            }
+            $vals = $col['allowed'] ?? [];
+            foreach (array_keys($col['labelMap'] ?? []) as $variant) {
+                if (!in_array($variant, $vals, true)) {
+                    $vals[] = $variant;
+                }
+            }
+            $validations[$col['field']] = $vals;
+        }
+
+        // Société : active seule si un contexte est ouvert (colonne ignorée), sinon toutes.
+        if ($ctx) {
+            $validations['societe'] = [$ctx['raison_sociale']];
+        } else {
+            $validations['societe'] = $this->db->query(
+                "SELECT raison_sociale FROM societes WHERE user_id = " . (int) Session::get('user_id') . " ORDER BY raison_sociale"
+            )->fetchAll(\PDO::FETCH_COLUMN);
+        }
+
+        // Service / Fonction : référentiel de la société active si contexte, sinon toutes.
+        $scope = $ctx ? ' WHERE societe_id = ' . (int) $ctx['id'] : ' WHERE societe_id IN (SELECT id FROM societes WHERE user_id = ' . (int) Session::get('user_id') . ')';
+        $validations['service']  = $this->db->query("SELECT DISTINCT nom FROM services$scope ORDER BY nom")->fetchAll(\PDO::FETCH_COLUMN);
+        $validations['fonction'] = $this->db->query("SELECT DISTINCT nom FROM fonctions$scope ORDER BY nom")->fetchAll(\PDO::FETCH_COLUMN);
+
+        return $validations;
     }
 
     /** Étape 1 (Test Odoo) : parse + valide sans rien écrire, affiche le rapport. */

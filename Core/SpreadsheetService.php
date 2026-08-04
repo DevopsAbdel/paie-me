@@ -4,11 +4,13 @@ namespace Core;
 
 use PhpOffice\PhpSpreadsheet\Cell\Cell;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+use PhpOffice\PhpSpreadsheet\Cell\DataValidation;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Writer\Csv;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
@@ -189,8 +191,9 @@ final class SpreadsheetService
      *
      * @param array<int, array<string, mixed>> $columns      [['field','label','type','required','example','note']]
      * @param array<int, string>               $instructions texte libre, une ligne par entrée
+     * @param array<string, list<string>>      $validations  liste déroulante par champ (field => valeurs autorisées)
      */
-    public static function streamTemplate(array $columns, string $filename, array $instructions = []): void
+    public static function streamTemplate(array $columns, string $filename, array $instructions = [], array $validations = []): void
     {
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
@@ -215,6 +218,47 @@ final class SpreadsheetService
 
         self::finishWorksheet($sheet, $columns);
 
+        // Listes déroulantes : feuille cachée « Listes » = sources des validations.
+        if ($validations) {
+            $lists = $spreadsheet->createSheet();
+            $lists->setTitle('Listes');
+            $lists->setSheetState(Worksheet::SHEETSTATE_HIDDEN);
+
+            $c = 1;
+            foreach ($columns as $col) {
+                $field = $col['field'];
+                if (!isset($validations[$field]) || !is_array($validations[$field])) {
+                    $c++;
+                    continue;
+                }
+                $values = array_values(array_filter(array_map('strval', $validations[$field])));
+                if (!$values) {
+                    $c++;
+                    continue;
+                }
+                $r = 1;
+                foreach ($values as $v) {
+                    $lists->setCellValue([$c, $r], $v);
+                    $r++;
+                }
+                $lastRow = $r - 1;
+
+                $colLetter = Coordinate::stringFromColumnIndex($c);
+                $range = $colLetter . '2:' . $colLetter . 2000;
+                $validation = new DataValidation();
+                $validation->setType(DataValidation::TYPE_LIST);
+                $validation->setFormula1("'Listes'!\$" . $colLetter . "\$1:\$" . $colLetter . "\$" . $lastRow);
+                $validation->setAllowBlank(true);
+                $validation->setShowDropDown(true);
+                $validation->setShowErrorMessage(true);
+                $validation->setErrorStyle(DataValidation::STYLE_STOP);
+                $validation->setErrorTitle('Valeur non conforme');
+                $validation->setError('Cette valeur n\'est pas autorisée. Choisissez une valeur dans la liste déroulante.');
+                $sheet->setDataValidation($range, $validation);
+                $c++;
+            }
+        }
+
         // Feuille d'instructions.
         $inst = $spreadsheet->createSheet();
         $inst->setTitle('Instructions');
@@ -227,6 +271,8 @@ final class SpreadsheetService
         $inst->setCellValue('A' . $row, 'Les en-têtes de colonnes ne doivent pas être modifiés. Les colonnes inconnues sont ignorées.');
         $row++;
         $inst->setCellValue('A' . $row, 'Les colonnes marquées d\'un astérisque (*) sont obligatoires. La ligne d\'exemple doit être supprimée.');
+        $row++;
+        $inst->setCellValue('A' . $row, 'Les colonnes Sexe, Situation familiale, Type de contrat, Type de salaire, Fréquence, Mode de paiement, Service, Fonction et Société ont une liste déroulante : choisissez une valeur proposée pour éviter les erreurs.');
         $row += 2;
         $inst->setCellValue('A' . $row, 'FORMATS DES VALEURS');
         $inst->getStyle('A' . $row)->getFont()->setBold(true);
