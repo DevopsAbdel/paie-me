@@ -772,6 +772,15 @@ try {
     echo "   + type_contrat: ANAPEC & TAHFIZ ajoutés\n";
 } catch (\PDOException $e) {}
 
+// === CIN élargi pour stockage chiffré (chiffré = 56 caractères) ===
+try {
+    $colCin = $p->query("SHOW COLUMNS FROM salaries LIKE 'cin'")->fetch();
+    if ($colCin && stripos($colCin['Type'], 'varchar(255)') === false) {
+        $p->exec("ALTER TABLE salaries MODIFY COLUMN cin VARCHAR(255) DEFAULT NULL");
+        echo "   + salaries.cin: élargi à VARCHAR(255) (stockage chiffré)\n";
+    }
+} catch (\PDOException $e) {}
+
 // === Barème de référence (base admin) : societe_id nullable (NULL = barème de référence) ===
 foreach (['bareme_smig_smag', 'bareme_anciennete', 'bareme_heures_sup'] as $t) {
     $nul = $p->query("SHOW COLUMNS FROM `$t` LIKE 'societe_id'")->fetch();

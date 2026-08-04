@@ -36,4 +36,19 @@ class Crypto
         $encrypted = substr($data, $ivLen);
         return openssl_decrypt($encrypted, self::$cipher, self::key(), 0, $iv);
     }
+
+    /**
+     * Déchiffre sans erreur si la valeur est réellement chiffrée ; sinon retourne
+     * la valeur telle quelle (données en clair, ex: seed de démo). Best-effort.
+     */
+    public static function tryDecrypt(?string $value): ?string
+    {
+        if ($value === null || $value === '') return $value;
+        $data = base64_decode($value, true);
+        if ($data === false) return $value;
+        $ivLen = openssl_cipher_iv_length(self::$cipher);
+        if (strlen($data) < $ivLen + 1) return $value;
+        $result = @openssl_decrypt(substr($data, $ivLen), self::$cipher, self::key(), 0, substr($data, 0, $ivLen));
+        return $result === false ? $value : $result;
+    }
 }

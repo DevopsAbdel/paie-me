@@ -1,7 +1,10 @@
 <div class="card">
     <div class="card-header">
         <h3>Liste des salariés</h3>
-        <a href="/paie-me/salaries/create" class="btn btn-primary btn-sm">+ Nouveau</a>
+        <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
+            <?php include __DIR__ . '/_import_ui.php'; ?>
+            <a href="/paie-me/salaries/create" class="btn btn-primary btn-sm">+ Nouveau</a>
+        </div>
     </div>
 
     <?php if (empty($salaries)): ?>

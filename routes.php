@@ -52,6 +52,10 @@ Router::post('/societes/{id}/baremes/{sous_tab}', [SocieteController::class, 'ba
 Router::get('/salaries',               [SalarieController::class, 'index']);
 Router::get('/salaries/create',        [SalarieController::class, 'create']);
 Router::post('/salaries/create',       [SalarieController::class, 'create']);
+Router::get('/salaries/export',        [SalarieController::class, 'export']);
+Router::get('/salaries/import/modele', [SalarieController::class, 'importModele']);
+Router::post('/salaries/import/preview', [SalarieController::class, 'importPreview']);
+Router::post('/salaries/import',       [SalarieController::class, 'importCommit']);
 Router::get('/salaries/{id}/edit',     [SalarieController::class, 'edit']);
 Router::post('/salaries/{id}/edit',    [SalarieController::class, 'edit']);
 Router::post('/salaries/{id}/delete',   [SalarieController::class, 'delete']);
