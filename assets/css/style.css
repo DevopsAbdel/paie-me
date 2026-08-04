@@ -46,7 +46,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .main-content {
     margin-left: 260px;
-    padding: 2.5rem;
+    padding: 1.5rem 1rem;
     min-height: 100vh;
 }
 
@@ -143,7 +143,7 @@ a:hover {
 .main-content {
     margin-left: 260px;
     flex: 1;
-    padding: 2.5rem;
+    padding: 1.5rem 1rem;
     min-height: 100vh;
 }
 
@@ -294,7 +294,7 @@ a:hover {
     background: var(--bg-surface);
     border: 1px solid var(--border);
     border-radius: 12px;
-    padding: 1.25rem;
+    padding: 1rem;
     margin-bottom: 1.5rem;
     color: var(--text);
 }
@@ -345,19 +345,24 @@ a:hover {
     overflow-x: auto;
     padding-bottom: 1px;
 }
+::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(139, 92, 246, 0.45);
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(139, 92, 246, 0.7);
+}
 .table-wrapper::-webkit-scrollbar {
-    height: 10px;
-}
-.table-wrapper::-webkit-scrollbar-track {
-    background: var(--bg-surface);
-    border-radius: 5px;
-}
-.table-wrapper::-webkit-scrollbar-thumb {
-    background: var(--border-strong);
-    border-radius: 5px;
-}
-.table-wrapper::-webkit-scrollbar-thumb:hover {
-    background: var(--accent-hover);
+    height: 5px;
+    width: 5px;
 }
 
 .table {
@@ -383,6 +388,7 @@ a:hover {
     border-bottom: 1px solid var(--border);
     font-size: 0.875rem;
     color: var(--text);
+    white-space: nowrap;
 }
 
 .table tbody tr:hover {
@@ -415,6 +421,7 @@ table tbody td {
     border-bottom: 1px solid var(--border);
     font-size: 0.875rem;
     color: var(--text);
+    white-space: nowrap;
 }
 
 table tbody tr:hover {
