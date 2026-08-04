@@ -262,57 +262,118 @@ final class SpreadsheetService
         // Feuille d'instructions.
         $inst = $spreadsheet->createSheet();
         $inst->setTitle('Instructions');
+        $accent = '8B5CF6';
         $row = 1;
-        $inst->setCellValue('A' . $row, "IMPORT DE DONNÉES — MODE D'EMPLOI");
-        $inst->getStyle('A' . $row)->getFont()->setBold(true)->setSize(14);
+
+        // Titre.
+        $inst->mergeCells('A' . $row . ':E' . $row);
+        $inst->setCellValue('A' . $row, "MODÈLE D'IMPORT DES SALARIÉS — MODE D'EMPLOI");
+        $inst->getStyle('A' . $row)->applyFromArray([
+            'font' => ['bold' => true, 'size' => 15, 'color' => ['rgb' => 'FFFFFF']],
+            'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => $accent]],
+        ]);
+        $inst->getRowDimension($row)->setRowHeight(28);
         $row += 2;
-        $inst->setCellValue('A' . $row, 'Remplissez ce fichier puis utilisez le bouton « Importer » dans l\'application.');
-        $row++;
-        $inst->setCellValue('A' . $row, 'Les en-têtes de colonnes ne doivent pas être modifiés. Les colonnes inconnues sont ignorées.');
-        $row++;
-        $inst->setCellValue('A' . $row, 'Les colonnes marquées d\'un astérisque (*) sont obligatoires. La ligne d\'exemple doit être supprimée.');
-        $row++;
-        $inst->setCellValue('A' . $row, 'Les colonnes Sexe, Situation familiale, Type de contrat, Type de salaire, Fréquence, Mode de paiement, Service, Fonction et Société ont une liste déroulante : choisissez une valeur proposée pour éviter les erreurs.');
-        $row += 2;
-        $inst->setCellValue('A' . $row, 'FORMATS DES VALEURS');
-        $inst->getStyle('A' . $row)->getFont()->setBold(true);
-        $row++;
-        $formats = [
-            'Dates' => 'JJ/MM/AAAA (ex: 15/03/2026) ou AAAA-MM-JJ',
-            'Montants' => 'décimal simple : 4500 ou 4500,50 (la virgule est le séparateur décimal)',
-            'Sexe' => 'M ou F',
-            'Situation familiale' => 'celibataire, marie, divorce, veuf',
-            'Type de contrat' => 'CDI, CDD, stage, interim, anapec, tahfiz',
-            'Type de salaire' => 'mensuel, horaire, journalier',
-            'Fréquence de paiement' => 'mensuel, quinzaine, hebdomadaire',
-            'Mode de paiement' => 'virement, cheque, especes',
-            'Service / Fonction' => 'le nom exact enregistré dans Paramètres > Services',
-            'Société' => 'requise si vous n\'êtes pas dans une société ; sinon ignorée',
+
+        // Étapes.
+        $steps = [
+            "1. TÉLÉCHARGER — ce modèle depuis la page Salariés (bouton « Modèle d'import »).",
+            "2. REMPLIR — un salarié par ligne à partir de la ligne 3. Ne modifiez jamais les en-têtes. Les colonnes à liste déroulante n'acceptent que les valeurs proposées.",
+            "3. IMPORTER — dans l'application : « Importer » → choisir ce fichier → « Vérifier le fichier », puis valider l'import. Aucune donnée n'est écrite tant que la vérification est sans erreur.",
         ];
-        foreach ($formats as $label => $desc) {
-            $inst->setCellValue('A' . $row, $label);
-            $inst->getStyle('A' . $row)->getFont()->setBold(true);
-            $inst->setCellValue('B' . $row, $desc);
+        foreach ($steps as $s) {
+            $inst->mergeCells('A' . $row . ':E' . $row);
+            $inst->setCellValue('A' . $row, $s);
+            $inst->getStyle('A' . $row)->getAlignment()->setWrapText(true);
             $row++;
         }
-        $row += 2;
-        $inst->setCellValue('A' . $row, 'COLONNES DÉTAILLÉES');
+        $row += 1;
+
+        // Règles importantes.
+        $inst->mergeCells('A' . $row . ':E' . $row);
+        $inst->setCellValue('A' . $row, 'RÈGLES IMPORTANTES');
         $inst->getStyle('A' . $row)->getFont()->setBold(true);
         $row++;
-        $inst->setCellValue('A' . $row, 'Colonne');
-        $inst->setCellValue('B' . $row, 'Exemple');
-        $inst->setCellValue('C' . $row, 'Remarque');
-        $inst->getStyle('A' . $row . ':C' . $row)->getFont()->setBold(true);
-        $row++;
-        foreach ($columns as $col) {
-            $inst->setCellValue('A' . $row, $col['label'] . (!empty($col['required']) ? self::REQUIRED_MARK : ''));
-            $inst->setCellValue('B' . $row, (string) ($col['example'] ?? ''));
-            $inst->setCellValue('C' . $row, (string) ($col['note'] ?? ''));
+        $rules = [
+            'Les colonnes marquées « * » (astérisque) sont OBLIGATOIRES.',
+            'La ligne d\'exemple (ligne 2) doit être supprimée avant l\'import.',
+            'Les colonnes inconnues ou renommées sont ignorées à l\'import (jamais bloquant).',
+            'Dates : JJ/MM/AAAA (ex: 15/03/2026) ou AAAA-MM-JJ. Montants : décimal simple, la virgule comme séparateur (ex: 3422,72).',
+            'Sexe, Situation familiale, Type de contrat, Type de salaire, Fréquence, Mode de paiement, Service, Fonction et Société ont une liste déroulante.',
+        ];
+        foreach ($rules as $r) {
+            $inst->mergeCells('A' . $row . ':E' . $row);
+            $inst->setCellValue('A' . $row, '• ' . $r);
+            $inst->getStyle('A' . $row)->getAlignment()->setWrapText(true);
             $row++;
         }
-        $inst->getColumnDimension('A')->setWidth(28);
-        $inst->getColumnDimension('B')->setWidth(30);
-        $inst->getColumnDimension('C')->setWidth(70);
+        $row += 1;
+
+        // Détail des colonnes (table).
+        $typeLabels = ['string' => 'Texte', 'number' => 'Montant', 'int' => 'Nombre entier', 'date' => 'Date', 'enum' => 'Liste', 'm2o' => 'Référentiel'];
+        $header = $row;
+        $inst->setCellValue('A' . $header, 'Colonne');
+        $inst->setCellValue('B' . $header, 'Requis');
+        $inst->setCellValue('C' . $header, 'Type');
+        $inst->setCellValue('D' . $header, 'Exemple');
+        $inst->setCellValue('E' . $header, 'Valeurs acceptées / Remarque');
+        $inst->getStyle('A' . $header . ':E' . $header)->applyFromArray([
+            'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
+            'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => $accent]],
+            'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+        ]);
+        $row++;
+
+        $firstData = $row;
+        foreach ($columns as $i => $col) {
+            $field = $col['field'];
+            $accepted = '';
+            if (isset($validations[$field]) && $validations[$field]) {
+                $accepted = implode(', ', $validations[$field]);
+            } elseif (($col['type'] ?? '') === 'enum' && !empty($col['allowed'])) {
+                $accepted = implode(', ', $col['allowed']);
+            }
+            if ($accepted === '' && !empty($col['note'])) {
+                $accepted = (string) $col['note'];
+            }
+            if ($accepted === '' && array_key_exists('default', $col) && $col['default'] !== '') {
+                $accepted = 'Valeur par défaut : ' . (string) $col['default'];
+            }
+            $inst->setCellValue('A' . $row, $col['label'] . (!empty($col['required']) ? self::REQUIRED_MARK : ''));
+            $inst->setCellValue('B' . $row, !empty($col['required']) ? 'Obligatoire' : 'Optionnelle');
+            $inst->setCellValue('C' . $row, $typeLabels[$col['type'] ?? 'string'] ?? 'Texte');
+            $inst->setCellValue('D' . $row, (string) ($col['example'] ?? ''));
+            $inst->setCellValue('E' . $row, $accepted);
+            if (!empty($col['required'])) {
+                $inst->getStyle('A' . $row)->getFont()->setBold(true);
+                $inst->getStyle('B' . $row)->getFont()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('C62828'));
+            } else {
+                $inst->getStyle('B' . $row)->getFont()->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('757575'));
+            }
+            $inst->getStyle('E' . $row)->getAlignment()->setWrapText(true);
+            if (($i % 2) === 1) {
+                $inst->getStyle('A' . $row . ':E' . $row)->getFill()
+                    ->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('F3F4F8');
+            }
+            $row++;
+        }
+        $last = $row - 1;
+        $inst->getStyle('A' . $firstData . ':E' . $last)->getBorders()->getAllBorders()
+            ->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN)
+            ->getColor()->setRGB('D5D9E2');
+
+        // Pied de page.
+        $row += 1;
+        $inst->mergeCells('A' . $row . ':E' . $row);
+        $inst->setCellValue('A' . $row, 'En cas de doute sur une valeur, vérifiez les listes déroulantes et le référentiel (Paramètres > Services) avant l\'import.');
+        $inst->getStyle('A' . $row)->getFont()->setItalic(true);
+        $row++;
+
+        $inst->getColumnDimension('A')->setWidth(30);
+        $inst->getColumnDimension('B')->setWidth(13);
+        $inst->getColumnDimension('C')->setWidth(15);
+        $inst->getColumnDimension('D')->setWidth(28);
+        $inst->getColumnDimension('E')->setWidth(62);
 
         self::sendSpreadsheet($spreadsheet, $filename, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     }
