@@ -497,7 +497,7 @@ class SalarieController extends Controller
             'nom_famille' => 'ALAMI',
             'prenom' => 'Yassine',
             'sexe' => 'M',
-            'situation_familiale' => 'marié',
+            'situation_familiale' => 'marie',
             'nb_enfants' => 2,
             'date_naissance' => '15/03/1990',
             'lieu_naissance' => 'Casablanca',
@@ -536,18 +536,13 @@ class SalarieController extends Controller
     {
         $validations = [];
 
-        // Enums : valeurs canoniques + variantes avec accents acceptées à l'import.
+        // Enums : uniquement les valeurs canoniques (pas de variantes accentuées,
+        // sinon doublons visibles dans la liste déroulante).
         foreach (self::IMPORT_COLUMNS as $col) {
             if (($col['type'] ?? '') !== 'enum') {
                 continue;
             }
-            $vals = $col['allowed'] ?? [];
-            foreach (array_keys($col['labelMap'] ?? []) as $variant) {
-                if (!in_array($variant, $vals, true)) {
-                    $vals[] = $variant;
-                }
-            }
-            $validations[$col['field']] = $vals;
+            $validations[$col['field']] = $col['allowed'] ?? [];
         }
 
         // Société : active seule si un contexte est ouvert (colonne ignorée), sinon toutes.
@@ -555,7 +550,7 @@ class SalarieController extends Controller
             $validations['societe'] = [$ctx['raison_sociale']];
         } else {
             $validations['societe'] = $this->db->query(
-                "SELECT raison_sociale FROM societes WHERE user_id = " . (int) Session::get('user_id') . " ORDER BY raison_sociale"
+                "SELECT DISTINCT raison_sociale FROM societes WHERE user_id = " . (int) Session::get('user_id') . " ORDER BY raison_sociale"
             )->fetchAll(\PDO::FETCH_COLUMN);
         }
 
