@@ -301,6 +301,11 @@ Net  = salaire - (CNSS + AMO + IR)
 - **Fix CSS** : `color-scheme: dark` étendu à tous les date/time inputs dans `style.css:428` (y compris `form-control-inline` et sans classe)
 - **Règle Icônes d'actions** ajoutée dans AGENTS.md : colonnes Actions = icônes outlined SVG (stroke-only) avec `title` tooltip au hover, 3 couleurs dédiées (view=bleu, edit=jaune, delete=rouge)
 - **5 vues converties** Ajouter → modale : smig_smag, jours_feries, retenues, services (x2), attestations
+- **Bouton « Mode démo »** sur la page de login : entre en mode démo en créant/initialisant une base séparée `paie_me_demo` (schéma + seed) si elle n'existe pas, connecte l'admin, pose le flag session `demo_mode`
+- **Bascule de base par session** : `Model::db()` utilise `paie_me_demo` quand `demo_mode` est actif ; `Model::resetDb()` réinitialise le singleton PDO
+- **seed_demo.php refactorisé** : logique extraite dans `seed_demo_database(PDO $pdo): array` (retourne des stats, sans echo/exit) ; usage CLI : `php database/seed_demo.php [dbname]`
+- **database/create_demo.php** : `create_demo_database(): PDO` crée la base démo si absente (CREATE DATABASE + import schema.sql avec `paie_me` → `paie_me_demo` + seed) ; idempotent (skip si sociétés existantes, n'importe le schéma que si table `users` absente)
+- **Badge « MODE DÉMO »** ajouté dans la topbar (layout.php) quand `demo_mode` est actif
 
 ### Pending
 - (none)
@@ -308,7 +313,10 @@ Net  = salaire - (CNSS + AMO + IR)
 ### Key changes
 | File | Change |
 |------|--------|
-| `database/migrate.php` | + table paie_gains |
-| `database/schema.sql` | + table paie_gains |
-| `views/paies/edit.php` | indemnités éditables + gains checkbox/input |
-| `controllers/PaieController.php` | editPaie() sauvegarde indemnités+gains ; calculate() préserve 4 indemnités + gains overrides |
+| `Core/Model.php` | `db()` bascule sur `paie_me_demo` si `demo_mode` ; + `demoDbName()` + `resetDb()` |
+| `database/seed_demo.php` | logique extraite dans `seed_demo_database(PDO): array` (sans echo/exit) |
+| `database/create_demo.php` | nouveau : crée/initialise la base démo (schéma + seed) |
+| `controllers/AuthController.php` | + `demo()` : crée la base démo, connecte admin, pose `demo_mode` |
+| `routes.php` | + route `GET /demo` |
+| `views/login.php` | + lien « Entrer en mode démo » |
+| `views/layout.php` | + badge « MODE DÉMO » dans la topbar |

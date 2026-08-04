@@ -32,7 +32,21 @@ if (-not $mysql) {
     Write-Info "Démarrage de MySQL..."
     if (Test-Path "$XamppPath\mysql\bin\mysqld.exe") {
         Start-Process -FilePath "$XamppPath\mysql\bin\mysqld.exe" -WindowStyle Hidden
-        Start-Sleep 3
+        Write-Info "Attente de MySQL..."
+        $mysqlReady = $false
+        for ($i = 0; $i -lt 30; $i++) {
+            Start-Sleep 2
+            $null = & "$XamppPath\mysql\bin\mysql.exe" -u root -e "SELECT 1" 2>$null
+            if ($LASTEXITCODE -eq 0) {
+                $mysqlReady = $true
+                break
+            }
+        }
+        if (-not $mysqlReady) {
+            Write-Error "MySQL ne répond pas après 60s. Vérifie le serveur."
+            exit 1
+        }
+        Write-Ok "MySQL prêt"
     } else {
         Write-Error "mysqld.exe introuvable dans $XamppPath. Vérifie le chemin XAMPP."
     }
@@ -41,33 +55,86 @@ if (-not $mysql) {
 }
 
 # ── Synchronisation Git ──
-try {
-    Write-Info "Synchronisation avec le dépôt distant..."
-    & git fetch --prune 2>&1 | Out-Null
-    & git pull --rebase --autostash 2>&1 | Out-Null
+Write-Info "Synchronisation avec le dépôt distant..."
+
+# Sécurité multi-postes : ne jamais continuer si un rebase est en cours
+if ((Test-Path ".git\rebase-merge") -or (Test-Path ".git\rebase-apply")) {
+    Write-Error "Un rebase git est en cours (probablement un conflit non résolu sur l'autre poste)."
+    Write-Error "Résous-le d'abord : git status, puis git rebase --continue ou git rebase --abort."
+    exit 1
+}
+
+# Vérifier la branche courante
+$currentBranch = & git rev-parse --abbrev-ref HEAD 2>$null
+if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($currentBranch)) {
+    Write-Error "Impossible de lire la branche git. Vérifie que tu es dans le bon dossier."
+    exit 1
+}
+if ($currentBranch -ne "main") {
+    Write-Info "Attention : branche courante = '$currentBranch' (prévu: main)"
+}
+
+# Fetch : si hors-ligne, on avertit mais on laisse l'app tourner en local
+$fetchOut = & git fetch --prune 2>&1
+if ($LASTEXITCODE -ne 0) {
+    Write-Error "Échec du git fetch (connexion Internet ? identifiants GitHub ?)."
+    Write-Error "L'application démarre avec le code local actuel."
+} else {
+    # Pull en rebase + autostash : préserve les changements non commités locaux
+    $syncOut = & git pull --rebase --autostash 2>&1
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "Échec du git pull :"
+        $syncOut | ForEach-Object { Write-Host "  $_" -ForegroundColor Red }
+        Write-Error "Conflits possibles. Corrige-les manuellement (git status) puis relance run.ps1."
+        exit 1
+    }
     Write-Ok "Code synchronisé"
-} catch {
-    Write-Error "Échec git pull — vérifie que tu es sur main et que tu n'as pas de conflits"
 }
 
 # ── Base de données ──
 $mysqlExe = "$XamppPath\mysql\bin\mysql.exe"
+$mysqldumpExe = "$XamppPath\mysql\bin\mysqldump.exe"
 if (Test-Path $mysqlExe) {
-        $dbExists = & $mysqlExe -u root -e "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = 'paie_me'" 2>$null
+    $dbExists = & $mysqlExe -u root -e "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = 'paie_me'" 2>$null
     if (-not $dbExists -or $ResetDB) {
         if ($ResetDB) {
+            # Sécurité : ne JAMAIS dropper sans sauvegarde réussie
+            Write-Info "Sauvegarde avant réinitialisation..."
+            & $PSScriptRoot\backup.ps1 -Silent
+            if (-not $?) {
+                Write-Error "Sauvegarde échouée — réinitialisation annulée."
+                exit 1
+            }
             Write-Info "Réinitialisation de la base..."
             & $mysqlExe -u root -e "DROP DATABASE IF EXISTS paie_me"
         }
         Write-Info "Import du schéma SQL..."
         Get-Content "$PSScriptRoot\database\schema.sql" | & $mysqlExe -u root --default-character-set=utf8mb4
+        if ($LASTEXITCODE -ne 0) {
+            Write-Error "Échec de l'import du schéma. Vérifie schema.sql."
+            exit 1
+        }
         Write-Ok "Base 'paie_me' créée"
     } else {
         Write-Ok "Base 'paie_me' déjà existante"
+        # Backup automatique si mysqldump disponible
+        if (Test-Path $mysqldumpExe) {
+            & $PSScriptRoot\backup.ps1 -Silent
+        }
         # Appliquer les migrations si la base existe déjà
         if (Test-Path $PhpExe) {
             Write-Info "Application des migrations..."
             & $PhpExe "$PSScriptRoot\database\migrate.php"
+        }
+    }
+    # Seed données démo si la base est vide (aucune société)
+    if (Test-Path $PhpExe) {
+        $nbSocietes = & $mysqlExe -u root -N -e "SELECT COUNT(*) FROM paie_me.societes" 2>$null
+        if ($LASTEXITCODE -eq 0 -and [int]$nbSocietes -eq 0) {
+            Write-Info "Base vide — insertion des données démo..."
+            & $PhpExe "$PSScriptRoot\database\seed_demo.php"
+        } else {
+            Write-Ok "Données existantes — seed démo ignoré ($nbSocietes société(s))"
         }
     }
 } else {

@@ -19,5 +19,13 @@
             </div>
             <button type="submit" class="btn btn-primary">Se connecter</button>
         </form>
+
+        <div style="margin-top:1.5rem; padding-top:1.25rem; border-top:1px solid var(--border);">
+            <p class="subtitle" style="margin-bottom:0.75rem;">Pas de compte ? Essayez l'application avec des données de démonstration :</p>
+            <a href="/paie-me/demo" class="btn btn-outline-info" style="width:100%;">
+                <i data-lucide="flask-conical" style="width:16px;height:16px;vertical-align:-2px;margin-right:0.4rem;"></i>
+                Entrer en mode démo
+            </a>
+        </div>
     </div>
 </div>

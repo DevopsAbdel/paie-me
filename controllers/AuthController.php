@@ -55,6 +55,38 @@ class AuthController extends Controller
         $this->renderLogin();
     }
 
+    public function demo(): void
+    {
+        if (Session::has('user_id')) {
+            $this->redirect('/paie-me/dashboard');
+        }
+
+        try {
+            require_once __DIR__ . '/../database/create_demo.php';
+            create_demo_database();
+
+            Session::set('demo_mode', true);
+            Model::resetDb();
+            $this->db = Model::db();
+
+            $stmt = $this->db->prepare('SELECT * FROM users WHERE email = ? AND actif = 1 LIMIT 1');
+            $stmt->execute(['admin@paie-me.ma']);
+            $user = $stmt->fetch();
+
+            if ($user) {
+                Session::set('user_id', $user['id']);
+                Session::set('user_nom', $user['nom']);
+                Session::set('user_email', $user['email']);
+                Session::set('user_role', $user['role']);
+                Audit::log($this->db, 'login', 'user', $user['id'], 'Connexion en mode démo');
+            }
+
+            $this->redirect('/paie-me/dashboard');
+        } catch (\Throwable $e) {
+            $this->renderLogin('Mode démo indisponible : ' . $e->getMessage());
+        }
+    }
+
     public function logout(): void
     {
         Audit::log($this->db, 'logout', 'user', Session::get('user_id'), 'Déconnexion utilisateur');

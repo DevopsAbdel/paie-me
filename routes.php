@@ -17,6 +17,7 @@ use Controllers\ModeleBulletinController;
 Router::get('/',                       [AuthController::class, 'login']);
 Router::get('/login',                  [AuthController::class, 'login']);
 Router::post('/login',                 [AuthController::class, 'login']);
+Router::get('/demo',                   [AuthController::class, 'demo']);
 Router::get('/logout',                [AuthController::class, 'logout']);
 
 Router::get('/dashboard',              [DashboardController::class, 'index']);

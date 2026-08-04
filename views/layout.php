@@ -158,7 +158,12 @@
 <main class="<?= isset($_SESSION['user_id']) ? 'main-content' : '' ?>">
     <?php if (isset($_SESSION['user_id'])): ?>
     <div class="topbar">
-        <h1><?= $title ?? 'Paie Me' ?></h1>
+        <h1>
+            <?= $title ?? 'Paie Me' ?>
+            <?php if (!empty($_SESSION['demo_mode'])): ?>
+                <span class="badge" style="background:rgba(34,211,238,0.15); color:#22d3ee; border:1px solid rgba(34,211,238,0.4); font-size:0.7rem; vertical-align:middle; margin-left:0.5rem;">MODE DÉMO</span>
+            <?php endif; ?>
+        </h1>
         <div class="topbar-actions">
             <?= $actions ?? '' ?>
         </div>

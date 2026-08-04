@@ -57,11 +57,41 @@ CREATE TABLE IF NOT EXISTS societes (
 ) ENGINE=InnoDB;
 
 -- -----------------------------------------------------------
+-- Services (départements)
+-- -----------------------------------------------------------
+CREATE TABLE IF NOT EXISTS services (
+    id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    societe_id      INT UNSIGNED        NOT NULL,
+    nom             VARCHAR(100)        NOT NULL,
+    description     TEXT,
+    actif           TINYINT(1)          NOT NULL DEFAULT 1,
+    created_at      DATETIME            NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (societe_id) REFERENCES societes(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- -----------------------------------------------------------
+-- Fonctions (postes par service)
+-- -----------------------------------------------------------
+CREATE TABLE IF NOT EXISTS fonctions (
+    id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    societe_id      INT UNSIGNED        NOT NULL,
+    service_id      INT UNSIGNED        DEFAULT NULL,
+    nom             VARCHAR(100)        NOT NULL,
+    description     TEXT,
+    actif           TINYINT(1)          NOT NULL DEFAULT 1,
+    created_at      DATETIME            NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (societe_id) REFERENCES societes(id) ON DELETE CASCADE,
+    FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+-- -----------------------------------------------------------
 -- Salariés
 -- -----------------------------------------------------------
 CREATE TABLE IF NOT EXISTS salaries (
     id                  INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     societe_id          INT UNSIGNED        NOT NULL,
+    service_id          INT UNSIGNED        DEFAULT NULL,
+    fonction_id         INT UNSIGNED        DEFAULT NULL,
     matricule           VARCHAR(20)         NOT NULL,
     nom_famille         VARCHAR(100)        NOT NULL,
     prenom              VARCHAR(100)        NOT NULL,
@@ -70,6 +100,7 @@ CREATE TABLE IF NOT EXISTS salaries (
     date_naissance      DATE,
     lieu_naissance      VARCHAR(100)        DEFAULT NULL,
     date_embauche       DATE,
+    date_sortie         DATE                DEFAULT NULL,
     cin                 VARCHAR(20),
     cnss                VARCHAR(20),
     situation_familiale ENUM('celibataire', 'marie', 'divorce', 'veuf') NOT NULL DEFAULT 'celibataire',
@@ -87,10 +118,14 @@ CREATE TABLE IF NOT EXISTS salaries (
     indemnite_panier    DECIMAL(10,2)       NOT NULL DEFAULT 780.00,
     indemnite_representation DECIMAL(10,2)  NOT NULL DEFAULT 0.00,
     avantage_logement   DECIMAL(10,2)       NOT NULL DEFAULT 0.00,
+    avances_salaire     DECIMAL(10,2)       NOT NULL DEFAULT 0.00,
+    mutuelle            DECIMAL(10,2)       NOT NULL DEFAULT 0.00,
     actif               TINYINT(1)          NOT NULL DEFAULT 1,
     created_at          DATETIME            NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at          DATETIME            NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (societe_id) REFERENCES societes(id) ON DELETE CASCADE
+    FOREIGN KEY (societe_id) REFERENCES societes(id) ON DELETE CASCADE,
+    FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE SET NULL,
+    FOREIGN KEY (fonction_id) REFERENCES fonctions(id) ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
 -- -----------------------------------------------------------
@@ -106,6 +141,34 @@ CREATE TABLE IF NOT EXISTS salarie_indemnites (
     actif           TINYINT(1)          NOT NULL DEFAULT 1,
     created_at      DATETIME            NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (salarie_id) REFERENCES salaries(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- -----------------------------------------------------------
+-- Rubriques de gains
+-- -----------------------------------------------------------
+CREATE TABLE IF NOT EXISTS rubriques_gains (
+    id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    societe_id      INT UNSIGNED        DEFAULT NULL,
+    is_global       TINYINT(1)          NOT NULL DEFAULT 0,
+    code            VARCHAR(20)         NOT NULL,
+    libelle         VARCHAR(100)        NOT NULL,
+    type_montant    ENUM('Fixe','Proportionnel') NOT NULL DEFAULT 'Fixe',
+    valeur_defaut   DECIMAL(10,2)       NOT NULL DEFAULT 0.00,
+    categorie       VARCHAR(50)         DEFAULT NULL,
+    imposable       TINYINT(1)          NOT NULL DEFAULT 1,
+    affectation     VARCHAR(20)         DEFAULT NULL,
+    plafond_dgi     VARCHAR(200)        DEFAULT NULL,
+    plafond_cnss    VARCHAR(200)        DEFAULT NULL,
+    justificatifs   VARCHAR(500)        DEFAULT NULL,
+    compte          VARCHAR(20)         DEFAULT NULL,
+    source          VARCHAR(100)        DEFAULT NULL,
+    source_maj      DATE                DEFAULT NULL,
+    nature_edi      VARCHAR(20)         DEFAULT NULL,
+    base_anciennete TINYINT(1)          NOT NULL DEFAULT 0,
+    au_prorata      TINYINT(1)          NOT NULL DEFAULT 0,
+    actif           TINYINT(1)          NOT NULL DEFAULT 1,
+    created_at      DATETIME            NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (societe_id) REFERENCES societes(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 -- -----------------------------------------------------------
@@ -155,6 +218,9 @@ CREATE TABLE IF NOT EXISTS paies (
     jours_conge                 DECIMAL(4,1)        NOT NULL DEFAULT 0.00,
     jours_feries                DECIMAL(4,1)        NOT NULL DEFAULT 0.00,
     salaire_brut                DECIMAL(10,2)       NOT NULL DEFAULT 0.00,
+    prime_anciennete            DECIMAL(10,2)       NOT NULL DEFAULT 0.00,
+    sbi                         DECIMAL(10,2)       NOT NULL DEFAULT 0.00,
+    frais_professionnels        DECIMAL(10,2)       NOT NULL DEFAULT 0.00,
     salaire_plafonne_cnss       DECIMAL(10,2)       NOT NULL DEFAULT 0.00,
     indemnite_transport         DECIMAL(10,2)       NOT NULL DEFAULT 0.00,
     indemnite_panier            DECIMAL(10,2)       NOT NULL DEFAULT 0.00,
@@ -162,6 +228,7 @@ CREATE TABLE IF NOT EXISTS paies (
     avantage_logement           DECIMAL(10,2)       NOT NULL DEFAULT 0.00,
     heures_supplementaires      DECIMAL(10,2)       NOT NULL DEFAULT 0.00,
     montant_heures_sup          DECIMAL(10,2)       NOT NULL DEFAULT 0.00,
+    total_gains                 DECIMAL(10,2)       NOT NULL DEFAULT 0.00,
     montant_hs_25               DECIMAL(10,2)       NOT NULL DEFAULT 0.00,
     montant_hs_50               DECIMAL(10,2)       NOT NULL DEFAULT 0.00,
     montant_hs_100              DECIMAL(10,2)       NOT NULL DEFAULT 0.00,
@@ -227,19 +294,6 @@ INSERT INTO bareme_ir (min, max, taux, deduction, type) VALUES
     (180000.01, 9999999.99, 37.00, 27400.00, 'annuel');
 
 -- -----------------------------------------------------------
--- Services (départements)
--- -----------------------------------------------------------
-CREATE TABLE IF NOT EXISTS services (
-    id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    societe_id      INT UNSIGNED        NOT NULL,
-    nom             VARCHAR(100)        NOT NULL,
-    description     TEXT,
-    actif           TINYINT(1)          NOT NULL DEFAULT 1,
-    created_at      DATETIME            NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (societe_id) REFERENCES societes(id) ON DELETE CASCADE
-) ENGINE=InnoDB;
-
--- -----------------------------------------------------------
 -- Paramètres CNSS / AMO (par société)
 -- -----------------------------------------------------------
 CREATE TABLE IF NOT EXISTS parametres_cnss_amo (
@@ -267,34 +321,6 @@ CREATE TABLE IF NOT EXISTS parametres_cnss_amo (
     astreinte_amo_par_salarie           DECIMAL(10,2) NOT NULL DEFAULT 100.00,
     created_at                  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at          DATETIME        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (societe_id) REFERENCES societes(id) ON DELETE CASCADE
-) ENGINE=InnoDB;
-
--- -----------------------------------------------------------
--- Rubriques de gains
--- -----------------------------------------------------------
-CREATE TABLE IF NOT EXISTS rubriques_gains (
-    id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    societe_id      INT UNSIGNED        DEFAULT NULL,
-    is_global       TINYINT(1)          NOT NULL DEFAULT 0,
-    code            VARCHAR(20)         NOT NULL,
-    libelle         VARCHAR(100)        NOT NULL,
-    type_montant    ENUM('Fixe','Proportionnel') NOT NULL DEFAULT 'Fixe',
-    valeur_defaut   DECIMAL(10,2)       NOT NULL DEFAULT 0.00,
-    categorie       VARCHAR(50)         DEFAULT NULL,
-    imposable       TINYINT(1)          NOT NULL DEFAULT 1,
-    affectation     VARCHAR(20)         DEFAULT NULL,
-    plafond_dgi     VARCHAR(200)        DEFAULT NULL,
-    plafond_cnss    VARCHAR(200)        DEFAULT NULL,
-    justificatifs   VARCHAR(500)        DEFAULT NULL,
-    compte          VARCHAR(20)         DEFAULT NULL,
-    source          VARCHAR(100)        DEFAULT NULL,
-    source_maj      DATE                DEFAULT NULL,
-    nature_edi      VARCHAR(20)         DEFAULT NULL,
-    base_anciennete TINYINT(1)          NOT NULL DEFAULT 0,
-    au_prorata      TINYINT(1)          NOT NULL DEFAULT 0,
-    actif           TINYINT(1)          NOT NULL DEFAULT 1,
-    created_at      DATETIME            NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (societe_id) REFERENCES societes(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
@@ -341,56 +367,6 @@ CREATE TABLE IF NOT EXISTS modeles_attestation (
     created_at      DATETIME            NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (societe_id) REFERENCES societes(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
-
--- -----------------------------------------------------------
--- Fonctions (postes par service)
--- -----------------------------------------------------------
-CREATE TABLE IF NOT EXISTS fonctions (
-    id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    societe_id      INT UNSIGNED        NOT NULL,
-    service_id      INT UNSIGNED        DEFAULT NULL,
-    nom             VARCHAR(100)        NOT NULL,
-    description     TEXT,
-    actif           TINYINT(1)          NOT NULL DEFAULT 1,
-    created_at      DATETIME            NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (societe_id) REFERENCES societes(id) ON DELETE CASCADE,
-    FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE SET NULL
-) ENGINE=InnoDB;
-
--- -----------------------------------------------------------
--- Colonnes ajoutées
--- -----------------------------------------------------------
-ALTER TABLE salaries
-    ADD COLUMN service_id        INT UNSIGNED    DEFAULT NULL AFTER societe_id,
-    ADD COLUMN fonction_id       INT UNSIGNED    DEFAULT NULL AFTER service_id,
-    ADD COLUMN avances_salaire   DECIMAL(10,2)   NOT NULL DEFAULT 0.00 AFTER avantage_logement,
-    ADD COLUMN mutuelle          DECIMAL(10,2)   NOT NULL DEFAULT 0.00 AFTER avances_salaire,
-    ADD COLUMN date_sortie       DATE            DEFAULT NULL AFTER date_embauche,
-    ADD COLUMN enfants_a_charge TINYINT UNSIGNED NOT NULL DEFAULT 0 AFTER nb_enfants,
-    ADD COLUMN personnes_a_charge TINYINT UNSIGNED NOT NULL DEFAULT 0 AFTER enfants_a_charge,
-    ADD FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE SET NULL,
-    ADD FOREIGN KEY (fonction_id) REFERENCES fonctions(id) ON DELETE SET NULL;
-
-ALTER TABLE paies
-    ADD COLUMN prime_anciennete  DECIMAL(10,2)   NOT NULL DEFAULT 0.00 AFTER salaire_brut,
-    ADD COLUMN sbi               DECIMAL(10,2)   NOT NULL DEFAULT 0.00 AFTER salaire_brut,
-    ADD COLUMN frais_professionnels DECIMAL(10,2) NOT NULL DEFAULT 0.00 AFTER sbi,
-    ADD COLUMN total_gains       DECIMAL(10,2)   NOT NULL DEFAULT 0.00 AFTER montant_heures_sup;
-
-ALTER TABLE rubriques_gains
-    ADD COLUMN categorie       VARCHAR(50)  DEFAULT NULL AFTER valeur_defaut,
-    ADD COLUMN affectation     VARCHAR(20)  DEFAULT NULL AFTER imposable,
-    ADD COLUMN plafond_dgi     VARCHAR(200) DEFAULT NULL AFTER affectation,
-    ADD COLUMN plafond_cnss    VARCHAR(200) DEFAULT NULL AFTER plafond_dgi,
-    ADD COLUMN justificatifs   VARCHAR(500) DEFAULT NULL AFTER plafond_cnss;
-
-ALTER TABLE rubriques_gains
-    ADD COLUMN compte          VARCHAR(20)  DEFAULT NULL AFTER justificatifs,
-    ADD COLUMN source          VARCHAR(100) DEFAULT NULL AFTER compte,
-    ADD COLUMN source_maj      DATE         DEFAULT NULL AFTER source,
-    ADD COLUMN nature_edi      VARCHAR(20)  DEFAULT NULL AFTER source_maj,
-    ADD COLUMN base_anciennete TINYINT(1)   NOT NULL DEFAULT 0 AFTER nature_edi,
-    ADD COLUMN au_prorata      TINYINT(1)   NOT NULL DEFAULT 0 AFTER base_anciennete;
 
 -- -----------------------------------------------------------
 -- Audit log
@@ -546,19 +522,6 @@ CREATE TABLE IF NOT EXISTS jours_feries (
     created_at      DATETIME            NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (societe_id) REFERENCES societes(id) ON DELETE CASCADE
 ) ENGINE=InnoDB;
-
-INSERT INTO jours_feries (societe_id, nom, jour, mois, type, actif) VALUES
-    (1, 'Jour de l''an', 1, 1, 'fixe', 1),
-    (1, 'Fête du Trône', 30, 7, 'fixe', 1),
-    (1, 'Fête de la révolution du Roi et du peuple', 20, 8, 'fixe', 1),
-    (1, 'Anniversaire du Roi Mohammed VI', 21, 8, 'fixe', 1),
-    (1, 'Fête de la Marche Verte', 6, 11, 'fixe', 1),
-    (1, 'Fête de l''Indépendance', 18, 11, 'fixe', 1),
-    (1, 'Fête du Travail', 1, 5, 'fixe', 1),
-    (1, 'Aïd el-Fitr', 1, 1, 'variable', 1),
-    (1, 'Aïd el-Adha', 1, 1, 'variable', 1),
-    (1, '1er Moharram (Nouvel An islamique)', 1, 1, 'variable', 1),
-    (1, 'Aïd al-Mawlid (Anniversaire du Prophète)', 1, 1, 'variable', 1);
 
 -- -----------------------------------------------------------
 -- Barème heures supplémentaires (par société)
