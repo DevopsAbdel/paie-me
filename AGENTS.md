@@ -267,6 +267,25 @@ Net  = salaire - (CNSS + AMO + IR)
 - **Ne jamais utiliser** d'icônes avec `fill` (solid) — uniquement `stroke` pour un rendu outlined léger.
 - Le `title` est obligatoire pour l'accessibilité et l'info-bulle au survol.
 
+## Règles Import / Export Excel (méthode Odoo)
+- **Méthode en 2 phases** : d'abord un **Test** (`importPreview`) qui valide ligne × colonne SANS écrire en base et affiche un rapport d'erreurs ; ensuite un **Commit** (`importCommit`) transactionnel — si une ligne échoue, `ROLLBACK`, rien n'est écrit.
+- **`Core/SpreadsheetService.php`** est le service générique réutilisable (namespace `Core`) :
+  - `parseFile()` → tableau de lignes (XLSX/XLS via PhpSpreadsheet, CSV avec BOM/Windows-1252/séparateur auto), garde-fou 5000 lignes max.
+  - `streamExport()` / `streamTemplate()` → export XLSX ou CSV (BOM), modèle 2 feuilles (Données + Instructions).
+  - Normalisations : `normalizeKey()` (casse/accents), `normalizeDate()` (ISO, JJ/MM/AAAA, JJ-MM-AAAA, JJ.MM.AAAA, sérial Excel), `normalizeNumber()` (virgule/point/espaces milliers), `normalizeEnum()`, `matchByName()`.
+- **Template** : en-têtes = mêmes libellés que l'export ; les colonnes requises sont marquées ` *` ; une ligne d'exemple est pré-remplie ; feuille « Instructions » pour les valeurs acceptées.
+- **Mapping** par en-tête normalisé (`normalizeKey`) — insensible à la casse et aux accents ; les colonnes inconnues sont **ignorées** avec un avertissement (jamais d'erreur bloquante) ; les colonnes requises manquantes → erreur.
+- **Champs enum** : valeurs acceptées en clair (ex: `M`, `F`, `marie`) avec `labelMap` pour tolérer les libellés longs ; `normalizeEnum` gère casse/accents.
+- **Champs m2o** (service, fonction, société) : résolution par nom via `buildSocieteLookups()` (index par `normalizeKey`), la société cible = colonne Société ou contexte courant.
+- **Matricule vide** : auto-généré (`SAL0001`, `TMS0007`…) à partir du préfixe du matricule max existant — l'aperçu montre déjà le matricule qui sera attribué.
+- **Doublons** : matricule dupliqué dans le fichier OU déjà présent en base → erreur.
+- **Valeur vide pour un champ chiffré** (cin/rib) → stockée `NULL` (pas de chiffrement d'une chaîne vide).
+- **Chiffrement** : `cin` et `rib` passent par `Crypto::encrypt()` à l'INSERT ; `Crypto::tryDecrypt()` (best-effort) à l'export pour tolérer les valeurs en clair (seed démo). Le colonne `salaries.cin` est `VARCHAR(255)` (chiffré = 56 caractères ; rib = 80).
+- **Piège PHP 8.2+** : `DateTime::getLastErrors()` retourne `false` quand il n'y a aucune erreur → traiter `false` comme « 0 erreur », sinon toute date est rejetée.
+- **Routes** : les routes `/salaries/export`, `/salaries/import/modele`, `/salaries/import/preview`, `/salaries/import` doivent être déclarées AVANT `/salaries/{id}/...`.
+- **Vues** : modale d'upload (`_import_ui.php`, CSRF + enctype multipart), rapport Odoo-style (`import_result.php` : stats Lignes/Valides/Erreurs + tableau erreurs ou aperçu des lignes + bouton « Importer N salarié(s) »).
+- **Rapport d'erreurs** : un seul message par champ — si le format est invalide, ne pas aussi reporter « requis manquant » (liste `$invalidFields` par ligne).
+
 ## Encodage UTF-8 — RÈGLE CRITIQUE
 - **Tous les fichiers PHP, SQL, CSS, JS** doivent être **sauvés en UTF-8 sans BOM**.
 - **Toute donnée contenant des accents français** (`é`, `è`, `ê`, `ë`, `à`, `â`, `ù`, `û`, `ô`, `î`, `ç`, `É`, `È`, etc.) doit être **validée** avant insertion.
