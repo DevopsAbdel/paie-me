@@ -302,6 +302,10 @@ class SalarieController extends Controller
 
     private function getPostData(): array
     {
+        $dateVide = static function (?string $v): ?string {
+            $v = trim((string)$v);
+            return $v === '' ? null : $v;
+        };
         return [
             'societe_id'             => $_POST['societe_id'] ?? 0,
             'service_id'             => $_POST['service_id'] ?? null,
@@ -311,9 +315,9 @@ class SalarieController extends Controller
             'prenom'                 => $_POST['prenom'] ?? '',
             'sexe'                   => $_POST['sexe'] ?? null,
             'adresse'                => $_POST['adresse'] ?? '',
-            'date_naissance'         => $_POST['date_naissance'] ?? null,
-            'lieu_naissance'         => $_POST['lieu_naissance'] ?? null,
-            'date_embauche'          => $_POST['date_embauche'] ?? null,
+            'date_naissance'         => $dateVide($_POST['date_naissance'] ?? null),
+            'lieu_naissance'         => $dateVide($_POST['lieu_naissance'] ?? null),
+            'date_embauche'          => $dateVide($_POST['date_embauche'] ?? null),
             'cin'                    => $_POST['cin'] ?? '',
             'cnss'                   => $_POST['cnss'] ?? '',
             'situation_familiale'    => $_POST['situation_familiale'] ?? 'celibataire',

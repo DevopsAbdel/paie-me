@@ -18,6 +18,11 @@
             <label>Taux part patronale (%)</label>
             <input type="number" name="taux_cnss_patronal" value="<?= htmlspecialchars($cnssParams['taux_cnss_patronal'] ?? '8.98') ?>" class="form-control" step="0.01">
         </div>
+        <div class="form-group">
+            <label>Part patronale non plafonnée (%)</label>
+            <input type="number" name="taux_cnss_patronal_non_plafonne" value="<?= htmlspecialchars($cnssParams['taux_cnss_patronal_non_plafonne'] ?? '0') ?>" class="form-control" step="0.01">
+            <small style="color:var(--text-muted); font-size:0.7rem; margin-top:0.25rem; display:block;">Assise sur le brut imposable (ex: 8,00 chez TOUCOUPLAST)</small>
+        </div>
     </div>
     <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:0.5rem;">
         <div class="form-group">

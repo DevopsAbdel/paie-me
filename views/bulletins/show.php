@@ -38,6 +38,7 @@ $values = [
     '202' => (float)($b['montant_hs_50'] ?? 0),
     '203' => (float)($b['montant_hs_100'] ?? 0),
     'SB'  => (float)($b['salaire_brut'] ?? 0),
+    'SBI' => (float)($b['sbi'] ?? 0),
     '400' => (float)($b['cnss_salariale'] ?? 0),
     '410' => (float)($b['amo_salariale'] ?? 0),
     '420' => (float)($b['mutuelle'] ?? 0),
@@ -58,9 +59,9 @@ $bases = [
     '201' => $tauxHoraire,
     '202' => $tauxHoraire,
     '203' => $tauxHoraire,
-    '400' => min($values['SB'] ?? $values['100'] ?? 0, $plafond),
+    '400' => min($values['SBI'] ?? 0, $plafond),
     '400P' => min($values['SB'] ?? $values['100'] ?? 0, $plafond),
-    '410' => $values['SB'] ?? $values['100'] ?? 0,
+    '410' => $values['SBI'] ?? 0,
     '410P' => $values['SB'] ?? $values['100'] ?? 0,
     '501' => (float)($b['sbi'] ?? 0),
     '600' => (float)($b['sni'] ?? 0),
@@ -177,6 +178,19 @@ $taux = [
                         <?php endif; ?>
                     <?php endfor; ?>
                 </tr>
+                <?php if ($section['total']['code'] === 'SB'): ?>
+                <tr style="font-weight:bold;">
+                    <td></td>
+                    <td>Salaire brut imposable</td>
+                    <?php for ($i = 2; $i < count($section['colonnes']); $i++): ?>
+                        <?php if ($section['colonnes'][$i] === 'Base' || $section['colonnes'][$i] === 'Taux'): ?>
+                            <td></td>
+                        <?php else: ?>
+                            <td style="text-align:right;"><?= number_format($values['SBI'] ?? 0, 2, ',', ' ') ?></td>
+                        <?php endif; ?>
+                    <?php endfor; ?>
+                </tr>
+                <?php endif; ?>
                 <?php endif; ?>
             </tbody>
         </table>

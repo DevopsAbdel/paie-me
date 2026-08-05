@@ -302,6 +302,7 @@ CREATE TABLE IF NOT EXISTS parametres_cnss_amo (
     plafond_cnss        DECIMAL(10,2)   NOT NULL DEFAULT 6000.00,
     taux_cnss_salarial  DECIMAL(5,2)    NOT NULL DEFAULT 4.48,
     taux_cnss_patronal  DECIMAL(5,2)    NOT NULL DEFAULT 8.98,
+    taux_cnss_patronal_non_plafonne DECIMAL(5,2) NOT NULL DEFAULT 0.00,
     taux_amo_salarial   DECIMAL(5,2)    NOT NULL DEFAULT 2.26,
     taux_amo_patronal   DECIMAL(5,2)    NOT NULL DEFAULT 4.11,
     taux_amo_total      DECIMAL(5,2)    NOT NULL DEFAULT 6.37,

@@ -782,10 +782,29 @@ class PaieController extends Controller
 
     private function gainsAuto(int $societeId): array
     {
-        return array_values(array_filter(
+        $gains = array_values(array_filter(
             $this->mergeRubriques('rubriques_gains', $societeId),
             fn($g) => ($g['categorie'] ?? '') === 'Gain standard'
         ));
+        if (!$gains) return [];
+
+        // Rubriques réellement affectées à au moins un salarié de la société.
+        // Un gain GLOBAL (societe_id NULL) n'est appliqué que si la société l'utilise,
+        // sinon les rubriques 501-505 (rendement, objectifs, assiduité, nuit, 13e mois)
+        // s'ajouteraient à toutes les paies (ex. +573,33 DH chez TOUCOUPLAST).
+        $utilises = $this->db->query(
+            "SELECT DISTINCT rg.code
+               FROM salarie_gains sg
+               JOIN rubriques_gains rg ON sg.rubrique_id = rg.id
+               JOIN salaries s ON sg.salarie_id = s.id
+              WHERE s.societe_id = $societeId AND sg.actif = 1 AND rg.actif = 1"
+        )->fetchAll(PDO::FETCH_COLUMN);
+        $utilises = array_flip($utilises);
+
+        return array_values(array_filter($gains, function ($g) use ($societeId, $utilises) {
+            if ((int) $g['societe_id'] === $societeId) return true;
+            return isset($utilises[$g['code']]);
+        }));
     }
 
     private function mergeGainsWithSalarie(array $autoGains, array $salarieGains): array

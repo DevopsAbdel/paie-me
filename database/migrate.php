@@ -220,6 +220,9 @@ addCol($p, 'parametres_cnss_amo', 'taux_penalites_amo DECIMAL(5,2) NOT NULL DEFA
 // === Taux total AMO cotisation ===
 addCol($p, 'parametres_cnss_amo', 'taux_amo_total DECIMAL(5,2) NOT NULL DEFAULT 6.37 AFTER taux_amo_patronal');
 
+// === Part patronale CNSS non plafonnée (assise sur le brut imposable, ex. TOUCOUPLAST 8,00 %) ===
+addCol($p, 'parametres_cnss_amo', 'taux_cnss_patronal_non_plafonne DECIMAL(5,2) NOT NULL DEFAULT 0.00 AFTER taux_cnss_patronal');
+
 // === Détail des pénalités (règles marocaines) ===
 addCol($p, 'parametres_cnss_amo', 'penalite_cnss_premier_mois DECIMAL(5,2) NOT NULL DEFAULT 3.00 AFTER taux_penalites_amo');
 addCol($p, 'parametres_cnss_amo', 'penalite_cnss_mois_suivants DECIMAL(5,2) NOT NULL DEFAULT 0.50 AFTER penalite_cnss_premier_mois');

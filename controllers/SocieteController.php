@@ -457,15 +457,16 @@ class SocieteController extends Controller
                 Session::setFlash('success', 'Barème IR mis à jour.');
             } elseif ($sousTab === 'cnss_amo') {
                 $stmt = $this->db->prepare("
-                    INSERT INTO parametres_cnss_amo (societe_id, plafond_cnss, taux_cnss_salarial, taux_cnss_patronal, taux_amo_salarial, taux_amo_patronal, taux_amo_total, taux_allocations_familiales, taux_prestations_sociales, taxe_formation, participation_amo, taux_penalites_cnss, taux_penalites_tfp, taux_penalites_amo, penalite_cnss_premier_mois, penalite_cnss_mois_suivants, penalite_amo_taux, astreinte_cnss_par_salarie, astreinte_amo_par_salarie)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                    ON DUPLICATE KEY UPDATE plafond_cnss=VALUES(plafond_cnss), taux_cnss_salarial=VALUES(taux_cnss_salarial), taux_cnss_patronal=VALUES(taux_cnss_patronal), taux_amo_salarial=VALUES(taux_amo_salarial), taux_amo_patronal=VALUES(taux_amo_patronal), taux_amo_total=VALUES(taux_amo_total), taux_allocations_familiales=VALUES(taux_allocations_familiales), taux_prestations_sociales=VALUES(taux_prestations_sociales), taxe_formation=VALUES(taxe_formation), participation_amo=VALUES(participation_amo), taux_penalites_cnss=VALUES(taux_penalites_cnss), taux_penalites_tfp=VALUES(taux_penalites_tfp), taux_penalites_amo=VALUES(taux_penalites_amo), penalite_cnss_premier_mois=VALUES(penalite_cnss_premier_mois), penalite_cnss_mois_suivants=VALUES(penalite_cnss_mois_suivants), penalite_amo_taux=VALUES(penalite_amo_taux), astreinte_cnss_par_salarie=VALUES(astreinte_cnss_par_salarie), astreinte_amo_par_salarie=VALUES(astreinte_amo_par_salarie)
+                    INSERT INTO parametres_cnss_amo (societe_id, plafond_cnss, taux_cnss_salarial, taux_cnss_patronal, taux_cnss_patronal_non_plafonne, taux_amo_salarial, taux_amo_patronal, taux_amo_total, taux_allocations_familiales, taux_prestations_sociales, taxe_formation, participation_amo, taux_penalites_cnss, taux_penalites_tfp, taux_penalites_amo, penalite_cnss_premier_mois, penalite_cnss_mois_suivants, penalite_amo_taux, astreinte_cnss_par_salarie, astreinte_amo_par_salarie)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ON DUPLICATE KEY UPDATE plafond_cnss=VALUES(plafond_cnss), taux_cnss_salarial=VALUES(taux_cnss_salarial), taux_cnss_patronal=VALUES(taux_cnss_patronal), taux_cnss_patronal_non_plafonne=VALUES(taux_cnss_patronal_non_plafonne), taux_amo_salarial=VALUES(taux_amo_salarial), taux_amo_patronal=VALUES(taux_amo_patronal), taux_amo_total=VALUES(taux_amo_total), taux_allocations_familiales=VALUES(taux_allocations_familiales), taux_prestations_sociales=VALUES(taux_prestations_sociales), taxe_formation=VALUES(taxe_formation), participation_amo=VALUES(participation_amo), taux_penalites_cnss=VALUES(taux_penalites_cnss), taux_penalites_tfp=VALUES(taux_penalites_tfp), taux_penalites_amo=VALUES(taux_penalites_amo), penalite_cnss_premier_mois=VALUES(penalite_cnss_premier_mois), penalite_cnss_mois_suivants=VALUES(penalite_cnss_mois_suivants), penalite_amo_taux=VALUES(penalite_amo_taux), astreinte_cnss_par_salarie=VALUES(astreinte_cnss_par_salarie), astreinte_amo_par_salarie=VALUES(astreinte_amo_par_salarie)
                 ");
                 $stmt->execute([
                     $id,
                     $_POST['plafond_cnss'] ?? 6000,
                     $_POST['taux_cnss_salarial'] ?? 4.48,
                     $_POST['taux_cnss_patronal'] ?? 8.98,
+                    $_POST['taux_cnss_patronal_non_plafonne'] ?? 0,
                     $_POST['taux_amo_salarial'] ?? 2.26,
                     $_POST['taux_amo_patronal'] ?? 4.11,
                     $_POST['taux_amo_total'] ?? 6.37,

@@ -94,7 +94,7 @@ class PaieCalculator
         $totalGains = 0;
         $gainsImposables = 0;
         foreach ($gains as $g) {
-            $baseGain = $g['type_montant'] === 'proportionnel'
+            $baseGain = strtolower((string) $g['type_montant']) === 'proportionnel'
                 ? $salaireBase * (float) $g['valeur_defaut'] / 100
                 : (float) $g['valeur_defaut'];
             $montant = round($baseGain * $prorata, 2);
@@ -104,7 +104,7 @@ class PaieCalculator
 
         $totalRetenuesCustom = 0;
         foreach ($retenues as $r) {
-            $baseRet = $r['type_montant'] === 'proportionnel'
+            $baseRet = strtolower((string) $r['type_montant']) === 'proportionnel'
                 ? $salaireBase * (float) $r['valeur_defaut'] / 100
                 : (float) $r['valeur_defaut'];
             $totalRetenuesCustom += round($baseRet * $prorata, 2);
@@ -127,16 +127,20 @@ class PaieCalculator
         $plafondPanier = round(780 * $prorata, 2);
         $transportExonere = min($transport, $plafondTransport);
         $panierExonere = min($panier, $plafondPanier);
-        $sbi = $sb - $transportExonere - $panierExonere - $indemniteCustomExonere;
+        // Brut imposable : transport, panier et indemnité de représentation exclus.
+        // (Règle Excel TOUCOUPLAST + art. 57 CGI : représentation exonérée jusqu'à 10 % du salaire)
+        $sbi = $sb - $transportExonere - $panierExonere - $representation - $indemniteCustomExonere;
 
-        $plafonne = min($sb, (float) ($cnssParams['plafond_cnss'] ?? 6000));
-        $cnss = round($plafonne * (float) ($cnssParams['taux_cnss_salarial'] ?? 4.48) / 100, 2);
-        $amo  = round($sb * (float) ($cnssParams['taux_amo_salarial'] ?? 2.26) / 100, 2);
+        // Base CNSS/AMO part salariale : salaire brut imposable (SBI), plafonné au plafond CNSS.
+        $plafonneS = min($sbi, (float) ($cnssParams['plafond_cnss'] ?? 6000));
+        $plafonne  = min($sb, (float) ($cnssParams['plafond_cnss'] ?? 6000));
+        $cnss = round($plafonneS * (float) ($cnssParams['taux_cnss_salarial'] ?? 4.48) / 100, 2);
+        $amo  = round($sbi * (float) ($cnssParams['taux_amo_salarial'] ?? 2.26) / 100, 2);
 
         if ($sbi * 12 <= 78000) {
             $fraisPro = round($sbi * 0.35, 2);
         } else {
-            $fraisPro = round(min($sbi * 0.25, 2916.70), 2);
+            $fraisPro = round(min($sbi * 0.25, 2916.67), 2);
         }
 
         $sni = round($sbi - ($cnss + $amo) - $fraisPro, 2);
@@ -159,8 +163,12 @@ class PaieCalculator
         $netAvant = round($sb - ($cnss + $amo) - $ir, 2);
         $net = round(max($netAvant + $deductionsFamiliales - $autresRetenues, 0), 2);
 
-        $cnssPatronale = round($plafonne * (float) ($cnssParams['taux_cnss_patronal'] ?? 8.98) / 100, 2);
-        $amoPatronale  = round($sb * (float) ($cnssParams['taux_amo_patronal'] ?? 4.11) / 100, 2);
+        $cnssPatronale = round(
+            $plafonne * (float) ($cnssParams['taux_cnss_patronal'] ?? 8.98) / 100
+            + $sbi * (float) ($cnssParams['taux_cnss_patronal_non_plafonne'] ?? 0) / 100,
+            2
+        );
+        $amoPatronale  = round($sbi * (float) ($cnssParams['taux_amo_patronal'] ?? 4.11) / 100, 2);
 
         return compact(
             'joursTravailles', 'primeAnciennete', 'heuresSup25', 'heuresSup50', 'heuresSup100',
