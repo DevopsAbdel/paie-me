@@ -34,6 +34,7 @@ class SourceLegaleController extends Controller
             'raison_sociale' => $societe['raison_sociale'],
             'ice'            => $societe['ice'],
             'cnss'           => $societe['cnss'],
+            'logo'           => $societe['logo'] ?? null,
         ]);
 
         if ($this->isPost()) {

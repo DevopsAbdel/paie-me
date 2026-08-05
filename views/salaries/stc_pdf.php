@@ -24,6 +24,10 @@
 </head>
 <body>
     <div class="header">
+        <?php $logoUri = \Core\Helper::logoDataUri($s['logo'] ?? null); ?>
+        <?php if ($logoUri): ?>
+        <div style="text-align:center; margin-bottom:8px;"><img src="<?= $logoUri ?>" alt="Logo" style="max-width:80px; max-height:60px; object-fit:contain;"></div>
+        <?php endif; ?>
         <p class="header-entreprise"><?= htmlspecialchars($s['raison_sociale']) ?></p>
         <h1>SOLDE DE TOUT COMPTE</h1>
         <p>Établi le <?= date('d/m/Y') ?></p>

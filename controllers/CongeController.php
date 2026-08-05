@@ -34,6 +34,7 @@ class CongeController extends Controller
             'raison_sociale' => $societe['raison_sociale'],
             'ice' => $societe['ice'],
             'cnss' => $societe['cnss'],
+            'logo' => $societe['logo'] ?? null,
         ]);
 
         $this->db->exec("DELETE FROM conges WHERE societe_id = $id AND date_fin < '1900-01-01'");

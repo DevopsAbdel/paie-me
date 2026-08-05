@@ -119,7 +119,12 @@ $taux = [
         <table style="width:100%; border-collapse:collapse; margin-bottom:6px; border-bottom:2px solid <?= $couleur ?>;">
             <tr>
                 <td style="vertical-align:middle; padding:0 8px 8px 0; width:36px;">
+                    <?php $logoUri = \Core\Helper::logoDataUri($b['logo'] ?? null); ?>
+                    <?php if ($logoUri): ?>
+                    <img src="<?= $logoUri ?>" alt="Logo" style="width:36px; height:36px; object-fit:contain;">
+                    <?php else: ?>
                     <div style="width:36px; height:36px; background:<?= $couleur ?>; border-radius:6px; text-align:center; line-height:36px; font-size:14px; font-weight:700; color:#fff;"><?= strtoupper(mb_substr($b['raison_sociale'], 0, 2)) ?></div>
+                    <?php endif; ?>
                 </td>
                 <td style="vertical-align:middle; padding-bottom:8px;">
                     <h1 style="font-size:12px; margin:0; color:<?= $couleur ?>;"><?= htmlspecialchars($b['raison_sociale']) ?></h1>

@@ -32,4 +32,22 @@ class Helper
     {
         return mb_strlen($text) > $length ? mb_substr($text, 0, $length) . '...' : $text;
     }
+
+    public static function logoWebPath(?string $logo): string
+    {
+        return $logo ? '/paie-me/' . ltrim($logo, '/') : '';
+    }
+
+    public static function logoFilePath(?string $logo): string
+    {
+        return $logo ? __DIR__ . '/../' . ltrim($logo, '/') : '';
+    }
+
+    public static function logoDataUri(?string $logo): string
+    {
+        $file = self::logoFilePath($logo);
+        if (!$file || !is_file($file)) return '';
+        $mime = mime_content_type($file) ?: 'image/png';
+        return 'data:' . $mime . ';base64,' . base64_encode((string) file_get_contents($file));
+    }
 }

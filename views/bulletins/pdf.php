@@ -86,7 +86,7 @@ $taux = [
     <meta charset="UTF-8">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'DejaVu Sans', sans-serif; font-size: 9px; color: #1e293b; line-height: 1.3; margin: 8mm 15mm; }
+        body { font-family: 'DejaVu Sans', sans-serif; font-size: 9px; color: #1e293b; line-height: 1.5; margin: 8mm 15mm; }
         .header { display: flex; align-items: center; gap: 10px; padding-bottom: 8px; margin-bottom: 6px; border-bottom: 2px solid <?= $couleur ?>; }
         .header-logo { width: 36px; height: 36px; background: <?= $couleur ?>; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: #fff; flex-shrink: 0; }
         .header-info { flex: 1; }
@@ -101,7 +101,7 @@ $taux = [
         .infos p { margin: 1px 0; font-size: 8px; }
         table.details { width: 100%; border-collapse: collapse; margin-bottom: 4px; }
         table.details th { background: #e5e7eb; padding: 3px 5px; text-align: left; font-size: 8px; text-transform: uppercase; letter-spacing: 0.03em; }
-        table.details td { padding: 2px 5px; border-bottom: 0.5px solid #e5e7eb; font-size: 8.5px; }
+        table.details td { padding: 4px 5px; border-bottom: 0.5px solid #e5e7eb; font-size: 8.5px; }
         table.details .right { text-align: right; }
         table.details .code { text-align: left; color: #666; font-size: 7.5px; font-family: monospace; }
         table.details .bold { font-weight: bold; }
@@ -116,7 +116,12 @@ $taux = [
     <table style="width:100%; border-collapse:collapse; margin-bottom:6px; border-bottom:2px solid <?= $couleur ?>;">
         <tr>
             <td style="vertical-align:middle; padding:0 8px 8px 0; width:36px;">
+                <?php $logoUri = \Core\Helper::logoDataUri($b['logo'] ?? null); ?>
+                <?php if ($logoUri): ?>
+                <img src="<?= $logoUri ?>" alt="Logo" style="width:36px; height:36px; object-fit:contain;">
+                <?php else: ?>
                 <div style="width:36px; height:36px; background:<?= $couleur ?>; border-radius:6px; text-align:center; line-height:36px; font-size:14px; font-weight:700; color:#fff;"><?= strtoupper(mb_substr($b['raison_sociale'], 0, 2)) ?></div>
+                <?php endif; ?>
             </td>
             <td style="vertical-align:middle; padding-bottom:8px;">
                 <h1 style="font-size:12px; margin:0; color:<?= $couleur ?>;"><?= htmlspecialchars($b['raison_sociale']) ?></h1>

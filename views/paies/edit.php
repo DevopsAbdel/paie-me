@@ -79,7 +79,7 @@ function overLimit(?float $valeur, ?float $plafond): bool
                         <td class="montant"><?= number_format($paie['salaire_base'], 2, ',', ' ') ?></td>
                         <td class="unite">DH</td>
                         <td class="taux"><?= number_format($tauxHoraire, 2, ',', ' ') ?> /h</td>
-                        <td class="montant"><?= number_format($paie['salaire_base'], 2, ',', ' ') ?></td>
+                        <td class="montant gains-cell"><?= number_format($paie['salaire_base'], 2, ',', ' ') ?></td>
                         <td></td>
                         <td></td>
                         <td></td>
@@ -93,7 +93,7 @@ function overLimit(?float $valeur, ?float $plafond): bool
                         </td>
                         <td class="unite">Jours</td>
                         <td class="taux"><?= number_format($tauxJournalier, 2, ',', ' ') ?> /j</td>
-                        <td class="montant"><?= number_format($baseProrata, 2, ',', ' ') ?></td>
+                        <td class="montant gains-cell"><?= number_format($baseProrata, 2, ',', ' ') ?></td>
                         <td></td>
                         <td></td>
                         <td></td>
@@ -106,7 +106,7 @@ function overLimit(?float $valeur, ?float $plafond): bool
                         </td>
                         <td class="unite">Jours</td>
                         <td class="taux"><?= number_format($tauxJournalier, 2, ',', ' ') ?> /j</td>
-                        <td class="montant"><?= number_format($jc * $tauxJournalier, 2, ',', ' ') ?></td>
+                        <td class="montant gains-cell"><?= number_format($jc * $tauxJournalier, 2, ',', ' ') ?></td>
                         <td></td>
                         <td></td>
                         <td></td>
@@ -119,7 +119,7 @@ function overLimit(?float $valeur, ?float $plafond): bool
                         </td>
                         <td class="unite">Jours</td>
                         <td class="taux"><?= number_format($tauxJournalier, 2, ',', ' ') ?> /j</td>
-                        <td class="montant"><?= number_format($jf * $tauxJournalier, 2, ',', ' ') ?></td>
+                        <td class="montant gains-cell"><?= number_format($jf * $tauxJournalier, 2, ',', ' ') ?></td>
                         <td></td>
                         <td></td>
                         <td></td>
@@ -135,7 +135,7 @@ function overLimit(?float $valeur, ?float $plafond): bool
                         </td>
                         <td class="unite">Heure</td>
                         <td class="taux"><?= $t25 ?>%</td>
-                        <td class="montant"><?= number_format($mHS25, 2, ',', ' ') ?></td>
+                        <td class="montant gains-cell"><?= number_format($mHS25, 2, ',', ' ') ?></td>
                         <td></td>
                         <td></td>
                         <td></td>
@@ -151,7 +151,7 @@ function overLimit(?float $valeur, ?float $plafond): bool
                         </td>
                         <td class="unite">Heure</td>
                         <td class="taux"><?= $t50 ?>%</td>
-                        <td class="montant"><?= number_format($mHS50, 2, ',', ' ') ?></td>
+                        <td class="montant gains-cell"><?= number_format($mHS50, 2, ',', ' ') ?></td>
                         <td></td>
                         <td></td>
                         <td></td>
@@ -167,7 +167,7 @@ function overLimit(?float $valeur, ?float $plafond): bool
                         </td>
                         <td class="unite">Heure</td>
                         <td class="taux"><?= $t100 ?>%</td>
-                        <td class="montant"><?= number_format($mHS100, 2, ',', ' ') ?></td>
+                        <td class="montant gains-cell"><?= number_format($mHS100, 2, ',', ' ') ?></td>
                         <td></td>
                         <td></td>
                         <td></td>
@@ -180,7 +180,7 @@ function overLimit(?float $valeur, ?float $plafond): bool
                         <td class="montant"><?= number_format($primeBaseElargie, 2, ',', ' ') ?></td>
                         <td class="unite">DH</td>
                         <td class="taux"><?= $ancienPct ?>%</td>
-                        <td class="montant"><?= number_format($paie['prime_anciennete'], 2, ',', ' ') ?></td>
+                        <td class="montant gains-cell"><?= number_format($paie['prime_anciennete'], 2, ',', ' ') ?></td>
                         <td></td>
                         <td></td>
                         <td></td>
@@ -194,7 +194,7 @@ function overLimit(?float $valeur, ?float $plafond): bool
                         <td></td>
                         <td class="unite">DH</td>
                         <td class="taux">—</td>
-                        <td class="montant"><?= number_format($totalApresFeries, 2, ',', ' ') ?></td>
+                        <td class="montant gains-cell"><?= number_format($totalApresFeries, 2, ',', ' ') ?></td>
                         <td></td>
                         <td></td>
                         <td></td>
@@ -220,7 +220,7 @@ function overLimit(?float $valeur, ?float $plafond): bool
                         <td></td>
                         <td class="unite">DH</td>
                         <td class="taux">—</td>
-                        <td class="montant">
+                        <td class="montant gains-cell">
                             <input type="number" step="0.01" min="0" name="<?= $field ?>" class="form-control-inline<?= $ov ? ' over-limit' : '' ?>" value="<?= $val ?>">
                             <?php if ($pt !== null): ?><span class="plafond-label">max <?= number_format($pt, 2, ',', ' ') ?></span><?php endif; ?>
                         </td>
@@ -240,7 +240,7 @@ function overLimit(?float $valeur, ?float $plafond): bool
                         <td></td>
                         <td class="unite">DH</td>
                         <td class="taux">—</td>
-                        <td class="montant<?= $ovG ? ' over-limit' : '' ?>">
+                        <td class="montant gains-cell<?= $ovG ? ' over-limit' : '' ?>">
                             <input type="hidden" name="gain_existing_rubrique_id[]" value="<?= (int)$g['rubrique_id'] ?>">
                             <input type="number" step="0.01" min="0" name="gain_existing_montant[]" class="form-control-inline" style="width:80px;" value="<?= $g['montant'] ?>">
                             <?php if ($ptG !== null): ?><span class="plafond-label">max <?= number_format($ptG, 2, ',', ' ') ?></span><?php endif; ?>
@@ -267,7 +267,7 @@ function overLimit(?float $valeur, ?float $plafond): bool
                         <td></td>
                         <td class="unite">DH</td>
                         <td></td>
-                        <td class="montant"><strong><?= number_format($paie['salaire_brut'], 2, ',', ' ') ?></strong></td>
+                        <td class="montant gains-cell"><strong><?= number_format($paie['salaire_brut'], 2, ',', ' ') ?></strong></td>
                         <td></td>
                         <td></td>
                         <td></td>
@@ -276,10 +276,10 @@ function overLimit(?float $valeur, ?float $plafond): bool
                     <tr>
                         <td class="code">500</td>
                         <td><span class="info-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="info-tooltip">Salaire brut – Gains exonérés</span></span> <strong>Salaire brut imposable</strong><span class="formule-label">(Salaire brut − 330 exonérée − 346 exonérée − 331)</span></td>
-                        <td class="montant"><?= number_format($paie['sbi'], 2, ',', ' ') ?></td>
+                        <td></td>
                         <td class="unite">DH</td>
                         <td></td>
-                        <td></td>
+                        <td class="montant gains-cell"><strong><?= number_format($paie['sbi'], 2, ',', ' ') ?></strong></td>
                         <td></td>
                         <td></td>
                         <td></td>
@@ -294,8 +294,8 @@ function overLimit(?float $valeur, ?float $plafond): bool
                         <td class="unite">DH</td>
                         <td class="taux">4,48%</td>
                         <td></td>
-                        <td class="montant"><?= number_format($paie['cnss_salariale'], 2, ',', ' ') ?></td>
-                        <td class="montant"><?= number_format($paie['cnss_patronale'], 2, ',', ' ') ?></td>
+                        <td class="montant retenues-cell"><?= number_format($paie['cnss_salariale'], 2, ',', ' ') ?></td>
+                        <td class="montant patronales-cell"><?= number_format($paie['cnss_patronale'], 2, ',', ' ') ?></td>
                         <td></td>
                     </tr>
 
@@ -306,8 +306,8 @@ function overLimit(?float $valeur, ?float $plafond): bool
                         <td class="unite">DH</td>
                         <td class="taux">2,26%</td>
                         <td></td>
-                        <td class="montant"><?= number_format($paie['amo_salariale'], 2, ',', ' ') ?></td>
-                        <td class="montant"><?= number_format($paie['amo_patronale'], 2, ',', ' ') ?></td>
+                        <td class="montant retenues-cell"><?= number_format($paie['amo_salariale'], 2, ',', ' ') ?></td>
+                        <td class="montant patronales-cell"><?= number_format($paie['amo_patronale'], 2, ',', ' ') ?></td>
                         <td></td>
                     </tr>
 
@@ -318,8 +318,20 @@ function overLimit(?float $valeur, ?float $plafond): bool
                         <td class="unite">DH</td>
                         <td class="taux">—</td>
                         <td></td>
-                        <td class="montant"><?= number_format($paie['mutuelle'], 2, ',', ' ') ?></td>
+                        <td class="montant retenues-cell"><?= number_format($paie['mutuelle'], 2, ',', ' ') ?></td>
                         <td></td>
+                        <td></td>
+                    </tr>
+
+                    <tr class="total-row">
+                        <td></td>
+                        <td><strong>Total cotisations</strong><span class="formule-label">(400 + 410 + 420)</span></td>
+                        <td></td>
+                        <td class="unite">DH</td>
+                        <td></td>
+                        <td></td>
+                        <td class="montant retenues-cell"><strong><?= number_format($paie['cnss_salariale'] + $paie['amo_salariale'] + $paie['mutuelle'], 2, ',', ' ') ?></strong></td>
+                        <td class="montant patronales-cell"><strong><?= number_format($paie['cnss_patronale'] + $paie['amo_patronale'], 2, ',', ' ') ?></strong></td>
                         <td></td>
                     </tr>
 
@@ -333,7 +345,7 @@ function overLimit(?float $valeur, ?float $plafond): bool
                         <td class="unite">DH</td>
                         <td class="taux"><?= $fpTaux ?>%</td>
                         <td></td>
-                        <td class="montant"><?= number_format($paie['frais_professionnels'], 2, ',', ' ') ?></td>
+                        <td class="montant retenues-cell"><?= number_format($paie['frais_professionnels'], 2, ',', ' ') ?></td>
                         <td></td>
                         <td></td>
                     </tr>
@@ -357,7 +369,7 @@ function overLimit(?float $valeur, ?float $plafond): bool
                         <td class="unite">DH</td>
                         <td class="taux">Barème</td>
                         <td></td>
-                        <td class="montant"><?= number_format($paie['ir'], 2, ',', ' ') ?></td>
+                        <td class="montant retenues-cell"><?= number_format($paie['ir'], 2, ',', ' ') ?></td>
                         <td></td>
                         <td></td>
                     </tr>
@@ -392,7 +404,7 @@ function overLimit(?float $valeur, ?float $plafond): bool
                         <td class="unite">DH</td>
                         <td class="taux">—</td>
                         <td></td>
-                        <td class="montant">
+                        <td class="montant retenues-cell">
                             <input type="number" step="0.01" min="0" name="retenue_montant_existing[<?= $r['id'] ?>]" class="form-control-inline" style="width:80px;" value="<?= $r['montant'] ?>">
                         </td>
                         <td></td>
@@ -418,7 +430,7 @@ function overLimit(?float $valeur, ?float $plafond): bool
                         <td class="unite">DH</td>
                         <td></td>
                         <td></td>
-                        <td class="montant"><?= number_format($paie['autres_retenues'], 2, ',', ' ') ?></td>
+                        <td class="montant retenues-cell"><?= number_format($paie['autres_retenues'], 2, ',', ' ') ?></td>
                         <td></td>
                         <td></td>
                     </tr>
@@ -429,8 +441,8 @@ function overLimit(?float $valeur, ?float $plafond): bool
                         <td></td>
                         <td class="unite">DH</td>
                         <td></td>
+                        <td class="montant gains-cell"><strong><?= number_format($paie['net_avant_retenues'], 2, ',', ' ') ?></strong></td>
                         <td></td>
-                        <td class="montant"><strong><?= number_format($paie['net_avant_retenues'], 2, ',', ' ') ?></strong></td>
                         <td></td>
                         <td></td>
                     </tr>
@@ -441,8 +453,8 @@ function overLimit(?float $valeur, ?float $plafond): bool
                         <td></td>
                         <td class="unite">DH</td>
                         <td></td>
+                        <td class="montant gains-cell"><strong style="color:var(--accent);font-size:1rem;"><?= number_format($paie['net_a_payer'], 2, ',', ' ') ?> MAD</strong></td>
                         <td></td>
-                        <td class="montant"><strong style="color:var(--accent);font-size:1rem;"><?= number_format($paie['net_a_payer'], 2, ',', ' ') ?> MAD</strong></td>
                         <td></td>
                         <td></td>
                     </tr>
@@ -585,6 +597,12 @@ function overLimit(?float $valeur, ?float $plafond): bool
 .info-icon svg { width:12px; height:12px; pointer-events:none; }
 .edit-paie-table-wrap { overflow:visible !important; }
 .formule-label { display:block; font-size:0.62rem; font-weight:400; color:var(--text-muted); margin-top:0.1rem; white-space:normal; }
+.edit-paie-table .gains-cell { color:#34d399; }
+.edit-paie-table .gains-cell strong { color:#34d399; }
+.edit-paie-table .retenues-cell { color:#f87171; }
+.edit-paie-table .retenues-cell strong { color:#f87171; }
+.edit-paie-table .patronales-cell { color:#fbbf24; }
+.edit-paie-table .patronales-cell strong { color:#fbbf24; }
 .info-icon .info-tooltip { display:none; position:fixed; background:var(--bg-surface); color:var(--text); padding:0.4rem 0.6rem; border-radius:6px; font-size:0.7rem; font-weight:400; white-space:nowrap; box-shadow:0 4px 12px rgba(0,0,0,0.3); z-index:9999; line-height:1.4; pointer-events:none; }
 .info-icon .info-tooltip::after { content:''; position:absolute; top:100%; left:50%; transform:translateX(-50%); border:5px solid transparent; border-top-color:var(--bg-surface); }
 .info-icon:hover .info-tooltip { display:block; }
@@ -643,7 +661,7 @@ function ajouterGainDepuisModal() {
         <td></td>
         <td class="unite">DH</td>
         <td class="taux">—</td>
-        <td class="montant">
+        <td class="montant gains-cell">
             <input type="hidden" name="gain_new_rubrique_id[${gainIdx}]" value="${gainSelected.id}">
             <input type="number" step="0.01" min="0" name="gain_new_montant[${gainIdx}]" class="form-control-inline" style="width:80px;" value="${montant.toFixed(2)}">
         </td>
@@ -698,7 +716,7 @@ function ajouterRetenueDepuisModal() {
         <td class="unite">DH</td>
         <td class="taux">—</td>
         <td></td>
-        <td class="montant">
+        <td class="montant retenues-cell">
             <input type="hidden" name="retenue_new_rubrique_id[${retenueIdx}]" value="${retenueSelected.id}">
             <input type="number" step="0.01" min="0" name="retenue_new_montant[${retenueIdx}]" class="form-control-inline" style="width:80px;" value="${montant.toFixed(2)}">
         </td>

@@ -114,7 +114,12 @@
     ?>
 
     <div class="a4-header">
+        <?php $logoUri = \Core\Helper::logoDataUri($societe['logo'] ?? null); ?>
+        <?php if ($logoUri): ?>
+        <div style="width:46px; height:46px; margin-right:10px; display:flex; align-items:center; justify-content:center;"><img src="<?= $logoUri ?>" alt="Logo" style="width:46px; height:46px; object-fit:contain;"></div>
+        <?php else: ?>
         <div class="a4-company-logo">TE</div>
+        <?php endif; ?>
         <div class="a4-company-name"><?= htmlspecialchars($societe['raison_sociale']) ?></div>
         <div class="a4-company-sub">ICE : <?= htmlspecialchars($societe['ice'] ?? '') ?></div>
     </div>

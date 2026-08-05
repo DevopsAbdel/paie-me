@@ -2,8 +2,26 @@
     <div class="card-header">
         <h3><?= $societe ? 'Modifier' : 'Nouvelle' ?> société</h3>
     </div>
-    <form method="POST">
+    <form method="POST" enctype="multipart/form-data">
         <?= \Core\Session::csrfField() ?>
+        <div class="form-row">
+            <div class="form-group" style="flex:0 0 auto; max-width:200px;">
+                <label>Logo</label>
+                <div style="display:flex; align-items:center; gap:0.75rem;">
+                    <div id="logo-preview" style="width:64px; height:64px; border-radius:8px; background:var(--bg-surface); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; overflow:hidden;">
+                        <?php if (!empty($societe['logo'])): ?>
+                            <img src="/paie-me/<?= htmlspecialchars($societe['logo']) ?>" alt="Logo" style="width:100%; height:100%; object-fit:contain;">
+                        <?php else: ?>
+                            <span style="font-size:0.7rem; color:var(--text-muted);">Aucun</span>
+                        <?php endif; ?>
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:0.35rem;">
+                        <input type="file" name="logo" id="logo-input" class="form-control" accept="image/png,image/jpeg,image/gif,image/webp,image/svg+xml">
+                        <small style="color:var(--text-muted); font-size:0.7rem;">PNG, JPG, GIF, WEBP, SVG</small>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="form-row">
             <div class="form-group">
                 <label>Raison sociale *</label>
@@ -152,3 +170,21 @@
         </div>
     </form>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var input = document.getElementById('logo-input');
+    var preview = document.getElementById('logo-preview');
+    if (input && preview) {
+        input.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.innerHTML = '<img src="' + e.target.result + '" alt="Logo" style="width:100%; height:100%; object-fit:contain;">';
+                };
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+    }
+});
+</script>

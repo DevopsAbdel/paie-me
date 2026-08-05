@@ -27,7 +27,16 @@
                 <tbody>
                     <?php foreach ($societes as $s): ?>
                     <tr>
-                        <td><a href="/paie-me/societes/<?= $s['id'] ?>" style="font-weight:600;"><?= htmlspecialchars($s['raison_sociale']) ?></a></td>
+                        <td>
+                            <div style="display:flex; align-items:center; gap:0.6rem;">
+                                <?php if (!empty($s['logo'])): ?>
+                                <img src="/paie-me/<?= htmlspecialchars($s['logo']) ?>" alt="Logo" style="width:26px; height:26px; border-radius:5px; object-fit:contain; background:var(--bg-surface); border:1px solid var(--border); padding:1px;">
+                                <?php else: ?>
+                                <div style="width:26px; height:26px; min-width:26px; border-radius:5px; background:var(--accent-60); color:var(--accent); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:0.7rem;"><?= htmlspecialchars(mb_strtoupper(mb_substr(trim($s['raison_sociale']), 0, 1))) ?></div>
+                                <?php endif; ?>
+                                <a href="/paie-me/societes/<?= $s['id'] ?>" style="font-weight:600;"><?= htmlspecialchars($s['raison_sociale']) ?></a>
+                            </div>
+                        </td>
                         <td><?= $s['forme_juridique'] ?></td>
                         <td><?= htmlspecialchars($s['ice']) ?></td>
                         <td><?= htmlspecialchars($s['if_fiscal']) ?></td>

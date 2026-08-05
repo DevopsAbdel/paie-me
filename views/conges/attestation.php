@@ -41,7 +41,11 @@ $statutLabel = $statuts[$conge['statut']] ?? $conge['statut'];
     <div class="a4-page">
 
         <div class="a4-header">
+            <?php if (!empty($societe['logo'])): ?>
+            <img src="/paie-me/<?= htmlspecialchars($societe['logo']) ?>" alt="Logo" style="width:46px; height:46px; margin-right:10px; object-fit:contain;">
+            <?php else: ?>
             <div class="a4-company-logo">TE</div>
+            <?php endif; ?>
             <div class="a4-company-name"><?= htmlspecialchars($societe['raison_sociale']) ?></div>
             <div class="a4-company-sub">ICE : <?= htmlspecialchars($societe['ice'] ?? '') ?></div>
         </div>

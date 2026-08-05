@@ -91,9 +91,14 @@ $taux = [
     </div>
 
     <div style="display:flex; align-items:center; gap:1rem; padding:1rem; border-bottom:2px solid <?= $couleur ?>; margin-bottom:1rem;">
+        <?php $logoUri = \Core\Helper::logoDataUri($b['logo'] ?? null); ?>
+        <?php if ($logoUri): ?>
+        <img src="<?= $logoUri ?>" alt="Logo" style="width:60px; height:60px; border-radius:8px; object-fit:contain; flex-shrink:0; background:var(--bg-surface); border:1px solid var(--border); padding:4px;">
+        <?php else: ?>
         <div style="width:60px; height:60px; background:<?= $couleur ?>; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:1.5rem; font-weight:700; color:#fff; flex-shrink:0;">
             <?= strtoupper(mb_substr($b['raison_sociale'], 0, 2)) ?>
         </div>
+        <?php endif; ?>
         <div style="flex:1;">
             <h4 style="color:<?= $couleur ?>; margin:0;"><?= htmlspecialchars($b['raison_sociale']) ?></h4>
             <p style="color:var(--text-muted); font-size:0.8125rem; margin:0.25rem 0 0 0;">

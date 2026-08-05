@@ -236,6 +236,7 @@ class ModeleBulletinController extends Controller
 
         $b = [
             'raison_sociale' => $societe['raison_sociale'],
+            'logo' => $societe['logo'] ?? null,
             'ice' => $societe['ice'] ?? 'ICE000000000',
             'if_fiscal' => $societe['if_fiscal'] ?? '00000000',
             'cnss_societe' => $societe['cnss_societe'] ?? '0000000',

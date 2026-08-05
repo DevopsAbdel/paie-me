@@ -8,6 +8,7 @@ use Core\Session;
 use Core\Validator;
 use Core\Audit;
 use Core\Crypto;
+use Core\Helper;
 use PDO;
 
 class SocieteController extends Controller
@@ -68,6 +69,12 @@ class SocieteController extends Controller
             ]);
 
             $societeId = $this->db->lastInsertId();
+
+            $logoPath = $this->handleLogoUpload();
+            if ($logoPath !== null) {
+                $this->db->prepare("UPDATE societes SET logo = ? WHERE id = ?")->execute([$logoPath, $societeId]);
+            }
+
             Audit::log($this->db, 'create', 'societe', (int) $societeId, 'Création société: ' . $data['raison_sociale']);
 
             Session::setFlash('success', 'Société créée avec succès.');
@@ -95,6 +102,7 @@ class SocieteController extends Controller
             'raison_sociale' => $societe['raison_sociale'],
             'ice'            => $societe['ice'],
             'cnss'           => $societe['cnss'],
+            'logo'           => $societe['logo'] ?? null,
         ]);
 
         $societe['rib'] = Crypto::decrypt($societe['rib']);
@@ -155,6 +163,7 @@ class SocieteController extends Controller
             'raison_sociale' => $societe['raison_sociale'],
             'ice'            => $societe['ice'],
             'cnss'           => $societe['cnss'],
+            'logo'           => $societe['logo'] ?? null,
         ]);
 
         $salaries = $this->db->query("SELECT s.*, f.nom as fonction_nom FROM salaries s LEFT JOIN fonctions f ON s.fonction_id = f.id WHERE s.societe_id = $id AND s.actif = 1 ORDER BY LENGTH(s.matricule), s.matricule")->fetchAll();
@@ -193,6 +202,7 @@ class SocieteController extends Controller
             'raison_sociale' => $societe['raison_sociale'],
             'ice'            => $societe['ice'],
             'cnss'           => $societe['cnss'],
+            'logo'           => $societe['logo'] ?? null,
         ]);
 
         $periodes = $this->db->query("SELECT p.*, (SELECT COUNT(*) FROM paies WHERE periode_id = p.id) as nb_paies FROM periodes p WHERE p.societe_id = $id ORDER BY p.annee DESC, p.mois DESC")->fetchAll();
@@ -227,6 +237,7 @@ class SocieteController extends Controller
             'raison_sociale' => $societe['raison_sociale'],
             'ice'            => $societe['ice'],
             'cnss'           => $societe['cnss'],
+            'logo'           => $societe['logo'] ?? null,
         ]);
 
         $bulletins = $this->db->query("
@@ -269,6 +280,7 @@ class SocieteController extends Controller
             'raison_sociale' => $societe['raison_sociale'],
             'ice'            => $societe['ice'],
             'cnss'           => $societe['cnss'],
+            'logo'           => $societe['logo'] ?? null,
         ]);
 
         $periodes = $this->db->query("SELECT p.*, (SELECT COUNT(*) FROM paies WHERE periode_id = p.id) as nb_paies FROM periodes p WHERE p.societe_id = $id ORDER BY p.annee DESC, p.mois DESC")->fetchAll();
@@ -304,6 +316,7 @@ class SocieteController extends Controller
             'raison_sociale' => $societe['raison_sociale'],
             'ice'            => $societe['ice'],
             'cnss'           => $societe['cnss'],
+            'logo'           => $societe['logo'] ?? null,
         ]);
 
         $periodes = $this->db->query("SELECT p.*, (SELECT COUNT(*) FROM paies WHERE periode_id = p.id) as nb_paies FROM periodes p WHERE p.societe_id = $id ORDER BY p.annee DESC, p.mois DESC")->fetchAll();
@@ -369,6 +382,14 @@ class SocieteController extends Controller
                 $data['cimr_login'], $data['cimr_password'], $id,
             ]);
 
+            $logoPath = $this->handleLogoUpload();
+            if ($logoPath !== null) {
+                if (!empty($societe['logo'])) {
+                    @unlink(Helper::logoFilePath($societe['logo']));
+                }
+                $this->db->prepare("UPDATE societes SET logo = ? WHERE id = ?")->execute([$logoPath, $id]);
+            }
+
             Audit::log($this->db, 'update', 'societe', $id, 'Modification société: ' . $societe['raison_sociale']);
 
             Session::setFlash('success', 'Société mise à jour.');
@@ -421,6 +442,7 @@ class SocieteController extends Controller
             'raison_sociale' => $societe['raison_sociale'],
             'ice'            => $societe['ice'],
             'cnss'           => $societe['cnss'],
+            'logo'           => $societe['logo'] ?? null,
         ]);
 
         // Delete actions via GET
@@ -692,6 +714,7 @@ class SocieteController extends Controller
             'raison_sociale' => $societe['raison_sociale'],
             'ice'            => $societe['ice'],
             'cnss'           => $societe['cnss'],
+            'logo'           => $societe['logo'] ?? null,
         ]);
 
         if (isset($_GET['delete_bareme'])) {
@@ -957,6 +980,44 @@ class SocieteController extends Controller
         }
 
         $this->redirect('/paie-me/societes/' . $societeId . '/baremes/reference');
+    }
+
+    private function handleLogoUpload(): ?string
+    {
+        if (empty($_FILES['logo']['name'])) {
+            return null;
+        }
+
+        $file = $_FILES['logo'];
+        if ((int) $file['error'] !== UPLOAD_ERR_OK) {
+            Session::setFlash('error', 'Erreur lors de l\'upload du logo.');
+            return null;
+        }
+
+        $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        if (!in_array($ext, ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'], true)) {
+            Session::setFlash('error', 'Format de logo invalide (PNG, JPG, GIF, WEBP, SVG autorisés).');
+            return null;
+        }
+
+        if (!is_uploaded_file($file['tmp_name'])) {
+            Session::setFlash('error', 'Fichier uploadé invalide.');
+            return null;
+        }
+
+        $dir = __DIR__ . '/../uploads/logos';
+        if (!is_dir($dir)) {
+            mkdir($dir, 0775, true);
+        }
+
+        $nom = 'logo_' . bin2hex(random_bytes(8)) . '.' . $ext;
+        $dest = $dir . '/' . $nom;
+        if (!move_uploaded_file($file['tmp_name'], $dest)) {
+            Session::setFlash('error', 'Impossible de sauvegarder le logo.');
+            return null;
+        }
+
+        return 'uploads/logos/' . $nom;
     }
 
     private function getPostData(): array

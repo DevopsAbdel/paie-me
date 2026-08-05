@@ -11,6 +11,9 @@
     <div class="card-body">
         <div class="stc-header">
             <div class="stc-entreprise">
+                <?php if (!empty($s['logo'])): ?>
+                <img src="/paie-me/<?= htmlspecialchars($s['logo']) ?>" alt="Logo" style="width:48px; height:48px; border-radius:8px; object-fit:contain; background:var(--bg-surface); border:1px solid var(--border); padding:2px; margin-bottom:0.4rem;">
+                <?php endif; ?>
                 <p><strong><?= htmlspecialchars($s['raison_sociale']) ?></strong></p>
                 <p><?= htmlspecialchars($s['adresse']) ?></p>
                 <p><?= htmlspecialchars($s['ville']) ?></p>

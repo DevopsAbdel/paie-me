@@ -38,9 +38,13 @@
     <div class="card-header"><h3>Informations société</h3></div>
 
     <div style="display:flex; align-items:center; gap:1rem; margin-bottom:1.25rem;">
+        <?php if (!empty($societe['logo'])): ?>
+        <img src="/paie-me/<?= htmlspecialchars($societe['logo']) ?>" alt="Logo" style="width:52px; height:52px; min-width:52px; border-radius:12px; object-fit:contain; border:1px solid var(--border); background:var(--bg-surface); padding:3px;">
+        <?php else: ?>
         <div style="width:52px; height:52px; min-width:52px; border-radius:12px; background:var(--accent-60); color:var(--accent); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:1.4rem; border:1px solid var(--accent-70);">
             <?= htmlspecialchars(mb_strtoupper(mb_substr(trim($societe['raison_sociale']), 0, 1))) ?>
         </div>
+        <?php endif; ?>
         <div>
             <div style="font-size:1.25rem; font-weight:800;"><?= htmlspecialchars($societe['raison_sociale']) ?></div>
             <div style="color:var(--text-muted); font-size:0.85rem;"><?= htmlspecialchars($societe['forme_juridique']) ?></div>
