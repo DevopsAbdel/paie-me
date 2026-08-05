@@ -5,19 +5,35 @@
     <form method="POST" enctype="multipart/form-data">
         <?= \Core\Session::csrfField() ?>
         <div class="form-row">
-            <div class="form-group" style="flex:0 0 auto; max-width:200px;">
+            <div class="form-group" style="flex:0 0 auto; max-width:100%;">
                 <label>Logo</label>
-                <div style="display:flex; align-items:center; gap:0.75rem;">
-                    <div id="logo-preview" style="width:64px; height:64px; border-radius:8px; background:var(--bg-surface); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; overflow:hidden;">
+                <div class="logo-upload">
+                    <div id="logo-preview" class="logo-preview <?= !empty($societe['logo']) ? 'has-logo' : '' ?>">
                         <?php if (!empty($societe['logo'])): ?>
-                            <img src="/paie-me/<?= htmlspecialchars($societe['logo']) ?>" alt="Logo" style="width:100%; height:100%; object-fit:contain;">
+                            <img src="/paie-me/<?= htmlspecialchars($societe['logo']) ?>" alt="Logo" class="logo-preview-img">
                         <?php else: ?>
-                            <span style="font-size:0.7rem; color:var(--text-muted);">Aucun</span>
+                            <span class="logo-preview-empty">
+                                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                                <span>Pas de logo</span>
+                            </span>
                         <?php endif; ?>
                     </div>
-                    <div style="display:flex; flex-direction:column; gap:0.35rem;">
-                        <input type="file" name="logo" id="logo-input" class="form-control" accept="image/png,image/jpeg,image/gif,image/webp,image/svg+xml">
-                        <small style="color:var(--text-muted); font-size:0.7rem;">PNG, JPG, GIF, WEBP, SVG</small>
+                    <div class="logo-upload-controls">
+                        <input type="file" name="logo" id="logo-input" class="form-control logo-file-input" accept="image/png,image/jpeg,image/gif,image/webp,image/svg+xml">
+                        <input type="hidden" name="logo_remove" id="logo-remove-field" value="0">
+                        <div class="logo-actions">
+                            <label for="logo-input" class="btn btn-outline-violet logo-btn">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                                Choisir un fichier
+                            </label>
+                            <?php if (!empty($societe['logo'])): ?>
+                            <button type="button" id="logo-remove-btn" class="btn btn-outline-danger logo-remove">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                                Retirer le logo
+                            </button>
+                            <?php endif; ?>
+                        </div>
+                        <small style="color:var(--text-muted); font-size:0.7rem;">Formats acceptés : PNG, JPG, GIF, WEBP, SVG</small>
                     </div>
                 </div>
             </div>
@@ -180,9 +196,21 @@ document.addEventListener('DOMContentLoaded', function() {
             if (this.files && this.files[0]) {
                 var reader = new FileReader();
                 reader.onload = function(e) {
-                    preview.innerHTML = '<img src="' + e.target.result + '" alt="Logo" style="width:100%; height:100%; object-fit:contain;">';
+                    preview.classList.add('has-logo');
+                    preview.innerHTML = '<img src="' + e.target.result + '" alt="Logo" class="logo-preview-img">';
                 };
                 reader.readAsDataURL(this.files[0]);
+            }
+        });
+    }
+
+    var removeBtn = document.getElementById('logo-remove-btn');
+    var removeField = document.getElementById('logo-remove-field');
+    if (removeBtn && removeField) {
+        removeBtn.addEventListener('click', function() {
+            if (confirm('Supprimer le logo actuel ?')) {
+                removeField.value = '1';
+                this.closest('form').submit();
             }
         });
     }

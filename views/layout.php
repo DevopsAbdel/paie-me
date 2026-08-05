@@ -22,15 +22,17 @@
     </button>
     <div class="sidebar-brand">
         <?php if ($ctx): ?>
-            <?php if (!empty($ctx['logo'])): ?>
-            <img src="/paie-me/<?= htmlspecialchars($ctx['logo']) ?>" alt="Logo" style="width:40px;height:40px;border-radius:8px;object-fit:contain;margin-bottom:4px;background:var(--bg-surface);border:1px solid var(--border);padding:2px;">
-            <?php else: ?>
-            <div style="width:40px;height:40px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;margin-bottom:4px;">
-                <?= strtoupper(mb_substr($ctx['raison_sociale'], 0, 2)) ?>
+            <div class="sidebar-brand-inner">
+                <?php if (!empty($ctx['logo'])): ?>
+                <img src="/paie-me/<?= htmlspecialchars($ctx['logo']) ?>" alt="Logo de <?= htmlspecialchars($ctx['raison_sociale']) ?>" class="sidebar-logo">
+                <?php else: ?>
+                <div class="sidebar-logo sidebar-logo-initials"><?= strtoupper(mb_substr($ctx['raison_sociale'], 0, 2)) ?></div>
+                <?php endif; ?>
+                <div class="sidebar-brand-text">
+                    <h2><?= htmlspecialchars($ctx['raison_sociale']) ?></h2>
+                    <small>ICE: <?= htmlspecialchars($ctx['ice']) ?></small>
+                </div>
             </div>
-            <?php endif; ?>
-            <h2 style="font-size:1rem;margin:0;"><?= htmlspecialchars($ctx['raison_sociale']) ?></h2>
-            <small style="font-size:0.7rem;">ICE: <?= htmlspecialchars($ctx['ice']) ?></small>
         <?php else: ?>
             <h2>Paie Me</h2>
             <small>Gestion de paie</small>

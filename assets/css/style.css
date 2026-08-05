@@ -75,18 +75,62 @@ a:hover {
 
 .sidebar-brand {
     position: relative;
-    padding: 1.5rem 1.25rem;
+    padding: 1.25rem 1.25rem;
     border-bottom: 1px solid var(--border);
 }
 
+.sidebar-brand-inner {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 0;
+}
+
+.sidebar-logo {
+    width: 46px;
+    height: 46px;
+    min-width: 46px;
+    border-radius: 12px;
+    object-fit: contain;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    padding: 4px;
+    flex-shrink: 0;
+}
+
+.sidebar-logo-initials {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--accent);
+    background: rgba(139, 92, 246, 0.12);
+    border-color: rgba(139, 92, 246, 0.35);
+    padding: 0;
+}
+
+.sidebar-brand-text {
+    min-width: 0;
+    flex: 1;
+}
+
 .sidebar-brand h2 {
-    font-size: 1.25rem;
+    font-size: 1rem;
+    margin: 0 0 0.1rem 0;
     color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .sidebar-brand small {
     color: var(--text-muted);
-    font-size: 0.75rem;
+    font-size: 0.7rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
 }
 
 .sidebar-nav {
@@ -1119,7 +1163,8 @@ body.sidebar-collapsed .sidebar-brand {
 }
 body.sidebar-collapsed .sidebar-brand h2,
 body.sidebar-collapsed .sidebar-brand small { display: none; }
-body.sidebar-collapsed .sidebar-brand > div[style*="width:40px"] { margin-left: auto; margin-right: auto; }
+body.sidebar-collapsed .sidebar-brand-inner { justify-content: center; }
+body.sidebar-collapsed .sidebar-logo { margin: 0 auto; }
 
 body.sidebar-collapsed .sidebar-nav li a {
     justify-content: center;
@@ -1139,6 +1184,125 @@ body.sidebar-collapsed .sidebar-footer {
     gap: 0.5rem;
 }
 body.sidebar-collapsed .sidebar-footer a { justify-content: center; padding: 0.5rem; }
+
+/* ── Upload logo société ── */
+.logo-upload {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+.logo-preview {
+    width: 96px;
+    height: 96px;
+    border-radius: 12px;
+    border: 1px dashed var(--border-strong, var(--border));
+    background: var(--bg-surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+.logo-preview.has-logo {
+    border-style: solid;
+    border-color: var(--border);
+}
+.logo-preview-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 4px;
+}
+.logo-preview-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    color: var(--text-muted);
+    font-size: 0.7rem;
+    text-align: center;
+    padding: 0.5rem;
+}
+.logo-upload-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    flex: 1;
+    min-width: 260px;
+}
+.logo-file-input {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0 0 0 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+.logo-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+.logo-btn,
+.logo-remove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 38px;
+    padding: 0.4rem 1.1rem;
+    font-size: 0.85rem;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+.logo-btn {
+    cursor: pointer;
+}
+.logo-file-name {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    word-break: break-all;
+    background: rgba(139, 92, 246, 0.08);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    padding: 0.4rem 0.7rem;
+    border-radius: 6px;
+}
+.logo-remove {
+    color: #ef4444;
+    border-color: rgba(239, 68, 68, 0.4);
+    cursor: pointer;
+    margin-left: 0;
+}
+.logo-remove:hover {
+    background: rgba(239, 68, 68, 0.12) !important;
+    color: #ef4444 !important;
+    border-color: #ef4444 !important;
+}
+.btn-outline-danger {
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    background: transparent;
+}
+.btn-outline-danger:hover {
+    background: rgba(239, 68, 68, 0.12);
+    color: #ef4444;
+    border-color: #ef4444;
+}
+.btn-outline-violet {
+    color: var(--accent);
+    border: 1px solid rgba(139, 92, 246, 0.5);
+    background: transparent;
+}
+.btn-outline-violet:hover {
+    background: rgba(139, 92, 246, 0.12);
+    color: var(--accent-hover);
+    border-color: var(--accent);
+}
 
 /* ── Table tools : tri + filtre ── */
 .table-toolbar {

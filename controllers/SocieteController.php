@@ -388,6 +388,9 @@ class SocieteController extends Controller
                     @unlink(Helper::logoFilePath($societe['logo']));
                 }
                 $this->db->prepare("UPDATE societes SET logo = ? WHERE id = ?")->execute([$logoPath, $id]);
+            } elseif (!empty($_POST['logo_remove']) && !empty($societe['logo'])) {
+                @unlink(Helper::logoFilePath($societe['logo']));
+                $this->db->prepare("UPDATE societes SET logo = NULL WHERE id = ?")->execute([$id]);
             }
 
             Audit::log($this->db, 'update', 'societe', $id, 'Modification société: ' . $societe['raison_sociale']);
