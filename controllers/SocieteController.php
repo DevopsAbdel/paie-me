@@ -157,7 +157,11 @@ class SocieteController extends Controller
             'cnss'           => $societe['cnss'],
         ]);
 
-        $salaries = $this->db->query("SELECT s.*, f.nom as fonction_nom FROM salaries s LEFT JOIN fonctions f ON s.fonction_id = f.id WHERE s.societe_id = $id AND s.actif = 1 ORDER BY s.nom_famille, s.prenom")->fetchAll();
+        $salaries = $this->db->query("SELECT s.*, f.nom as fonction_nom FROM salaries s LEFT JOIN fonctions f ON s.fonction_id = f.id WHERE s.societe_id = $id AND s.actif = 1 ORDER BY LENGTH(s.matricule), s.matricule")->fetchAll();
+        foreach ($salaries as &$s) {
+            $s['cin'] = Crypto::tryDecrypt($s['cin'] ?? '');
+        }
+        unset($s);
 
         $title = 'Salariés ' . $societe['raison_sociale'] . ' ' . $societe['forme_juridique'] . ' — ICE: ' . $societe['ice'];
         $actions = '

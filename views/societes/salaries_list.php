@@ -13,7 +13,7 @@
         <table>
             <thead>
                 <tr>
-                    <th>Matricule</th><th>Nom</th><th>Prénom</th><th>Poste</th>
+                    <th>Matricule</th><th>Nom</th><th>Prénom</th><th>CIN</th><th>Poste</th>
                     <th>Salaire</th><th>CNSS</th><th>Actions</th>
                 </tr>
             </thead>
@@ -23,6 +23,7 @@
                     <td><?= htmlspecialchars($s['matricule']) ?></td>
                     <td><?= htmlspecialchars($s['nom_famille']) ?></td>
                     <td><?= htmlspecialchars($s['prenom']) ?></td>
+                    <td><?= htmlspecialchars($s['cin'] ?? '') ?></td>
                     <td><?= htmlspecialchars($s['fonction_nom'] ?? $s['poste']) ?></td>
                     <td><?= number_format($s['salaire_base'], 2, ',', ' ') ?></td>
                     <td><?= htmlspecialchars($s['cnss']) ?></td>

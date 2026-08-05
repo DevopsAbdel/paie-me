@@ -36,7 +36,7 @@ class SalarieController extends Controller
         if ($ctx) {
             $sql .= " AND s.societe_id = " . (int)$ctx['id'];
         }
-        $sql .= " ORDER BY s.nom_famille, s.prenom";
+        $sql .= " ORDER BY LENGTH(s.matricule), s.matricule";
         $salaries = $this->db->query($sql)->fetchAll();
 
         $this->render('salaries/index.php', [
