@@ -137,6 +137,16 @@ if (Test-Path $mysqlExe) {
             Write-Ok "Données existantes — seed démo ignoré ($nbSocietes société(s))"
         }
     }
+    # Base démo (paie_me_demo) : créée/initialisée à chaque démarrage (idempotent)
+    if (Test-Path $PhpExe) {
+        Write-Info "Initialisation de la base démo (paie_me_demo)..."
+        & $PhpExe "$PSScriptRoot\database\create_demo.php"
+        if ($LASTEXITCODE -eq 0) {
+            Write-Ok "Base 'paie_me_demo' prête"
+        } else {
+            Write-Error "Échec de l'initialisation de la base démo."
+        }
+    }
 } else {
     Write-Error "mysql.exe introuvable. Vérifie le chemin XAMPP."
 }

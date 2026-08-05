@@ -64,6 +64,27 @@ class AdminController extends Controller
                     }
                     break;
 
+                case 'sync_schema':
+                    try {
+                        require_once __DIR__ . '/../database/sync_schema.php';
+                        $r = sync_schema_database();
+                        $nb = count($r['tables_created']) + count($r['columns_added']) + count($r['indexes_added']);
+                        $msg = 'Schéma synchronisé : '
+                            . count($r['tables_created']) . ' table(s) créée(s), '
+                            . count($r['columns_added']) . ' colonne(s) ajoutée(s), '
+                            . count($r['indexes_added']) . ' index ajouté(s).';
+                        if ($nb === 0) {
+                            Session::setFlash('success', 'Schéma à jour — aucune différence entre paie_me et paie_me_demo.');
+                        } elseif ($r['errors']) {
+                            Session::setFlash('warning', $msg . ' Erreurs : ' . implode(' | ', array_slice($r['errors'], 0, 3)));
+                        } else {
+                            Session::setFlash('success', $msg);
+                        }
+                    } catch (\Throwable $e) {
+                        Session::setFlash('error', 'Erreur synchronisation : ' . $e->getMessage());
+                    }
+                    break;
+
                 case 'create_user':
                     $this->createUser();
                     break;

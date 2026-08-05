@@ -19,6 +19,11 @@
                 <input type="hidden" name="action" value="migrate">
                 <button type="submit" class="btn btn-secondary btn-sm">Appliquer les migrations</button>
             </form>
+            <form method="post" action="/paie-me/admin" class="inline-form" onsubmit="return confirm('Copier les nouvelles tables, colonnes et index de paie_me vers paie_me_demo ?')">
+                <?= \Core\Session::csrfField() ?>
+                <input type="hidden" name="action" value="sync_schema">
+                <button type="submit" class="btn btn-secondary btn-sm">Copier les nouvelles colonnes/tables vers la démo</button>
+            </form>
         </div>
         <div class="table-wrapper">
             <table>
