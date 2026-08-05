@@ -5,6 +5,7 @@ namespace Controllers;
 use Core\Controller;
 use Core\Model;
 use Core\Session;
+use Core\Crypto;
 use Dompdf\Dompdf;
 use PDO;
 
@@ -141,7 +142,12 @@ class BulletinController extends Controller
             LIMIT 1
         ");
         $stmt->execute([$id, $userId]);
-        return $stmt->fetch() ?: null;
+        $bulletin = $stmt->fetch() ?: null;
+        if ($bulletin) {
+            $bulletin['cin'] = Crypto::tryDecrypt($bulletin['cin'] ?? '');
+            $bulletin['rib'] = Crypto::tryDecrypt($bulletin['rib'] ?? '');
+        }
+        return $bulletin;
     }
 
     private function getTemplate(int $societeId): array

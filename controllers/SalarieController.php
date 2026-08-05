@@ -39,6 +39,12 @@ class SalarieController extends Controller
         $sql .= " ORDER BY LENGTH(s.matricule), s.matricule";
         $salaries = $this->db->query($sql)->fetchAll();
 
+        foreach ($salaries as &$s) {
+            $s['cin'] = Crypto::tryDecrypt($s['cin'] ?? '');
+            $s['rib'] = Crypto::tryDecrypt($s['rib'] ?? '');
+        }
+        unset($s);
+
         $this->render('salaries/index.php', [
             'title'    => 'Salariés',
             'salaries' => $salaries,

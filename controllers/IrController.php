@@ -5,6 +5,7 @@ namespace Controllers;
 use Core\Controller;
 use Core\Model;
 use Core\Session;
+use Core\Crypto;
 use PDO;
 
 class IrController extends Controller
@@ -86,7 +87,7 @@ class IrController extends Controller
                 $paie['id'],
                 $paie['nom_famille'],
                 $paie['prenom'],
-                $paie['cin'],
+                Crypto::tryDecrypt($paie['cin'] ?? ''),
                 number_format($paie['salaire_brut'], 2, ',', ''),
                 number_format($paie['cnss_salariale'], 2, ',', ''),
                 number_format($paie['amo_salariale'], 2, ',', ''),
