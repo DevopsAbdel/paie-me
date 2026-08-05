@@ -346,12 +346,35 @@ class PaieController extends Controller
         }
 
         $paies = $this->db->query("
-            SELECT pa.*, s.nom_famille, s.prenom, s.matricule, s.cnss
+            SELECT pa.*, s.nom_famille, s.prenom, s.matricule, s.cnss, s.date_embauche, s.salaire_base
             FROM paies pa
             JOIN salaries s ON pa.salarie_id = s.id
             WHERE pa.periode_id = $id
             ORDER BY s.nom_famille, s.prenom
         ")->fetchAll();
+
+        $dateFin = $periode['date_fin'];
+        foreach ($paies as &$pa) {
+            $annees = null;
+            $taux = 0.00;
+            if (!empty($pa['date_embauche'])) {
+                $annees = (int) (new \DateTime($pa['date_embauche']))->diff(new \DateTime($dateFin))->format('%y');
+                $taux = $this->calculator->calcAnciennete($pa['date_embauche'], $dateFin);
+            }
+            $salaireBase = (float) $pa['salaire_base'];
+            $jours = (int) $pa['jours_travailles'];
+            $joursConge = (int) ($pa['jours_conge'] ?? 0);
+            $joursFeries = (int) ($pa['jours_feries'] ?? 0);
+            $baseAnc = round($salaireBase * ($jours / 26), 2)
+                + round($salaireBase / 26 * $joursConge, 2)
+                + round($salaireBase / 26 * $joursFeries, 2)
+                + (float) $pa['montant_heures_sup'];
+            $pa['annees_anciennete'] = $annees;
+            $pa['taux_anciennete']   = $taux;
+            $pa['prime_attendu']     = round($baseAnc * $taux, 2);
+            $pa['prime_ecart']       = round((float) $pa['prime_anciennete'] - round($baseAnc * $taux, 2), 2);
+        }
+        unset($pa);
 
         $disponibles = $this->db->prepare("
             SELECT s.id, s.matricule, s.cnss, s.nom_famille, s.prenom, s.salaire_base

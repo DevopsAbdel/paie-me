@@ -5,7 +5,12 @@
             <?php if (!$periode['cloturee'] && !empty($disponibles)): ?>
             <button type="button" class="btn btn-primary btn-sm" id="btn-importer">Importer</button>
             <?php endif; ?>
+            <button type="button" class="btn btn-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#modal-verif-anciennete">Vérifier ancienneté</button>
+            <?php if (!$periode['cloturee']): ?>
             <a href="/paie-me/paies/<?= $periode['id'] ?>/calculate" class="btn btn-secondary btn-sm" onclick="return confirm('Recalculer toutes les paies ?')">Recalculer</a>
+            <?php else: ?>
+            <a href="/paie-me/paies/<?= $periode['id'] ?>/rouvrir" class="btn btn-warning btn-sm" onclick="return confirm('Réouvrir cette période ? Les modifications seront à nouveau autorisées.')">Réouvrir</a>
+            <?php endif; ?>
             <a href="/paie-me/paies" class="btn btn-secondary btn-sm">Retour</a>
         </div>
     </div>
@@ -73,6 +78,58 @@
             </table>
         </div>
     <?php endif; ?>
+</div>
+
+<div class="modal fade" id="modal-verif-anciennete" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content" style="background:var(--bg-surface); color:var(--text); border:1px solid var(--border); border-radius:12px;">
+            <div class="modal-header" style="border-bottom:1px solid var(--border);">
+                <h5 class="modal-title">Vérification — Prime d'ancienneté</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:0.75rem;">
+                    Ancienneté calculée au <?= date('d/m/Y', strtotime($periode['date_fin'])) ?>.
+                    Écart = prime en paie − prime attendue (<span style="color:#22c55e;">0,00 = conforme</span>, <span style="color:#ef4444;">≠ 0 = écart</span>).
+                </p>
+                <div class="table-wrapper" style="max-height:420px; overflow-y:auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Matricule</th>
+                                <th>Salarié</th>
+                                <th>Embauche</th>
+                                <th>Années</th>
+                                <th>Taux</th>
+                                <th>Prime (paie)</th>
+                                <th>Prime attendue</th>
+                                <th>Écart</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($paies as $pa): ?>
+                            <tr>
+                                <td><?= htmlspecialchars($pa['matricule']) ?></td>
+                                <td><?= htmlspecialchars($pa['nom_famille'] . ' ' . $pa['prenom']) ?></td>
+                                <td><?= $pa['date_embauche'] ? date('d/m/Y', strtotime($pa['date_embauche'])) : '—' ?></td>
+                                <td><?= $pa['annees_anciennete'] !== null ? $pa['annees_anciennete'] . ' an(s)' : '—' ?></td>
+                                <td><?= $pa['taux_anciennete'] > 0 ? number_format($pa['taux_anciennete'] * 100, 0) . ' %' : '—' ?></td>
+                                <td><?= number_format((float) $pa['prime_anciennete'], 2, ',', ' ') ?></td>
+                                <td><?= number_format((float) $pa['prime_attendu'], 2, ',', ' ') ?></td>
+                                <td style="font-weight:600; color:<?= abs((float) $pa['prime_ecart']) > 0.01 ? '#ef4444' : '#22c55e' ?>;">
+                                    <?= number_format((float) $pa['prime_ecart'], 2, ',', ' ') ?>
+                                </td>
+                            </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer" style="border-top:1px solid var(--border);">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Fermer</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <?php if (!$periode['cloturee'] && !empty($disponibles)): ?>
