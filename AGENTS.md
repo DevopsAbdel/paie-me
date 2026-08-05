@@ -359,6 +359,12 @@ Net  = salaire - (CNSS + AMO + IR)
   - Cause : suppression d'un utilisateur via la page admin alors que sa session était active → le logout (ou toute action) échouait sur la FK `audit_log.user_id` / `societes.user_id` (fatal PDOException)
   - Fix 1 (racine) : `index.php` vérifie après `Session::start()` que l'utilisateur de session existe toujours et est `actif = 1` (via `Core\Model::db()`, qui respecte `demo_mode`) ; sinon `Session::destroy()` + redirect `/login` — une session orpheline ne survit jamais à une suppression/désactivation
   - Fix 2 (défense en profondeur) : `Core\Audit::log()` capture les `PDOException` (journalisation best-effort, ne bloque jamais l'application)
+- **Fix doublons « Articles par source » (Sources légales)** :
+  - Cause : `schema.sql` insérait l'ancien jeu de codes (`PRIME_*` + 330–377 sans `source`), puis `migrate.php` ré-insérait le jeu canonique (501–505 + 330–377 avec `source`) via `INSERT IGNORE` — sans contrainte UNIQUE sur `code`, l'IGNORE ne dédupliquait pas → 43 codes ×2 + 5 `PRIME_*`
+  - `migrate.php` : bloc de **fusion des doublons** (après le seed des articles) — garde **une seule ligne par code** (la plus petite `id`, indépendamment de `source`), remappe les références enfants (`rubrique_sources_articles`, `salarie_gains`, `paie_gains`) via DELETE-sans-doublon + UPDATE puis DELETE des lignes excédentaires ; `PRIME_*` → 501–505 via `$primeMap`
+  - Complément des articles manquants pour les rubriques canoniques en `INSERT IGNORE` (idempotent) → 90 articles au total (80 remappés + 10 pour 501–505)
+  - `schema.sql` : seed `rubriques_gains` réécrit avec le jeu canonique (18 colonnes : `compte` 6 chiffres, `source`, `source_maj`, `nature_edi`, `base_anciennete`, `au_prorata`) — plus aucun `PRIME_*`
+  - Vérifié sur `paie_me` + `paie_me_demo` : 48 rubriques globales, 0 doublon par code, 0 `PRIME_*`, 90 articles, aucun FK orphelin
 
 ### Pending
 - (none)
@@ -388,3 +394,5 @@ Net  = salaire - (CNSS + AMO + IR)
 | `routes.php` | + `use Controllers\AdminController` + `GET`/`POST /admin` |
 | `index.php` | + contrôle d'intégrité de session (utilisateur supprimé/désactivé → session détruite + redirect login) |
 | `Core/Audit.php` | `log()` best-effort : les `PDOException` sont capturées (jamais de fatal sur la journalisation) |
+| `database/migrate.php` | + fusion des doublons de `rubriques_gains` (remap enfants → ligne canonique + DELETE) ; seed articles passé en `INSERT IGNORE` idempotent ; complément articles 501–505 |
+| `database/schema.sql` | seed `rubriques_gains` = jeu canonique (501–505 + 330–377 avec `source`/`compte` 6 chiffres/`nature_edi`) au lieu de `PRIME_*` + codes sans source |

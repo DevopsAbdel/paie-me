@@ -400,6 +400,149 @@ if (!$existing) {
     echo "   + articles par rubrique insérés\n";
 }
 
+// === Nettoyage : fusion des rubriques gains dupliquées ===
+// L'ancienne seed (schema.sql) créait des codes PRIME_* et des 330-377 sans "source".
+// La version canonique (501-505 + 330-377 avec source) insérée par migrate (ou par des
+// imports successifs du schema) a créé des doublons. On garde une seule ligne par code
+// (la plus petite id) et on redirige les références (rubrique_sources_articles,
+// salarie_gains, paie_gains) vers elle avant suppression des lignes excédentaires.
+$primeMap = [
+    'PRIME_REND'      => '501',
+    'PRIME_OBJECTIF'  => '502',
+    'PRIME_ASSIDUITE' => '503',
+    'PRIME_NUIT'      => '504',
+    'PRIME_13EME'     => '505',
+];
+
+$allRubriques = $p->query("SELECT id, code, source FROM rubriques_gains WHERE is_global = 1 AND societe_id IS NULL")->fetchAll(PDO::FETCH_ASSOC);
+$keepByCode = [];
+foreach ($allRubriques as $r) {
+    $code = $primeMap[$r['code']] ?? $r['code'];
+    if (!isset($keepByCode[$code])) {
+        $keepByCode[$code] = (int)$r['id'];
+    }
+}
+
+$nbFusion = 0;
+foreach ($allRubriques as $r) {
+    $code = $primeMap[$r['code']] ?? $r['code'];
+    if (!isset($keepByCode[$code])) continue;
+    $newId = $keepByCode[$code];
+    $oldId = (int)$r['id'];
+    if ($oldId === $newId) continue;
+
+    $p->exec("DELETE rsa FROM rubrique_sources_articles rsa JOIN rubrique_sources_articles rsa2 ON rsa2.rubrique_id = $newId AND rsa2.source_id = rsa.source_id AND rsa2.article = rsa.article WHERE rsa.rubrique_id = $oldId");
+    $p->exec("UPDATE rubrique_sources_articles SET rubrique_id = $newId WHERE rubrique_id = $oldId");
+    $p->exec("DELETE sg FROM salarie_gains sg JOIN salarie_gains sg2 ON sg2.salarie_id = sg.salarie_id AND sg2.rubrique_id = $newId WHERE sg.rubrique_id = $oldId");
+    $p->exec("UPDATE salarie_gains SET rubrique_id = $newId WHERE rubrique_id = $oldId");
+    $p->exec("DELETE pg FROM paie_gains pg JOIN paie_gains pg2 ON pg2.paie_id = pg.paie_id AND pg2.rubrique_id = $newId WHERE pg.rubrique_id = $oldId");
+    $p->exec("UPDATE paie_gains SET rubrique_id = $newId WHERE rubrique_id = $oldId");
+    $p->exec("DELETE FROM rubriques_gains WHERE id = $oldId");
+    echo "   + fusion {$r['code']} (id $oldId → $newId)\n";
+    $nbFusion++;
+}
+if ($nbFusion > 0) {
+    echo "   + $nbFusion rubrique(s) dupliquée(s) fusionnée(s)\n";
+}
+
+// Compléter les articles manquants pour les rubriques canoniques (INSERT IGNORE idempotent)
+$p->exec("INSERT IGNORE INTO rubrique_sources_articles (rubrique_id, source_id, article)
+    SELECT r.id, s.id, a.article
+    FROM rubriques_gains r
+    CROSS JOIN (SELECT 'CGI' AS c, 'Art. 57-1°' AS article, '330' AS code UNION ALL
+                SELECT 'CGI', 'Art. 57-1°', '331' UNION ALL
+                SELECT 'CGI', 'Art. 57-1°', '334' UNION ALL
+                SELECT 'CGI', 'Art. 57-1°', '337' UNION ALL
+                SELECT 'CGI', 'Art. 57-1°', '339' UNION ALL
+                SELECT 'CGI', 'Art. 57-1°', '340' UNION ALL
+                SELECT 'CGI', 'Art. 57-1°', '341' UNION ALL
+                SELECT 'CGI', 'Art. 57-1°', '342' UNION ALL
+                SELECT 'CGI', 'Art. 57-1°', '343' UNION ALL
+                SELECT 'CGI', 'Art. 57-1°', '344' UNION ALL
+                SELECT 'CGI', 'Art. 57-1°', '345' UNION ALL
+                SELECT 'CGI', 'Art. 57-1°', '346' UNION ALL
+                SELECT 'CGI', 'Art. 57-1°', '347' UNION ALL
+                SELECT 'CGI', 'Art. 57-1°', '348' UNION ALL
+                SELECT 'CGI', 'Art. 57-1°', '349' UNION ALL
+                SELECT 'CGI', 'Art. 57-1°', '350' UNION ALL
+                SELECT 'CGI', 'Art. 57-1°', '351' UNION ALL
+                SELECT 'CGI', 'Art. 57-1°', '352' UNION ALL
+                SELECT 'CGI', 'Art. 57-1°', '353' UNION ALL
+                SELECT 'CGI', 'Art. 57-1°', '354' UNION ALL
+                SELECT 'CGI', 'Art. 57-1°', '355' UNION ALL
+                SELECT 'CGI', 'Art. 57-1°', '356' UNION ALL
+                SELECT 'CGI', 'Art. 57-1°', '357' UNION ALL
+                SELECT 'CGI', 'Art. 57-1°', '358' UNION ALL
+                SELECT 'CGI', 'Art. 57-1°', '359' UNION ALL
+                SELECT 'CGI', 'Art. 57-1°', '360' UNION ALL
+                SELECT 'CGI', 'Art. 57-1°', '361' UNION ALL
+                SELECT 'CGI', 'Art. 57-1°', '362' UNION ALL
+                SELECT 'CGI', 'Art. 57-1°', '363' UNION ALL
+                SELECT 'CGI', 'Art. 57-1°', '364' UNION ALL
+                SELECT 'CGI', 'Art. 57-1°', '365' UNION ALL
+                SELECT 'CGI', 'Art. 57-7°', '366' UNION ALL
+                SELECT 'CGI', 'Art. 57-7°', '367' UNION ALL
+                SELECT 'CGI', 'Art. 57-7°', '368' UNION ALL
+                SELECT 'CGI', 'Art. 57 (soumis)', '501' UNION ALL
+                SELECT 'CGI', 'Art. 57 (soumis)', '502' UNION ALL
+                SELECT 'CGI', 'Art. 57 (soumis)', '503' UNION ALL
+                SELECT 'CGI', 'Art. 57 (soumis)', '504' UNION ALL
+                SELECT 'CGI', 'Art. 57 (soumis)', '505' UNION ALL
+                SELECT 'CT', 'Art. 53', '366' UNION ALL
+                SELECT 'CT', 'Art. 41', '367' UNION ALL
+                SELECT 'CT', 'Art. 43', '369' UNION ALL
+                SELECT 'CT', 'Art. 345-353', '501' UNION ALL
+                SELECT 'CT', 'Art. 345-353', '502' UNION ALL
+                SELECT 'CT', 'Art. 345-353', '503' UNION ALL
+                SELECT 'CT', 'Art. 345-353', '504' UNION ALL
+                SELECT 'CT', 'Art. 345', '505' UNION ALL
+                SELECT 'A1314', 'Titre I', '330' UNION ALL
+                SELECT 'A1314', 'Titre I', '334' UNION ALL
+                SELECT 'A1314', 'Titre I', '337' UNION ALL
+                SELECT 'A1314', 'Titre I', '339' UNION ALL
+                SELECT 'A1314', 'Titre I', '340' UNION ALL
+                SELECT 'A1314', 'Titre I', '341' UNION ALL
+                SELECT 'A1314', 'Titre I', '342' UNION ALL
+                SELECT 'A1314', 'Titre I', '351' UNION ALL
+                SELECT 'A1314', 'Titre I', '352' UNION ALL
+                SELECT 'A1314', 'Titre I', '353' UNION ALL
+                SELECT 'A1314', 'Titre II', '331' UNION ALL
+                SELECT 'A1314', 'Titre II', '343' UNION ALL
+                SELECT 'A1314', 'Titre II', '344' UNION ALL
+                SELECT 'A1314', 'Titre II', '345' UNION ALL
+                SELECT 'A1314', 'Titre II', '346' UNION ALL
+                SELECT 'A1314', 'Titre II', '347' UNION ALL
+                SELECT 'A1314', 'Titre II', '348' UNION ALL
+                SELECT 'A1314', 'Titre II', '349' UNION ALL
+                SELECT 'A1314', 'Titre II', '350' UNION ALL
+                SELECT 'A1314', 'Titre II', '360' UNION ALL
+                SELECT 'A1314', 'Titre V', '354' UNION ALL
+                SELECT 'A1314', 'Titre V', '355' UNION ALL
+                SELECT 'A1314', 'Titre V', '356' UNION ALL
+                SELECT 'A1314', 'Titre V', '357' UNION ALL
+                SELECT 'A1314', 'Titre V', '358' UNION ALL
+                SELECT 'A1314', 'Titre V', '359' UNION ALL
+                SELECT 'A1314', 'Titre V', '361' UNION ALL
+                SELECT 'A1314', 'Titre V', '362' UNION ALL
+                SELECT 'A1314', 'Titre V', '363' UNION ALL
+                SELECT 'A1314', 'Titre V', '364' UNION ALL
+                SELECT 'A1314', 'Titre V', '365' UNION ALL
+                SELECT 'A1314', 'Titre III', '366' UNION ALL
+                SELECT 'A1314', 'Titre III', '367' UNION ALL
+                SELECT 'A1314', 'Titre III', '368' UNION ALL
+                SELECT 'A1314', 'Titre III', '369' UNION ALL
+                SELECT 'A1314', 'Titre III', '370' UNION ALL
+                SELECT 'A1314', 'Titre III', '371' UNION ALL
+                SELECT 'A1314', 'Titre III', '372' UNION ALL
+                SELECT 'A1314', 'Titre III', '373' UNION ALL
+                SELECT 'A1314', 'Titre III', '374' UNION ALL
+                SELECT 'A1314', 'Titre III', '375' UNION ALL
+                SELECT 'A1314', 'Titre III', '376' UNION ALL
+                SELECT 'A1314', 'Titre VII', '377') AS a
+    JOIN sources_legales s ON s.code = a.c
+    WHERE r.code = a.code AND r.societe_id IS NULL");
+echo "   + articles manquants complétés (INSERT IGNORE)\n";
+
 // === Tables Barèmes et Réglages ===
 $p->exec("CREATE TABLE IF NOT EXISTS bareme_anciennete (
     id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
