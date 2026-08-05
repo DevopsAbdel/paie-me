@@ -87,7 +87,7 @@ function overLimit(?float $valeur, ?float $plafond): bool
                     
                     <tr>
                         <td class="code">101</td>
-                        <td><span class="info-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="info-tooltip">Jours ouvrés dans le mois (salaire proratisé)</span></span> Durée de travail</td>
+                        <td><span class="info-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="info-tooltip">Jours ouvrés dans le mois (salaire proratisé)</span></span> Durée de travail<span class="formule-label">(100 × jours travaillés / 26)</span></td>
                         <td class="montant">
                             <input type="number" step="1" min="0" max="31" name="jours_travailles" class="form-control-inline" value="<?= $jt ?>" style="width:55px;">
                         </td>
@@ -100,7 +100,7 @@ function overLimit(?float $valeur, ?float $plafond): bool
                     </tr>
                     <tr>
                         <td class="code">102</td>
-                        <td><span class="info-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="info-tooltip">Jours de congé payé — rémunérés au taux journalier</span></span> Jours de congé</td>
+                        <td><span class="info-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="info-tooltip">Jours de congé payé — rémunérés au taux journalier</span></span> Jours de congé<span class="formule-label">(100 / 26 × jours de congé)</span></td>
                         <td class="montant">
                             <input type="number" step="0.5" min="0" max="31" name="jours_conge" class="form-control-inline" value="<?= (float)($paie['jours_conge'] ?? 0) ?>" style="width:55px;">
                         </td>
@@ -113,7 +113,7 @@ function overLimit(?float $valeur, ?float $plafond): bool
                     </tr>
                     <tr>
                         <td class="code">103</td>
-                        <td><span class="info-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="info-tooltip">Jours fériés chômés — rémunérés au taux journalier</span></span> Jours fériés</td>
+                        <td><span class="info-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="info-tooltip">Jours fériés chômés — rémunérés au taux journalier</span></span> Jours fériés<span class="formule-label">(100 / 26 × jours fériés)</span></td>
                         <td class="montant">
                             <input type="number" step="0.5" min="0" max="31" name="jours_feries" class="form-control-inline" value="<?= (float)($paie['jours_feries'] ?? 0) ?>" style="width:55px;">
                         </td>
@@ -128,7 +128,7 @@ function overLimit(?float $valeur, ?float $plafond): bool
                     <tr>
                         <td class="code">201</td>
                         <td><span class="info-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="info-tooltip">Taux horaire <?= number_format($th, 2, ',', ' ') ?> MAD/h — majoration <?= $t25 ?>%</span></span>
-                            HS <?= $t25 ?>%
+                            HS <?= $t25 ?>%<span class="formule-label">(100 / 191 × <?= $t25 ?>% × nbre h)</span>
                         </td>
                         <td class="montant">
                             <input type="number" step="0.5" min="0" name="heures_sup_25" class="form-control-inline" value="<?= $hs25 ?>" style="width:55px;">
@@ -144,7 +144,7 @@ function overLimit(?float $valeur, ?float $plafond): bool
                     <tr>
                         <td class="code">202</td>
                         <td><span class="info-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="info-tooltip">Taux horaire <?= number_format($th, 2, ',', ' ') ?> MAD/h — majoration <?= $t50 ?>%</span></span>
-                            HS <?= $t50 ?>%
+                            HS <?= $t50 ?>%<span class="formule-label">(100 / 191 × <?= $t50 ?>% × nbre h)</span>
                         </td>
                         <td class="montant">
                             <input type="number" step="0.5" min="0" name="heures_sup_50" class="form-control-inline" value="<?= $hs50 ?>" style="width:55px;">
@@ -160,7 +160,7 @@ function overLimit(?float $valeur, ?float $plafond): bool
                     <tr>
                         <td class="code">203</td>
                         <td><span class="info-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="info-tooltip">Taux horaire <?= number_format($th, 2, ',', ' ') ?> MAD/h — majoration <?= $t100 ?>%</span></span>
-                            HS <?= $t100 ?>%
+                            HS <?= $t100 ?>%<span class="formule-label">(100 / 191 × <?= $t100 ?>% × nbre h)</span>
                         </td>
                         <td class="montant">
                             <input type="number" step="0.5" min="0" name="heures_sup_100" class="form-control-inline" value="<?= $hs100 ?>" style="width:55px;">
@@ -176,7 +176,7 @@ function overLimit(?float $valeur, ?float $plafond): bool
                     <?php if ($paie['prime_anciennete'] > 0): ?>
                     <tr>
                         <td class="code">204</td>
-                        <td><span class="info-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="info-tooltip">Ancienneté : <?= $ancienPct ?>% du salaire de base + HS</span></span> Prime d'ancienneté</td>
+                        <td><span class="info-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="info-tooltip">Ancienneté : <?= $ancienPct ?>% du salaire de base + HS</span></span> Prime d'ancienneté<span class="formule-label">((100 × prorata) + 201 + 202 + 203) × <?= $ancienPct ?>%</span></td>
                         <td class="montant"><?= number_format($primeBaseElargie, 2, ',', ' ') ?></td>
                         <td class="unite">DH</td>
                         <td class="taux"><?= $ancienPct ?>%</td>
@@ -190,7 +190,7 @@ function overLimit(?float $valeur, ?float $plafond): bool
                     <?php $totalApresFeries = $baseProrata + ($jc * $tauxJournalier) + ($jf * $tauxJournalier) + $mHS25 + $mHS50 + $mHS100 + (float)($paie['prime_anciennete'] ?? 0); ?>
                     <tr>
                         <td class="code">205</td>
-                        <td><span class="info-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="info-tooltip">Base prorata + congés + fériés + HS + ancienneté</span></span> Salaire Recalculer</td>
+                        <td><span class="info-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="info-tooltip">Base prorata + congés + fériés + HS + ancienneté</span></span> Salaire Recalculer<span class="formule-label">(101 + 102 + 103 + 201 + 202 + 203 + 204)</span></td>
                         <td></td>
                         <td class="unite">DH</td>
                         <td class="taux">—</td>
@@ -204,18 +204,19 @@ function overLimit(?float $valeur, ?float $plafond): bool
                     $indemnFields = [
                         'indemnite_transport' => ['330', 'Indemnité transport', 'Exonérée IR/CNSS — Plafond : 500 MAD/mois'],
                         'indemnite_panier'    => ['346', 'Indemnité panier', 'Exonérée IR/CNSS jusqu\'à 780 MAD/mois'],
-                        'indemnite_representation' => ['331', 'Indemnité représentation', '10% du salaire de base'],
+                        'indemnite_representation' => ['331', 'Indemnité représentation', '10% du salaire de base', '100 × 10%'],
                         'avantage_logement'   => ['340', 'Avantage logement', 'Avantage en nature imposable'],
                     ];
                     foreach ($indemnFields as $field => $meta):
                         $code = $meta[0];
+                        $formule = $meta[3] ?? null;
                         $val = (float) ($paie[$field] ?? 0);
                         $pt = getPlafondDgi($code, $plafonds, (float) $paie['salaire_base']);
                         $ov = overLimit($val, $pt);
                     ?>
                     <tr<?= $ov ? ' class="row-over-limit"' : '' ?><?= $val == 0 ? ' style="display:none"' : '' ?>>
                         <td class="code"><?= $code ?></td>
-                        <td><span class="info-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="info-tooltip"><?= $meta[2] ?></span></span> <?= $meta[1] ?></td>
+                        <td><span class="info-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="info-tooltip"><?= $meta[2] ?></span></span> <?= $meta[1] ?><?php if ($formule): ?><span class="formule-label">(<?= $formule ?>)</span><?php endif; ?></td>
                         <td></td>
                         <td class="unite">DH</td>
                         <td class="taux">—</td>
@@ -262,7 +263,7 @@ function overLimit(?float $valeur, ?float $plafond): bool
 
                     <tr class="total-row">
                         <td></td>
-                        <td><strong><span class="info-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="info-tooltip">Somme de tous les gains du mois</span></span> Salaire brut</strong></td>
+                        <td><strong><span class="info-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="info-tooltip">Somme de tous les gains du mois</span></span> Salaire brut</strong><span class="formule-label">(205 + 330 + 346 + 331 + 340 + rubriques gains)</span></td>
                         <td></td>
                         <td class="unite">DH</td>
                         <td></td>
@@ -272,11 +273,23 @@ function overLimit(?float $valeur, ?float $plafond): bool
                         <td></td>
                     </tr>
 
+                    <tr>
+                        <td class="code">500</td>
+                        <td><span class="info-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="info-tooltip">Salaire brut – Gains exonérés</span></span> <strong>Salaire brut imposable</strong><span class="formule-label">(Salaire brut − 330 exonérée − 346 exonérée − 331)</span></td>
+                        <td class="montant"><?= number_format($paie['sbi'], 2, ',', ' ') ?></td>
+                        <td class="unite">DH</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+
                     <tr class="section-header"><td colspan="9">Cotisations</td></tr>
 
                     <tr>
                         <td class="code">400</td>
-                        <td><span class="info-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="info-tooltip">min(Salaire brut, 6 000) × 4.48%</span></span> CNSS</td>
+                        <td><span class="info-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="info-tooltip">min(Salaire brut, 6 000) × 4.48%</span></span> CNSS<span class="formule-label">(min(SBI, 6 000) × 4,48%)</span></td>
                         <td class="montant"><?= number_format(min($paie['salaire_brut'], 6000), 2, ',', ' ') ?></td>
                         <td class="unite">DH</td>
                         <td class="taux">4,48%</td>
@@ -288,7 +301,7 @@ function overLimit(?float $valeur, ?float $plafond): bool
 
                     <tr>
                         <td class="code">410</td>
-                        <td><span class="info-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="info-tooltip">Salaire brut × 2.26%</span></span> AMO</td>
+                        <td><span class="info-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="info-tooltip">Salaire brut × 2.26%</span></span> AMO<span class="formule-label">(SBI × 2,26%)</span></td>
                         <td class="montant"><?= number_format($paie['salaire_brut'], 2, ',', ' ') ?></td>
                         <td class="unite">DH</td>
                         <td class="taux">2,26%</td>
@@ -314,20 +327,8 @@ function overLimit(?float $valeur, ?float $plafond): bool
 
                     <?php $sbiAnnuel = $paie['sbi'] * 12; $fpTaux = $sbiAnnuel <= 78000 ? 35 : 25; ?>
                     <tr>
-                        <td class="code">500</td>
-                        <td><span class="info-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="info-tooltip">Salaire brut – Gains exonérés</span></span> SBI</td>
-                        <td class="montant"><?= number_format($paie['sbi'], 2, ',', ' ') ?></td>
-                        <td class="unite">DH</td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr>
-
-                    <tr>
                         <td class="code">501</td>
-                        <td><span class="info-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="info-tooltip"><?= $sbiAnnuel <= 78000 ? 'SBI annuel ≤ 78 000 → 35%' : 'SBI annuel > 78 000 → 25% (max 2 916,70 MAD)' ?></span></span> Frais professionnels</td>
+                        <td><span class="info-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="info-tooltip"><?= $sbiAnnuel <= 78000 ? 'SBI annuel ≤ 78 000 → 35%' : 'SBI annuel > 78 000 → 25% (max 2 916,70 MAD)' ?></span></span> Frais professionnels<span class="formule-label">(SBI × <?= $fpTaux ?>%)</span></td>
                         <td class="montant"><?= number_format($paie['sbi'], 2, ',', ' ') ?></td>
                         <td class="unite">DH</td>
                         <td class="taux"><?= $fpTaux ?>%</td>
@@ -339,7 +340,7 @@ function overLimit(?float $valeur, ?float $plafond): bool
 
                     <tr>
                         <td class="code">502</td>
-                        <td><span class="info-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="info-tooltip">SBI – Frais pro – CNSS – AMO – Mutuelle</span></span> SNI</td>
+                        <td><span class="info-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="info-tooltip">SBI – Frais pro – CNSS – AMO – Mutuelle</span></span> SNI<span class="formule-label">(SBI − 501 − 400 − 410 − 420)</span></td>
                         <td class="montant"><?= number_format($paie['sni'], 2, ',', ' ') ?></td>
                         <td class="unite">DH</td>
                         <td></td>
@@ -351,7 +352,7 @@ function overLimit(?float $valeur, ?float $plafond): bool
 
                     <tr>
                         <td class="code">600</td>
-                        <td><span class="info-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="info-tooltip">Barème progressif IR sur SNI</span></span> IR brut</td>
+                        <td><span class="info-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="info-tooltip">Barème progressif IR sur SNI</span></span> IR brut<span class="formule-label">(barème progressif sur 502)</span></td>
                         <td class="montant"><?= number_format($paie['sni'], 2, ',', ' ') ?></td>
                         <td class="unite">DH</td>
                         <td class="taux">Barème</td>
@@ -363,7 +364,7 @@ function overLimit(?float $valeur, ?float $plafond): bool
 
                     <tr>
                         <td class="code">601</td>
-                        <td><span class="info-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="info-tooltip">30 MAD × Nb enfants à charge (max 6)</span></span> Déductions familiales</td>
+                        <td><span class="info-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="info-tooltip">30 MAD × Nb enfants à charge (max 6)</span></span> Déductions familiales<span class="formule-label">(50 MAD × nb charges, max 6)</span></td>
                         <td></td>
                         <td class="unite">DH</td>
                         <td class="taux">—</td>
@@ -412,7 +413,7 @@ function overLimit(?float $valeur, ?float $plafond): bool
 
                     <tr>
                         <td></td>
-                        <td><span class="info-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="info-tooltip">Avances + Prêts + Retenues personnalisées</span></span> Autres retenues</td>
+                        <td><span class="info-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="info-tooltip">Avances + Prêts + Retenues personnalisées</span></span> Autres retenues<span class="formule-label">(801 + 802 + …)</span></td>
                         <td></td>
                         <td class="unite">DH</td>
                         <td></td>
@@ -424,7 +425,7 @@ function overLimit(?float $valeur, ?float $plafond): bool
 
                     <tr>
                         <td></td>
-                        <td><span class="info-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="info-tooltip">Salaire brut – Cotisations – IR – Mutuelle</span></span> Net avant retenues</td>
+                        <td><span class="info-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="info-tooltip">Salaire brut – Cotisations – IR – Mutuelle</span></span> Net avant retenues<span class="formule-label">(Salaire brut − 400 − 410 − 420 − 600)</span></td>
                         <td></td>
                         <td class="unite">DH</td>
                         <td></td>
@@ -436,7 +437,7 @@ function overLimit(?float $valeur, ?float $plafond): bool
 
                     <tr class="net-row">
                         <td></td>
-                        <td><span class="info-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="info-tooltip">Net avant retenues – Autres retenues</span></span> <strong style="color:var(--accent);">Net à payer</strong></td>
+                        <td><span class="info-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="info-tooltip">Net avant retenues – Autres retenues</span></span> <strong style="color:var(--accent);">Net à payer</strong><span class="formule-label">(Net avant retenues − Autres retenues)</span></td>
                         <td></td>
                         <td class="unite">DH</td>
                         <td></td>
@@ -583,6 +584,7 @@ function overLimit(?float $valeur, ?float $plafond): bool
 .info-icon:hover { background:var(--accent-hover); }
 .info-icon svg { width:12px; height:12px; pointer-events:none; }
 .edit-paie-table-wrap { overflow:visible !important; }
+.formule-label { display:block; font-size:0.62rem; font-weight:400; color:var(--text-muted); margin-top:0.1rem; white-space:normal; }
 .info-icon .info-tooltip { display:none; position:fixed; background:var(--bg-surface); color:var(--text); padding:0.4rem 0.6rem; border-radius:6px; font-size:0.7rem; font-weight:400; white-space:nowrap; box-shadow:0 4px 12px rgba(0,0,0,0.3); z-index:9999; line-height:1.4; pointer-events:none; }
 .info-icon .info-tooltip::after { content:''; position:absolute; top:100%; left:50%; transform:translateX(-50%); border:5px solid transparent; border-top-color:var(--bg-surface); }
 .info-icon:hover .info-tooltip { display:block; }
