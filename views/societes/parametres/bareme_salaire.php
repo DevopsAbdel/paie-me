@@ -1,7 +1,7 @@
 <div class="card">
     <div class="card-header" style="display:flex; justify-content:space-between; align-items:center; gap:1rem; flex-wrap:wrap;">
         <h3 style="margin:0;">Barème SMIG & SMAG</h3>
-        <button type="button" class="btn btn-sm btn-secondary" onclick="document.getElementById('bs-add-row').style.display = document.getElementById('bs-add-row').style.display === 'none' ? 'flex' : 'none';">
+        <button type="button" class="btn btn-primary btn-sm" onclick="document.getElementById('bs-add-row').style.display = document.getElementById('bs-add-row').style.display === 'none' ? 'flex' : 'none';">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle; margin-right:0.25rem;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             Ajouter
         </button>
@@ -31,7 +31,7 @@
                     <label style="font-size:0.7rem; color:var(--text-muted);">Mensuel</label>
                     <input type="number" step="0.01" name="nouveau_mensuel" class="form-control" placeholder="3422.72" style="width:100px;" required>
                 </div>
-                <button type="submit" class="btn btn-success btn-sm">Ajouter</button>
+                <button type="submit" class="btn btn-primary btn-sm">Ajouter</button>
             </div>
             <table class="data-table">
                 <thead>
@@ -72,12 +72,12 @@
                 </tbody>
             </table>
             <div style="padding:0.5rem 0; display:flex; align-items:center; gap:0.5rem;">
-                <button type="button" id="bs-btn-edit" class="btn btn-sm btn-secondary" onclick="bsToggleEdit(true)" style="font-size:0.75rem;">
+                <button type="button" id="bs-btn-edit" class="btn btn-warning btn-sm" onclick="bsToggleEdit(true)" style="font-size:0.75rem;">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle; margin-right:0.25rem;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                     Modifier
                 </button>
                 <button type="button" id="bs-btn-save" class="btn btn-sm btn-success" onclick="document.getElementById('bsForm').submit()" style="font-size:0.75rem; display:none;">Enregistrer les modifications</button>
-                <button type="button" id="bs-btn-cancel" class="btn btn-sm btn-danger" onclick="location.reload()" style="font-size:0.75rem; display:none;">Annuler</button>
+                <button type="button" id="bs-btn-cancel" class="btn btn-secondary btn-sm" onclick="location.reload()" style="font-size:0.75rem; display:none;">Annuler</button>
             </div>
         </form>
     </div>

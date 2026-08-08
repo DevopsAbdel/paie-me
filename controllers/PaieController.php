@@ -549,6 +549,17 @@ class PaieController extends Controller
         $rubriquesRetenues = $this->mergeRubriques('rubriques_retenues', $societeId);
         $rubriquesGains = $this->mergeRubriques('rubriques_gains', $societeId);
 
+        $anneePaie = (int) ($paie['annee'] ?? date('Y'));
+        $smigRows = $this->db->query("
+            SELECT type, mensuel FROM bareme_smig_smag
+            WHERE (societe_id = $societeId OR societe_id IS NULL) AND annee = $anneePaie
+            ORDER BY (societe_id IS NULL) ASC, type
+        ")->fetchAll();
+        $smigMensuel = null;
+        foreach ($smigRows as $r) {
+            if ($r['type'] === 'SMIG') { $smigMensuel = (float) $r['mensuel']; break; }
+        }
+
         $this->render('paies/edit.php', [
             'title'             => 'Modifier la paie — ' . $paie['nom_famille'] . ' ' . $paie['prenom'],
             'paie'              => $paie,
@@ -558,6 +569,7 @@ class PaieController extends Controller
             'plafonds'          => $plafonds,
             'rubriquesRetenues' => $rubriquesRetenues,
             'rubriquesGains'    => $rubriquesGains,
+            'smigMensuel'       => $smigMensuel,
         ]);
     }
 

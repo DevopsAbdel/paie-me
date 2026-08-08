@@ -316,6 +316,17 @@ Net  = salaire - (CNSS + AMO + IR)
 ### Done
 - **Changement TOTAL de palette vers Dark Neutre + Violet** — palette finale dans `style.css` `:root` : bg `#0b0d12`, surface `#14171f`, hover `#1e222d`, élevé `#252a38`, **accent violet `#8b5cf6`**, hover `#a78bfa`, text `#e8e9ee`, muted `#a3a8b4`, border `#232834`, border-strong `#3a4150`
 - **Bouton primaire violet plein** `#8b5cf6` + texte blanc, hover `#a78bfa`, radius 6px ; secondaire = surface + bordure ardoise + texte clair
+- **UNIFICATION des boutons — style outline coloré** : tous les `.btn-*` sont désormais **outlined** (fond transparent + bordure colorée + texte coloré, hover = fond teinté léger). Chaque couleur = une action :
+  | Classe | Couleur | Action |
+  |--------|---------|--------|
+  | `.btn-primary` | violet `#8b5cf6` | Ajouter / Créer / principal |
+  | `.btn-success` | vert `#22c55e` | Enregistrer / Valider |
+  | `.btn-warning` | ambre `#eab308` | Modifier / Recalculer / Réouvrir |
+  | `.btn-danger` | rouge `#ef4444` | Supprimer / Confirmer action destructrice |
+  | `.btn-info` | magenta `#d946ef` | PDF / Export / Générer / Imprimer / Télécharger |
+  | `.btn-secondary` | gris `--border-strong` | Retour / Annuler / Fermer / neutre |
+- **Définitions globales** dans `style.css` (`.btn-primary`…`.btn-info`) — plus AUCUNE classe locale `.btn-outline-*` dans les vues (elles ont été supprimées d'`edit.php`, `lignes.php`, `style.css`).
+- **Piège** : `btn-warning` = ambre outline (Modifier/Recalculer), `btn-info` = magenta outline (PDF/Export) ; ne plus utiliser `btn-outline-*` custom.
 - **Toutes les teintes bleu/cyan/navy supprimées** : `#1E90FF`, `#3b82f6`, `#3abff8`, `#22d3ee`, `#06b6d4`, `#1e293b`, `#334155`, `rgba(30,144,255,…)`, `rgba(58,191,248,…)` → violet/magenta dans l'UI écran
 - **Icônes d'actions recolorées** : view=violet `#8b5cf6`, edit=ambre `#eab308`, delete=rouge `#ef4444`, info=magenta `#d946ef` (style.css `.btn-icon`)
 - **Badges** : `badge-info` → magenta `#d946ef` ; badge MODE DÉMO (layout.php) → violet ; `sources_legales.php` borders loi→violet, arrêté→magenta

@@ -1,7 +1,7 @@
 <div class="card">
     <div class="card-header">
         <h3>CNSS / Damancom — <?= htmlspecialchars($societe['raison_sociale']) ?></h3>
-        <a href="/paie-me/damancom" class="btn btn-primary btn-sm">Générer fichier DS</a>
+        <a href="/paie-me/damancom" class="btn btn-info btn-sm">Générer fichier DS</a>
     </div>
     <?php if (empty($periodes)): ?>
         <div class="empty-state"><p>Aucune période de paie. Créez une paie avant de générer la déclaration CNSS.</p></div>

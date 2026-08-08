@@ -20,7 +20,7 @@
                     <?php endforeach; ?>
                 </select>
             </div>
-            <button type="submit" class="btn btn-primary">Exporter CSV CGNC</button>
+            <button type="submit" class="btn btn-info">Exporter CSV CGNC</button>
         </form>
     <?php endif; ?>
 </div>

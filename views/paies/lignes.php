@@ -5,13 +5,13 @@
             <?php if (!$periode['cloturee'] && !empty($disponibles)): ?>
             <button type="button" class="btn btn-primary btn-sm" id="btn-importer">Importer</button>
             <?php endif; ?>
-            <button type="button" class="btn btn-outline-violet btn-sm" data-bs-toggle="modal" data-bs-target="#modal-verif-anciennete">Vérifier ancienneté</button>
+            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modal-verif-anciennete">Vérifier ancienneté</button>
             <?php if (!$periode['cloturee']): ?>
-            <a href="/paie-me/paies/<?= $periode['id'] ?>/calculate" class="btn btn-outline-ambre btn-sm" onclick="return confirm('Recalculer toutes les paies ?')">Recalculer</a>
+            <a href="/paie-me/paies/<?= $periode['id'] ?>/calculate" class="btn btn-warning btn-sm" onclick="return confirm('Recalculer toutes les paies ?')">Recalculer</a>
             <?php else: ?>
             <a href="/paie-me/paies/<?= $periode['id'] ?>/rouvrir" class="btn btn-warning btn-sm" onclick="return confirm('Réouvrir cette période ? Les modifications seront à nouveau autorisées.')">Réouvrir</a>
             <?php endif; ?>
-            <a href="/paie-me/paies" class="btn btn-outline-muted btn-sm">Retour</a>
+            <a href="/paie-me/paies" class="btn btn-secondary btn-sm">Retour</a>
         </div>
     </div>
 
@@ -208,30 +208,6 @@
     cursor:pointer; padding:0.2rem 0.4rem; line-height:1;
 }
 .btn-close:hover { color:var(--text); }
-.btn-outline-violet {
-    background: transparent; color: var(--accent);
-    border: 1px solid var(--accent);
-}
-.btn-outline-violet:hover {
-    background: rgba(139,92,246,0.15); color: var(--accent-hover);
-    border-color: var(--accent-hover);
-}
-.btn-outline-ambre {
-    background: transparent; color: #eab308;
-    border: 1px solid #eab308;
-}
-.btn-outline-ambre:hover {
-    background: rgba(234,179,8,0.15); color: #facc15;
-    border-color: #facc15;
-}
-.btn-outline-muted {
-    background: transparent; color: var(--text-muted);
-    border: 1px solid var(--border-strong);
-}
-.btn-outline-muted:hover {
-    background: var(--bg-hover); color: var(--text);
-    border-color: var(--text-muted);
-}
 .ligne-salarie:hover td { background:rgba(139,92,246,0.18); }
 table tbody tr[data-href]:hover td,
 table tbody tr[onclick]:hover td { background:rgba(139,92,246,0.18); }

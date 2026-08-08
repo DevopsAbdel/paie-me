@@ -220,7 +220,7 @@ function renderSectionBody(section, si) {
         html += '<input type="text" value="' + escHtml(section.total.label) + '" class="form-control" style="width:250px; font-size:0.8rem;" onchange="configData.sections[' + si + '].total.label=this.value;">';
         html += '<button type="button" class="btn-icon btn-delete" title="Supprimer total" onclick="removeTotal(' + si + ')" style="flex-shrink:0;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>';
     } else {
-        html += '<button type="button" class="btn btn-secondary btn-sm" onclick="addTotal(' + si + ')">+ Ajouter un total</button>';
+        html += '<button type="button" class="btn btn-primary btn-sm" onclick="addTotal(' + si + ')">+ Ajouter un total</button>';
     }
     html += '</div>';
     return html;

@@ -400,7 +400,7 @@ class SalarieController extends Controller
         };
         return [
             'societe_id'             => $_POST['societe_id'] ?? 0,
-            'service_id'             => $_POST['service_id'] ?? null,
+            'service_id'             => !empty($_POST['service_id']) ? (int)$_POST['service_id'] : null,
             'fonction_id'            => !empty($_POST['fonction_id']) ? (int)$_POST['fonction_id'] : null,
             'matricule'              => $_POST['matricule'] ?? '',
             'nom_famille'            => $_POST['nom_famille'] ?? '',

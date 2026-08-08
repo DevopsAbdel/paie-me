@@ -70,7 +70,7 @@
 
         <div style="margin-top:1rem; display:flex; justify-content:flex-end; gap:0.5rem;">
             <a href="<?= $baseUrl ?>" class="btn btn-secondary">Annuler</a>
-            <button type="submit" class="btn btn-primary"><?= $editing ? 'Enregistrer' : 'Créer la demande' ?></button>
+            <button type="submit" class="btn <?= $editing ? 'btn-success' : 'btn-primary' ?>"><?= $editing ? 'Enregistrer' : 'Créer la demande' ?></button>
         </div>
     </form>
 </div>

@@ -1,7 +1,7 @@
 <div class="card">
     <div class="card-header">
         <h3>IR / SIMPL — <?= htmlspecialchars($societe['raison_sociale']) ?></h3>
-        <a href="/paie-me/ir" class="btn btn-primary btn-sm">Export CSV IR</a>
+        <a href="/paie-me/ir" class="btn btn-info btn-sm">Export CSV IR</a>
     </div>
     <?php if (empty($periodes)): ?>
         <div class="empty-state"><p>Aucune période de paie. Créez une paie avant d'exporter l'IR.</p></div>

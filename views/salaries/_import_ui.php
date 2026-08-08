@@ -4,13 +4,13 @@
 $importBase = '/paie-me/salaries';
 ?>
 <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
-    <a href="<?= $importBase ?>/import/modele" class="btn btn-secondary btn-sm" title="Télécharger le modèle d'import (XLSX)">
+    <a href="<?= $importBase ?>/import/modele" class="btn btn-info btn-sm" title="Télécharger le modèle d'import (XLSX)">
         Modèle d'import
     </a>
     <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#importSalariesModal">
         Importer
     </button>
-    <a href="<?= $importBase ?>/export" class="btn btn-secondary btn-sm" title="Exporter les salariés en Excel (XLSX)">
+    <a href="<?= $importBase ?>/export" class="btn btn-info btn-sm" title="Exporter les salariés en Excel (XLSX)">
         Exporter
     </a>
 </div>

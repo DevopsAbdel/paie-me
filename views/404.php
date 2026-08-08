@@ -11,7 +11,7 @@
     <div class="auth-card" style="text-align:center;">
         <h1>404</h1>
         <p>Page introuvable</p>
-        <a href="/paie-me/" class="btn btn-primary">Retour à l'accueil</a>
+        <a href="/paie-me/" class="btn btn-secondary">Retour à l'accueil</a>
     </div>
 </div>
 </body>

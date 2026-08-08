@@ -9,7 +9,7 @@
     <?php if (empty($salaries)): ?>
         <div class="empty-state">
             <p>Aucun salarié sortant.</p>
-            <a href="/paie-me/salaries" class="btn btn-primary">Retour aux salariés</a>
+            <a href="/paie-me/salaries" class="btn btn-secondary">Retour aux salariés</a>
         </div>
     <?php else: ?>
     <div class="table-wrapper">

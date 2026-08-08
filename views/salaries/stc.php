@@ -4,7 +4,7 @@
         <div>
             <span class="badge badge-info"><?= htmlspecialchars($s['nom_famille'] . ' ' . $s['prenom']) ?></span>
             <a href="/paie-me/salaries/<?= $s['id'] ?>/edit" class="btn btn-secondary btn-sm">← Fiche salarié</a>
-            <a href="/paie-me/salaries/<?= $s['id'] ?>/stc/pdf" class="btn btn-primary btn-sm" target="_blank">PDF</a>
+            <a href="/paie-me/salaries/<?= $s['id'] ?>/stc/pdf" class="btn btn-info btn-sm" target="_blank">PDF</a>
         </div>
     </div>
 

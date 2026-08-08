@@ -29,7 +29,7 @@
     <div class="card">
         <div class="card-header" style="display:flex; justify-content:space-between; align-items:center; gap:1rem; flex-wrap:wrap;">
             <h3 style="margin:0;">SMIG & SMAG — référence</h3>
-            <button type="button" class="btn btn-sm btn-secondary" onclick="refSmigAjouter()" style="font-size:0.75rem;">+ Ajouter une ligne</button>
+            <button type="button" class="btn btn-primary btn-sm" onclick="refSmigAjouter()" style="font-size:0.75rem;">+ Ajouter une ligne</button>
         </div>
         <div style="overflow-x:auto;">
             <table class="data-table">
@@ -88,7 +88,7 @@
     <div class="card">
         <div class="card-header" style="display:flex; justify-content:space-between; align-items:center; gap:1rem; flex-wrap:wrap;">
             <h3 style="margin:0;">Ancienneté — référence</h3>
-            <button type="button" class="btn btn-sm btn-secondary" onclick="refAncAjouter()" style="font-size:0.75rem;">+ Ajouter une tranche</button>
+            <button type="button" class="btn btn-primary btn-sm" onclick="refAncAjouter()" style="font-size:0.75rem;">+ Ajouter une tranche</button>
         </div>
         <div style="overflow-x:auto;">
             <table class="data-table">

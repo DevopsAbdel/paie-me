@@ -20,7 +20,7 @@
                     <?php endforeach; ?>
                 </select>
             </div>
-            <button type="submit" class="btn btn-primary">Générer le fichier DS</button>
+            <button type="submit" class="btn btn-info">Générer le fichier DS</button>
         </form>
     <?php endif; ?>
 </div>

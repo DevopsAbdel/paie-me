@@ -12,7 +12,7 @@
             <form method="post" action="/paie-me/admin" class="inline-form" onsubmit="return confirm('Vider et re-seeder la base démo ? Cette action efface toutes les données démo.')">
                 <?= \Core\Session::csrfField() ?>
                 <input type="hidden" name="action" value="reseed">
-                <button type="submit" class="btn btn-secondary btn-sm">Vider et re-seeder la démo</button>
+                <button type="submit" class="btn btn-danger btn-sm">Vider et re-seeder la démo</button>
             </form>
             <form method="post" action="/paie-me/admin" class="inline-form" onsubmit="return confirm('Appliquer les migrations sur paie_me et paie_me_demo ?')">
                 <?= \Core\Session::csrfField() ?>

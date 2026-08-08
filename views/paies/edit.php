@@ -32,9 +32,77 @@ function getPlafondDgi(string $code, array $plafonds, float $salaireBase): ?floa
     return null;
 }
 
+function getPlafondCnss(string $code, array $plafonds): ?float
+{
+    if (isset($plafonds[$code]) && $plafonds[$code]['plafond_cnss_actif']) {
+        return (float) $plafonds[$code]['plafond_cnss_valeur'];
+    }
+    if ($code === '330') return 500.0;
+    if ($code === '346') return 780.0;
+    return null;
+}
+
 function overLimit(?float $valeur, ?float $plafond): bool
 {
     return $plafond !== null && $valeur !== null && $valeur > $plafond;
+}
+
+$alerts = [];
+
+$indemnFields = [
+    'indemnite_transport' => ['330', 'Indemnité transport', 'Exonérée IR/CNSS — Plafond : 500 MAD/mois'],
+    'indemnite_panier'    => ['346', 'Indemnité panier', 'Exonérée IR/CNSS jusqu\'à 780 MAD/mois'],
+    'indemnite_representation' => ['331', 'Indemnité représentation', '10% du salaire de base', '100 × 10%'],
+    'avantage_logement'   => ['340', 'Avantage logement', 'Avantage en nature imposable'],
+];
+
+if (!empty($smigMensuel) && (float) $paie['salaire_base'] < $smigMensuel) {
+    $alerts[] = [
+        'type'  => 'danger',
+        'titre' => 'Salaire non conforme au SMIG',
+        'texte' => 'Le salaire de base (' . number_format($paie['salaire_base'], 2, ',', ' ') . ' MAD) est inférieur au SMIG mensuel ' . ($paie['annee'] ?? '') . ' (' . number_format($smigMensuel, 2, ',', ' ') . ' MAD).',
+    ];
+}
+
+foreach ($indemnFields as $field => $meta) {
+    $code = $meta[0];
+    $val = (float) ($paie[$field] ?? 0);
+    $ptDgi = getPlafondDgi($code, $plafonds, (float) $paie['salaire_base']);
+    $ptCnss = getPlafondCnss($code, $plafonds);
+    if (overLimit($val, $ptDgi)) {
+        $alerts[] = [
+            'type'  => 'warning',
+            'titre' => $meta[1] . ' — plafond DGI dépassé',
+            'texte' => 'Le montant de ' . number_format($val, 2, ',', ' ') . ' MAD dépasse le plafond DGI (' . number_format($ptDgi, 2, ',', ' ') . ' MAD).',
+        ];
+    }
+    if (overLimit($val, $ptCnss)) {
+        $alerts[] = [
+            'type'  => 'warning',
+            'titre' => $meta[1] . ' — plafond CNSS dépassé',
+            'texte' => 'Le montant de ' . number_format($val, 2, ',', ' ') . ' MAD dépasse le plafond CNSS (' . number_format($ptCnss, 2, ',', ' ') . ' MAD).',
+        ];
+    }
+}
+
+foreach ($paieGains as $g) {
+    $valG = (float) $g['montant'];
+    $ptDG = getPlafondDgi($g['code'], $plafonds, (float) $paie['salaire_base']);
+    $ptCG = getPlafondCnss($g['code'], $plafonds);
+    if (overLimit($valG, $ptDG)) {
+        $alerts[] = [
+            'type'  => 'warning',
+            'titre' => $g['libelle'] . ' — plafond DGI dépassé',
+            'texte' => 'Le montant de ' . number_format($valG, 2, ',', ' ') . ' MAD dépasse le plafond DGI (' . number_format($ptDG, 2, ',', ' ') . ' MAD).',
+        ];
+    }
+    if (overLimit($valG, $ptCG)) {
+        $alerts[] = [
+            'type'  => 'warning',
+            'titre' => $g['libelle'] . ' — plafond CNSS dépassé',
+            'texte' => 'Le montant de ' . number_format($valG, 2, ',', ' ') . ' MAD dépasse le plafond CNSS (' . number_format($ptCG, 2, ',', ' ') . ' MAD).',
+        ];
+    }
 }
 ?>
 <div class="card">
@@ -45,12 +113,38 @@ function overLimit(?float $valeur, ?float $plafond): bool
         </div>
     </div>
 
-    <div style="padding:1rem; border-bottom:1px solid var(--border); display:grid; grid-template-columns:1fr 1fr; gap:0.5rem;">
-        <div><strong>Salarié :</strong> <?= htmlspecialchars($paie['nom_famille'] . ' ' . $paie['prenom']) ?></div>
-        <div><strong>Société :</strong> <?= htmlspecialchars($paie['raison_sociale']) ?></div>
-        <div><strong>Période :</strong> <?= str_pad($paie['mois'] ?? '', 2, '0', STR_PAD_LEFT) ?>/<?= $paie['annee'] ?? '' ?></div>
-        <div><strong>Salaire de base :</strong> <?= number_format($paie['salaire_base'], 2, ',', ' ') ?> MAD</div>
+    <div class="edit-paie-summary">
+        <div class="ep-summary-item">
+            <span class="ep-summary-label">Salarié</span>
+            <span class="ep-summary-value"><?= htmlspecialchars($paie['nom_famille'] . ' ' . $paie['prenom']) ?></span>
+        </div>
+        <div class="ep-summary-item">
+            <span class="ep-summary-label">Société</span>
+            <span class="ep-summary-value"><?= htmlspecialchars($paie['raison_sociale']) ?></span>
+        </div>
+        <div class="ep-summary-item">
+            <span class="ep-summary-label">Période</span>
+            <span class="ep-summary-value"><?= str_pad($paie['mois'] ?? '', 2, '0', STR_PAD_LEFT) ?>/<?= $paie['annee'] ?? '' ?></span>
+        </div>
+        <div class="ep-summary-item">
+            <span class="ep-summary-label">Salaire de base</span>
+            <span class="ep-summary-value"><?= number_format($paie['salaire_base'], 2, ',', ' ') ?> MAD</span>
+        </div>
     </div>
+
+    <?php if (!empty($alerts)): ?>
+    <div class="ep-alerts">
+        <?php foreach ($alerts as $alert): ?>
+        <div class="ep-alert ep-alert-<?= $alert['type'] ?>">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <div class="ep-alert-body">
+                <strong><?= htmlspecialchars($alert['titre']) ?></strong>
+                <span><?= htmlspecialchars($alert['texte']) ?></span>
+            </div>
+        </div>
+        <?php endforeach; ?>
+    </div>
+    <?php endif; ?>
 
     <form method="POST">
         <?= \Core\Session::csrfField() ?>
@@ -89,7 +183,7 @@ function overLimit(?float $valeur, ?float $plafond): bool
                         <td class="code">101</td>
                         <td><span class="info-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="info-tooltip">Jours ouvrés dans le mois (salaire proratisé)</span></span> Durée de travail<span class="formule-label">(100 × jours travaillés / 26)</span></td>
                         <td class="montant">
-                            <input type="number" step="1" min="0" max="31" name="jours_travailles" class="form-control-inline" value="<?= $jt ?>" style="width:55px;">
+                            <input type="number" step="1" min="0" max="31" name="jours_travailles" class="form-control-inline" value="<?= $jt ?>" style="width:64px;">
                         </td>
                         <td class="unite">Jours</td>
                         <td class="taux"><?= number_format($tauxJournalier, 2, ',', ' ') ?> /j</td>
@@ -102,7 +196,7 @@ function overLimit(?float $valeur, ?float $plafond): bool
                         <td class="code">102</td>
                         <td><span class="info-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="info-tooltip">Jours de congé payé — rémunérés au taux journalier</span></span> Jours de congé<span class="formule-label">(100 / 26 × jours de congé)</span></td>
                         <td class="montant">
-                            <input type="number" step="0.5" min="0" max="31" name="jours_conge" class="form-control-inline" value="<?= (float)($paie['jours_conge'] ?? 0) ?>" style="width:55px;">
+                            <input type="number" step="0.5" min="0" max="31" name="jours_conge" class="form-control-inline" value="<?= (float)($paie['jours_conge'] ?? 0) ?>" style="width:64px;">
                         </td>
                         <td class="unite">Jours</td>
                         <td class="taux"><?= number_format($tauxJournalier, 2, ',', ' ') ?> /j</td>
@@ -115,7 +209,7 @@ function overLimit(?float $valeur, ?float $plafond): bool
                         <td class="code">103</td>
                         <td><span class="info-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><span class="info-tooltip">Jours fériés chômés — rémunérés au taux journalier</span></span> Jours fériés<span class="formule-label">(100 / 26 × jours fériés)</span></td>
                         <td class="montant">
-                            <input type="number" step="0.5" min="0" max="31" name="jours_feries" class="form-control-inline" value="<?= (float)($paie['jours_feries'] ?? 0) ?>" style="width:55px;">
+                            <input type="number" step="0.5" min="0" max="31" name="jours_feries" class="form-control-inline" value="<?= (float)($paie['jours_feries'] ?? 0) ?>" style="width:64px;">
                         </td>
                         <td class="unite">Jours</td>
                         <td class="taux"><?= number_format($tauxJournalier, 2, ',', ' ') ?> /j</td>
@@ -131,7 +225,7 @@ function overLimit(?float $valeur, ?float $plafond): bool
                             HS <?= $t25 ?>%<span class="formule-label">(100 / 191 × <?= $t25 ?>% × nbre h)</span>
                         </td>
                         <td class="montant">
-                            <input type="number" step="0.5" min="0" name="heures_sup_25" class="form-control-inline" value="<?= $hs25 ?>" style="width:55px;">
+                            <input type="number" step="0.5" min="0" name="heures_sup_25" class="form-control-inline" value="<?= $hs25 ?>" style="width:64px;">
                         </td>
                         <td class="unite">Heure</td>
                         <td class="taux"><?= $t25 ?>%</td>
@@ -147,7 +241,7 @@ function overLimit(?float $valeur, ?float $plafond): bool
                             HS <?= $t50 ?>%<span class="formule-label">(100 / 191 × <?= $t50 ?>% × nbre h)</span>
                         </td>
                         <td class="montant">
-                            <input type="number" step="0.5" min="0" name="heures_sup_50" class="form-control-inline" value="<?= $hs50 ?>" style="width:55px;">
+                            <input type="number" step="0.5" min="0" name="heures_sup_50" class="form-control-inline" value="<?= $hs50 ?>" style="width:64px;">
                         </td>
                         <td class="unite">Heure</td>
                         <td class="taux"><?= $t50 ?>%</td>
@@ -163,7 +257,7 @@ function overLimit(?float $valeur, ?float $plafond): bool
                             HS <?= $t100 ?>%<span class="formule-label">(100 / 191 × <?= $t100 ?>% × nbre h)</span>
                         </td>
                         <td class="montant">
-                            <input type="number" step="0.5" min="0" name="heures_sup_100" class="form-control-inline" value="<?= $hs100 ?>" style="width:55px;">
+                            <input type="number" step="0.5" min="0" name="heures_sup_100" class="form-control-inline" value="<?= $hs100 ?>" style="width:64px;">
                         </td>
                         <td class="unite">Heure</td>
                         <td class="taux"><?= $t100 ?>%</td>
@@ -201,12 +295,6 @@ function overLimit(?float $valeur, ?float $plafond): bool
                     </tr>
 
                     <?php
-                    $indemnFields = [
-                        'indemnite_transport' => ['330', 'Indemnité transport', 'Exonérée IR/CNSS — Plafond : 500 MAD/mois'],
-                        'indemnite_panier'    => ['346', 'Indemnité panier', 'Exonérée IR/CNSS jusqu\'à 780 MAD/mois'],
-                        'indemnite_representation' => ['331', 'Indemnité représentation', '10% du salaire de base', '100 × 10%'],
-                        'avantage_logement'   => ['340', 'Avantage logement', 'Avantage en nature imposable'],
-                    ];
                     foreach ($indemnFields as $field => $meta):
                         $code = $meta[0];
                         $formule = $meta[3] ?? null;
@@ -242,7 +330,7 @@ function overLimit(?float $valeur, ?float $plafond): bool
                         <td class="taux">—</td>
                         <td class="montant gains-cell<?= $ovG ? ' over-limit' : '' ?>">
                             <input type="hidden" name="gain_existing_rubrique_id[]" value="<?= (int)$g['rubrique_id'] ?>">
-                            <input type="number" step="0.01" min="0" name="gain_existing_montant[]" class="form-control-inline" style="width:80px;" value="<?= $g['montant'] ?>">
+                            <input type="number" step="0.01" min="0" name="gain_existing_montant[]" class="form-control-inline" style="width:90px;" value="<?= $g['montant'] ?>">
                             <?php if ($ptG !== null): ?><span class="plafond-label">max <?= number_format($ptG, 2, ',', ' ') ?></span><?php endif; ?>
                         </td>
                         <td></td>
@@ -257,7 +345,7 @@ function overLimit(?float $valeur, ?float $plafond): bool
 
                     <tr>
                         <td colspan="9" style="padding:0.25rem 0.75rem;">
-                            <button type="button" class="btn btn-sm btn-secondary" onclick="document.getElementById('gainModal').style.display='flex'" style="font-size:0.75rem;">+ Ajouter un gain</button>
+                            <button type="button" class="btn btn-primary btn-sm" onclick="document.getElementById('gainModal').style.display='flex'" style="font-size:0.75rem;">+ Ajouter un gain</button>
                         </td>
                     </tr>
 
@@ -398,14 +486,14 @@ function overLimit(?float $valeur, ?float $plafond): bool
                                 <option value="sanction"<?= $r['type'] === 'sanction' ? ' selected' : '' ?>>Sanction</option>
                                 <option value="autre"<?= $r['type'] === 'autre' ? ' selected' : '' ?>>Autre</option>
                             </select>
-                            <input type="text" name="retenue_libelle_existing[<?= $r['id'] ?>]" class="form-control-inline" style="width:calc(100% - 80px);text-align:left;" value="<?= htmlspecialchars($r['libelle']) ?>">
+                            <input type="text" name="retenue_libelle_existing[<?= $r['id'] ?>]" class="form-control-inline" style="width:calc(100% - 90px);text-align:left;" value="<?= htmlspecialchars($r['libelle']) ?>">
                         </td>
                         <td></td>
                         <td class="unite">DH</td>
                         <td class="taux">—</td>
                         <td></td>
                         <td class="montant retenues-cell">
-                            <input type="number" step="0.01" min="0" name="retenue_montant_existing[<?= $r['id'] ?>]" class="form-control-inline" style="width:80px;" value="<?= $r['montant'] ?>">
+                            <input type="number" step="0.01" min="0" name="retenue_montant_existing[<?= $r['id'] ?>]" class="form-control-inline" style="width:90px;" value="<?= $r['montant'] ?>">
                         </td>
                         <td></td>
                         <td style="text-align:center;">
@@ -417,7 +505,7 @@ function overLimit(?float $valeur, ?float $plafond): bool
 
                     <tr>
                         <td colspan="9" style="padding:0.25rem 0.75rem;">
-                            <button type="button" class="btn btn-sm btn-secondary" onclick="document.getElementById('retenueModal').style.display='flex'" style="font-size:0.75rem;">+ Ajouter une retenue</button>
+                            <button type="button" class="btn btn-primary btn-sm" onclick="document.getElementById('retenueModal').style.display='flex'" style="font-size:0.75rem;">+ Ajouter une retenue</button>
                         </td>
                     </tr>
 
@@ -453,7 +541,7 @@ function overLimit(?float $valeur, ?float $plafond): bool
                         <td></td>
                         <td class="unite">DH</td>
                         <td></td>
-                        <td class="montant gains-cell"><strong style="color:var(--accent);font-size:1rem;"><?= number_format($paie['net_a_payer'], 2, ',', ' ') ?> MAD</strong></td>
+                        <td class="montant gains-cell"><strong style="color:var(--accent);font-size:1.15rem;"><?= number_format($paie['net_a_payer'], 2, ',', ' ') ?> MAD</strong></td>
                         <td></td>
                         <td></td>
                         <td></td>
@@ -467,10 +555,10 @@ function overLimit(?float $valeur, ?float $plafond): bool
                 <input type="checkbox" name="fermer_apres" value="1" style="accent-color:var(--accent);cursor:pointer;">
                 <span>Fermer la fenêtre après l'enregistrement</span>
             </label>
-            <div style="display:flex;gap:0.5rem;align-items:center;">
-                <button type="submit" class="btn btn-success">Enregistrer</button>
-                <button type="submit" name="recalculer" value="1" class="btn btn-secondary btn-sm" onclick="return confirm('Recalculer cette paie ? Les modifications seront sauvegardées avant le calcul.')">Recalculer la paie</button>
-                <a href="/paie-me/paies/<?= $paie['periode_id'] ?>/lignes" class="btn btn-secondary btn-sm">Retour</a>
+            <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
+                <button type="submit" class="btn btn-success ep-footer-btn">Enregistrer</button>
+                <button type="submit" name="recalculer" value="1" class="btn btn-warning ep-footer-btn" onclick="return confirm('Recalculer cette paie ? Les modifications seront sauvegardées avant le calcul.')">Recalculer la paie</button>
+                <a href="/paie-me/paies/<?= $paie['periode_id'] ?>/lignes" class="btn btn-secondary ep-footer-btn">Retour</a>
             </div>
         </div>
     </form>
@@ -506,7 +594,7 @@ function overLimit(?float $valeur, ?float $plafond): bool
                                 <td><?= htmlspecialchars($rg['libelle']) ?></td>
                                 <td style="text-align:center;font-size:0.72rem;"><?= htmlspecialchars($rg['type_montant'] ?? 'fixe') ?></td>
                                 <td style="text-align:right;font-size:0.72rem;color:var(--text-muted);"><?= $plafondText ?></td>
-                                <td style="text-align:center;"><button type="button" class="btn btn-sm btn-secondary" onclick="event.stopPropagation();selectGainRow(this.closest('tr'))" style="font-size:0.68rem;padding:0.15rem 0.5rem;">Choisir</button></td>
+                                <td style="text-align:center;"><button type="button" class="btn btn-primary btn-sm" onclick="event.stopPropagation();selectGainRow(this.closest('tr'))" style="font-size:0.68rem;padding:0.15rem 0.5rem;">Choisir</button></td>
                             </tr>
                             <?php endforeach; ?>
                         </tbody>
@@ -554,7 +642,7 @@ function overLimit(?float $valeur, ?float $plafond): bool
                                 <td><?= htmlspecialchars($rr['libelle']) ?></td>
                                 <td style="text-align:center;font-size:0.72rem;"><?= htmlspecialchars($rr['type_montant'] ?? 'fixe') ?></td>
                                 <td style="text-align:right;font-size:0.72rem;color:var(--text-muted);"><?= htmlspecialchars($rr['valeur_defaut'] ?? '—') ?></td>
-                                <td style="text-align:center;"><button type="button" class="btn btn-sm btn-secondary" onclick="event.stopPropagation();selectRetenueRow(this.closest('tr'))" style="font-size:0.68rem;padding:0.15rem 0.5rem;">Choisir</button></td>
+                                <td style="text-align:center;"><button type="button" class="btn btn-primary btn-sm" onclick="event.stopPropagation();selectRetenueRow(this.closest('tr'))" style="font-size:0.68rem;padding:0.15rem 0.5rem;">Choisir</button></td>
                             </tr>
                             <?php endforeach; ?>
                         </tbody>
@@ -575,38 +663,50 @@ function overLimit(?float $valeur, ?float $plafond): bool
 </div>
 
 <style>
+.edit-paie-summary {
+    padding:1.1rem 1.25rem;
+    border-bottom:1px solid var(--border);
+    display:flex;
+    align-items:center;
+    background:linear-gradient(180deg, rgba(139,92,246,0.06), transparent);
+}
+.ep-summary-item { display:flex; flex-direction:column; gap:0.15rem; flex:1; min-width:0; }
+.ep-summary-item + .ep-summary-item { border-left:1px solid var(--border-subtle); padding-left:1.5rem; }
+.ep-summary-label { font-size:0.72rem; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-muted); }
+.ep-summary-value { font-size:1.05rem; font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
 .edit-paie-table { width:100%; border-collapse:collapse; }
-.edit-paie-table th { padding:0.4rem 0.5rem; text-align:center; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--text-muted); border-bottom:1px solid var(--border); }
-.edit-paie-table td { padding:0.3rem 0.5rem; font-size:0.8rem; border-bottom:1px solid var(--border-subtle); }
+.edit-paie-table th { padding:0.55rem 0.65rem; text-align:center; font-size:0.82rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-muted); border-bottom:1px solid var(--border); background:var(--bg-hover); }
+.edit-paie-table td { padding:0.5rem 0.65rem; font-size:0.92rem; border-bottom:1px solid var(--border-subtle); }
 .edit-paie-table .montant { text-align:right; white-space:nowrap; }
-.edit-paie-table .taux { text-align:center; font-size:0.75rem; color:var(--text-muted); }
-.edit-paie-table .unite { text-align:center; font-size:0.7rem; color:var(--text-muted); width:55px; }
-.edit-paie-table .code { text-align:center; font-size:0.7rem; color:var(--text-muted); font-family:monospace; }
-.edit-paie-table .section-header td { padding:0.4rem 0.5rem 0.2rem; font-size:0.65rem; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; color:var(--text-muted); border-bottom:none; background:rgba(139,92,246,0.12); }
-.edit-paie-table .total-row td { padding:0.4rem 0.5rem; border-top:1px solid var(--border); font-weight:600; }
+.edit-paie-table .taux { text-align:center; font-size:0.85rem; color:var(--text-muted); }
+.edit-paie-table .unite { text-align:center; font-size:0.8rem; color:var(--text-muted); width:60px; }
+.edit-paie-table .code { text-align:center; font-size:0.82rem; color:var(--text-muted); font-family:monospace; }
+.edit-paie-table .section-header td { padding:0.55rem 0.75rem 0.35rem; font-size:0.78rem; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--accent); border-bottom:none; background:rgba(139,92,246,0.12); border-left:3px solid var(--accent); }
+.edit-paie-table .total-row td { padding:0.55rem 0.65rem; border-top:1px solid var(--border); font-weight:600; background:rgba(139,92,246,0.05); }
 .edit-paie-table .recap-section td { border-top:1px solid var(--border); }
-.edit-paie-table .net-row td { border-top:2px solid var(--accent); }
-.form-control-inline { width:60px; padding:0.2rem 0.3rem; font-size:0.75rem; background:var(--bg-surface); border:1px solid var(--border); border-radius:3px; color:var(--text); text-align:right; }
-.form-control-inline:focus { border-color:var(--accent); outline:none; }
+.edit-paie-table .net-row td { border-top:2px solid var(--accent); background:rgba(139,92,246,0.08); }
+.form-control-inline { width:64px; padding:0.3rem 0.4rem; font-size:0.88rem; background:var(--bg-surface); border:1px solid var(--border); border-radius:4px; color:var(--text); text-align:right; }
+.form-control-inline:focus { border-color:var(--accent); outline:none; box-shadow:0 0 0 2px rgba(139,92,246,0.25); }
 .form-control-inline.over-limit { border-color:#ef4444; background:rgba(239,68,68,0.12); color:#fca5a5; }
 .row-over-limit td { background:rgba(239,68,68,0.06); }
 .montant.over-limit { color:#fca5a5; font-weight:600; }
-.plafond-label { display:block; font-size:0.6rem; color:var(--text-muted); white-space:nowrap; margin-top:0.1rem; }
-.info-icon { cursor:help; display:inline-flex; align-items:center; justify-content:center; width:16px; height:16px; border-radius:50%; background:rgba(139,92,246,0.18); color:var(--text-muted); font-size:0; vertical-align:middle; margin-left:0.3rem; position:relative; transition:background 0.2s; }
+.plafond-label { display:block; font-size:0.7rem; color:var(--text-muted); white-space:nowrap; margin-top:0.15rem; }
+.info-icon { cursor:help; display:inline-flex; align-items:center; justify-content:center; width:18px; height:18px; border-radius:50%; background:rgba(139,92,246,0.18); color:var(--text-muted); font-size:0; vertical-align:middle; margin-left:0.3rem; position:relative; transition:background 0.2s; }
 .info-icon:hover { background:var(--accent-hover); }
-.info-icon svg { width:12px; height:12px; pointer-events:none; }
+.info-icon svg { width:13px; height:13px; pointer-events:none; }
 .edit-paie-table-wrap { overflow:visible !important; }
-.formule-label { display:block; font-size:0.62rem; font-weight:400; color:var(--text-muted); margin-top:0.1rem; white-space:normal; }
+.formule-label { display:block; font-size:0.74rem; font-weight:400; color:var(--text-muted); margin-top:0.15rem; white-space:normal; }
 .edit-paie-table .gains-cell { color:#34d399; }
 .edit-paie-table .gains-cell strong { color:#34d399; }
 .edit-paie-table .retenues-cell { color:#f87171; }
 .edit-paie-table .retenues-cell strong { color:#f87171; }
 .edit-paie-table .patronales-cell { color:#fbbf24; }
 .edit-paie-table .patronales-cell strong { color:#fbbf24; }
-.info-icon .info-tooltip { display:none; position:fixed; background:var(--bg-surface); color:var(--text); padding:0.4rem 0.6rem; border-radius:6px; font-size:0.7rem; font-weight:400; white-space:nowrap; box-shadow:0 4px 12px rgba(0,0,0,0.3); z-index:9999; line-height:1.4; pointer-events:none; }
+.info-icon .info-tooltip { display:none; position:fixed; background:var(--bg-surface); color:var(--text); padding:0.5rem 0.75rem; border-radius:6px; font-size:0.82rem; font-weight:400; white-space:nowrap; box-shadow:0 4px 12px rgba(0,0,0,0.3); z-index:9999; line-height:1.4; pointer-events:none; }
 .info-icon .info-tooltip::after { content:''; position:absolute; top:100%; left:50%; transform:translateX(-50%); border:5px solid transparent; border-top-color:var(--bg-surface); }
 .info-icon:hover .info-tooltip { display:block; }
-.form-select-inline { padding:0.2rem 0.3rem; font-size:0.72rem; background:var(--bg-surface); border:1px solid var(--border); border-radius:3px; color:var(--text); }
+.form-select-inline { padding:0.3rem 0.4rem; font-size:0.85rem; background:var(--bg-surface); border:1px solid var(--border); border-radius:4px; color:var(--text); }
 .form-select-inline:focus { border-color:var(--accent); outline:none; }
 
 .gain-row { cursor:pointer; }
@@ -617,6 +717,17 @@ function overLimit(?float $valeur, ?float $plafond): bool
 .retenue-row:hover { background:var(--bg-hover); }
 .retenue-row.selected { background:rgba(139,92,246,0.18); }
 .retenue-row.selected td { color:var(--accent); font-weight:500; }
+
+.ep-footer-btn { min-width:170px; justify-content:center; }
+
+.ep-alerts { padding:0.9rem 1.25rem 0.25rem; display:flex; flex-direction:column; gap:0.5rem; }
+.ep-alert { display:flex; align-items:flex-start; gap:0.6rem; padding:0.65rem 0.85rem; border-radius:8px; font-size:0.88rem; line-height:1.45; }
+.ep-alert svg { flex-shrink:0; margin-top:0.1rem; }
+.ep-alert-body { display:flex; flex-direction:column; gap:0.1rem; }
+.ep-alert-body strong { font-weight:700; }
+.ep-alert-body span { color:var(--text-muted); }
+.ep-alert-danger { background:rgba(239,68,68,0.10); border:1px solid rgba(239,68,68,0.35); color:#f87171; }
+.ep-alert-warning { background:rgba(245,158,11,0.10); border:1px solid rgba(245,158,11,0.35); color:#fbbf24; }
 </style>
 
 <script>
@@ -663,7 +774,7 @@ function ajouterGainDepuisModal() {
         <td class="taux">—</td>
         <td class="montant gains-cell">
             <input type="hidden" name="gain_new_rubrique_id[${gainIdx}]" value="${gainSelected.id}">
-            <input type="number" step="0.01" min="0" name="gain_new_montant[${gainIdx}]" class="form-control-inline" style="width:80px;" value="${montant.toFixed(2)}">
+            <input type="number" step="0.01" min="0" name="gain_new_montant[${gainIdx}]" class="form-control-inline" style="width:90px;" value="${montant.toFixed(2)}">
         </td>
         <td></td>
         <td></td>
@@ -718,7 +829,7 @@ function ajouterRetenueDepuisModal() {
         <td></td>
         <td class="montant retenues-cell">
             <input type="hidden" name="retenue_new_rubrique_id[${retenueIdx}]" value="${retenueSelected.id}">
-            <input type="number" step="0.01" min="0" name="retenue_new_montant[${retenueIdx}]" class="form-control-inline" style="width:80px;" value="${montant.toFixed(2)}">
+            <input type="number" step="0.01" min="0" name="retenue_new_montant[${retenueIdx}]" class="form-control-inline" style="width:90px;" value="${montant.toFixed(2)}">
         </td>
         <td></td>
         <td style="text-align:center;">

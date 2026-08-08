@@ -94,13 +94,13 @@
     </div>
 
     <div style="padding:0.5rem 0; display:flex; align-items:center; gap:0.5rem;">
-        <button type="button" id="dc-btn-edit" class="btn btn-sm btn-secondary" onclick="dcToggleEdit(true)" style="font-size:0.75rem;">
+        <button type="button" id="dc-btn-edit" class="btn btn-warning btn-sm" onclick="dcToggleEdit(true)" style="font-size:0.75rem;">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle; margin-right:0.25rem;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
             Modifier
         </button>
-        <button type="button" id="dc-btn-add" class="btn btn-sm btn-secondary" onclick="dcAjouter()" style="font-size:0.75rem; display:none;">+ Ajouter une tranche</button>
+        <button type="button" id="dc-btn-add" class="btn btn-primary btn-sm" onclick="dcAjouter()" style="font-size:0.75rem; display:none;">+ Ajouter une tranche</button>
         <button type="button" id="dc-btn-save" class="btn btn-sm btn-success" onclick="document.getElementById('congeAnnuelForm').submit()" style="font-size:0.75rem; display:none;">Enregistrer les modifications</button>
-        <button type="button" id="dc-btn-cancel" class="btn btn-sm btn-danger" onclick="dcToggleEdit(false)" style="font-size:0.75rem; display:none;">Annuler</button>
+        <button type="button" id="dc-btn-cancel" class="btn btn-secondary btn-sm" onclick="dcToggleEdit(false)" style="font-size:0.75rem; display:none;">Annuler</button>
     </div>
 </div>
 

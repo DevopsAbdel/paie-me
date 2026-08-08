@@ -16,7 +16,7 @@ $nbImportables = $report['valid'];
     <div class="card-header">
         <h3>Vérification de l'import</h3>
         <div style="display:flex; align-items:center; gap:0.5rem;">
-            <a href="<?= $baseUrl ?>/salaries/import/modele" class="btn btn-secondary btn-sm">Télécharger le modèle</a>
+            <a href="<?= $baseUrl ?>/salaries/import/modele" class="btn btn-info btn-sm">Télécharger le modèle</a>
             <a href="<?= $baseUrl ?>/salaries" class="btn btn-secondary btn-sm">Retour</a>
         </div>
     </div>

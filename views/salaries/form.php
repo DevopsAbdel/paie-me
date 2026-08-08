@@ -302,7 +302,7 @@
             </table>
         </div>
         <div style="padding:0.5rem 0;">
-            <button type="button" class="btn btn-sm btn-secondary" onclick="document.getElementById('indemniteModal').style.display='flex'" style="font-size:0.75rem;">+ Ajouter une indemnité</button>
+            <button type="button" class="btn btn-primary btn-sm" onclick="document.getElementById('indemniteModal').style.display='flex'" style="font-size:0.75rem;">+ Ajouter une indemnité</button>
         </div>
 
         <!-- Modale Gain -->
@@ -332,7 +332,7 @@
                                     <td class="code" style="text-align:left;"><?= htmlspecialchars($rg['code']) ?></td>
                                     <td style="text-align:left;"><?= htmlspecialchars($rg['libelle']) ?></td>
                                     <td style="text-align:center;font-size:0.72rem;"><?= htmlspecialchars($rg['type_montant'] ?? 'fixe') ?></td>
-                                    <td style="text-align:center;"><button type="button" class="btn btn-sm btn-secondary" onclick="event.stopPropagation();selectGainRow(this.closest('tr'))" style="font-size:0.68rem;padding:0.15rem 0.5rem;">Choisir</button></td>
+                                    <td style="text-align:center;"><button type="button" class="btn btn-primary btn-sm" onclick="event.stopPropagation();selectGainRow(this.closest('tr'))" style="font-size:0.68rem;padding:0.15rem 0.5rem;">Choisir</button></td>
                                 </tr>
                                 <?php endforeach; ?>
                             </tbody>
@@ -389,7 +389,7 @@
                                     <td style="text-align:left;"><?= htmlspecialchars($ri['libelle']) ?></td>
                                     <td style="text-align:left;font-size:0.72rem;color:var(--text-muted);"><?= $plafondDgiText ?></td>
                                     <td style="text-align:left;font-size:0.72rem;color:var(--text-muted);"><?= $plafondCnssText ?></td>
-                                    <td style="text-align:center;"><button type="button" class="btn btn-sm btn-secondary" onclick="event.stopPropagation();selectIndemniteRow(this.closest('tr'))" style="font-size:0.68rem;padding:0.15rem 0.5rem;">Choisir</button></td>
+                                    <td style="text-align:center;"><button type="button" class="btn btn-primary btn-sm" onclick="event.stopPropagation();selectIndemniteRow(this.closest('tr'))" style="font-size:0.68rem;padding:0.15rem 0.5rem;">Choisir</button></td>
                                 </tr>
                                 <?php endforeach; ?>
                             </tbody>

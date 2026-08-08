@@ -85,7 +85,7 @@ $taux = [
     <div class="card-header">
         <h3>Bulletin de paie — <?= htmlspecialchars($b['nom_famille'] . ' ' . $b['prenom']) ?></h3>
         <div>
-            <a href="/paie-me/bulletins/<?= $b['id'] ?>/pdf" class="btn btn-primary btn-sm">Télécharger PDF</a>
+            <a href="/paie-me/bulletins/<?= $b['id'] ?>/pdf" class="btn btn-info btn-sm">Télécharger PDF</a>
             <a href="/paie-me/bulletins" class="btn btn-secondary btn-sm">Retour</a>
         </div>
     </div>
