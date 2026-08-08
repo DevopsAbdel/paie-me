@@ -287,6 +287,16 @@ Net  = salaire - (CNSS + AMO + IR)
 - **Vues** : modale d'upload (`_import_ui.php`, CSRF + enctype multipart), rapport Odoo-style (`import_result.php` : stats Lignes/Valides/Erreurs + tableau erreurs ou aperçu des lignes + bouton « Importer N salarié(s) »).
 - **Rapport d'erreurs** : un seul message par champ — si le format est invalide, ne pas aussi reporter « requis manquant » (liste `$invalidFields` par ligne).
 
+## Règles — Salariés sortants
+- **Sortie ≠ suppression** : un salarié qui quitte la société est marqué `actif = 0` (UPDATE, jamais DELETE) — son historique (paies, congés, STC) reste intact.
+- **Colonnes** : `salaries.date_sortie` (DATE nullable) et `salaries.motif_sortie` (VARCHAR(100) nullable, ex: Démission, Licenciement, Fin de CDD, Retraite…).
+- **Action « Sortir »** : bouton icône dans les listes de salariés actifs (`views/salaries/index.php` et `views/societes/salaries_list.php`) → modale partagée `views/salaries/_sortie_modal.php` (date obligatoire + motif optionnel). POST sur `/salaries/{id}/sortir` → `SalarieController::sortir()` : UPDATE `date_sortie`, `motif_sortie`, `actif = 0` + Audit + flash.
+- **Section « Salariés sortants »** : page dédiée `views/salaries/sortants.php` (GET `/salaries/sortants`, méthode `SalarieController::sortants()`) — affiche **toutes les infos** (matricule, CIN, CNSS, poste, société, salaire, dates, motif sortie en badge rouge) avec actions STC / Modifier / **Réintégrer** (POST `/salaries/{id}/reintegrer` → `actif = 1` + efface `date_sortie`/`motif_sortie`) / Supprimer définitivement.
+- **Filtre actifs** : `index()` et `SocieteController::salaries()` ne listent QUE `actif = 1` ; la liste index affiche un bouton « Sortants (N) » quand N > 0.
+- **Sidebar** : sous-menu « Salariés » → « Salariés sortants » (visible quand l'URI contient `/salaries`), affiché dans le menu latéral en contexte société.
+- **Calcul paie** : `PaieCalculator` applique déjà le prorata du mois de sortie via `date_sortie` (Core/PaieCalculator.php:54) ; les sortants ne sont pas inclus dans les nouvelles paies (`actif = 1`).
+- **Routes** : les routes `/salaries/sortants`, `/salaries/{id}/sortir`, `/salaries/{id}/reintegrer` doivent être déclarées AVANT `/salaries/{id}/...`.
+
 ## Encodage UTF-8 — RÈGLE CRITIQUE
 - **Tous les fichiers PHP, SQL, CSS, JS** doivent être **sauvés en UTF-8 sans BOM**.
 - **Toute donnée contenant des accents français** (`é`, `è`, `ê`, `ë`, `à`, `â`, `ù`, `û`, `ô`, `î`, `ç`, `É`, `È`, etc.) doit être **validée** avant insertion.
@@ -365,6 +375,12 @@ Net  = salaire - (CNSS + AMO + IR)
   - Complément des articles manquants pour les rubriques canoniques en `INSERT IGNORE` (idempotent) → 90 articles au total (80 remappés + 10 pour 501–505)
   - `schema.sql` : seed `rubriques_gains` réécrit avec le jeu canonique (18 colonnes : `compte` 6 chiffres, `source`, `source_maj`, `nature_edi`, `base_anciennete`, `au_prorata`) — plus aucun `PRIME_*`
   - Vérifié sur `paie_me` + `paie_me_demo` : 48 rubriques globales, 0 doublon par code, 0 `PRIME_*`, 90 articles, aucun FK orphelin
+- **Gestion des salariés sortants** (sortie ≠ suppression) :
+  - Colonne `salaries.motif_sortie VARCHAR(100) DEFAULT NULL` (après `date_sortie`) ajoutée dans `schema.sql` + `migrate.php` (migrations relancées sur `paie_me` + `paie_me_demo`)
+  - `SalarieController` : `index()` filtre `actif = 1` + compte `nbSortants` ; méthodes `sortants()` (liste actif=0 avec JOIN société/fonction/service + décrypt CIN/RIB), `sortir()` (POST, date obligatoire + motif optionnel, UPDATE + Audit + flash, redirect referer), `reintegrer()` (POST, efface date/motif, `actif = 1`, Audit)
+  - Routes : `GET /salaries/sortants`, `POST /salaries/{id}/sortir`, `POST /salaries/{id}/reintegrer` (avant `/salaries/{id}/...`)
+  - Vues : `views/salaries/sortants.php` (nouvelle, toutes les infos + badge rouge motif + actions STC/Modifier/Réintégrer/Supprimer) ; `views/salaries/_sortie_modal.php` (nouvelle, modale partagée date+motif) ; `index.php` + `views/societes/salaries_list.php` (bouton « Sortants (N) » + action Sortir + include modale) ; `layout.php` sous-menu sidebar « Salariés sortants » (visible si URI contient `/salaries`)
+  - Vérifié navigateur : sortie depuis liste globale + contexte société (redirect referer, flash, disparition liste active, badge), page sortants (motif « Décès » affiché), réintégration (retour effectifs actifs + liste vide), sous-menu sidebar présent
 
 ### Pending
 - (none)
@@ -396,3 +412,10 @@ Net  = salaire - (CNSS + AMO + IR)
 | `Core/Audit.php` | `log()` best-effort : les `PDOException` sont capturées (jamais de fatal sur la journalisation) |
 | `database/migrate.php` | + fusion des doublons de `rubriques_gains` (remap enfants → ligne canonique + DELETE) ; seed articles passé en `INSERT IGNORE` idempotent ; complément articles 501–505 |
 | `database/schema.sql` | seed `rubriques_gains` = jeu canonique (501–505 + 330–377 avec `source`/`compte` 6 chiffres/`nature_edi`) au lieu de `PRIME_*` + codes sans source |
+| `database/schema.sql` + `database/migrate.php` | + colonne `salaries.motif_sortie VARCHAR(100) DEFAULT NULL` (après `date_sortie`) |
+| `controllers/SalarieController.php` | `index()` filtre `actif = 1` + `nbSortants` ; + `sortants()`, `sortir()`, `reintegrer()` |
+| `routes.php` | + `GET /salaries/sortants`, `POST /salaries/{id}/sortir`, `POST /salaries/{id}/reintegrer` |
+| `views/salaries/sortants.php` | nouveau : section « Salariés sortants » (toutes infos + badge motif rouge + STC/Modifier/Réintégrer/Supprimer) |
+| `views/salaries/_sortie_modal.php` | nouveau : modale partagée « Sortir de la société » (date + motif, CSRF) |
+| `views/salaries/index.php` + `views/societes/salaries_list.php` | bouton « Sortants (N) » + action « Sortir de la société » (icône) + include modale |
+| `views/layout.php` | sous-menu sidebar « Salariés sortants » sous « Salariés » |

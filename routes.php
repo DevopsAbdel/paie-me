@@ -50,6 +50,9 @@ Router::post('/societes/{id}/baremes', [SocieteController::class, 'baremes']);
 Router::post('/societes/{id}/baremes/{sous_tab}', [SocieteController::class, 'baremes']);
 
 Router::get('/salaries',               [SalarieController::class, 'index']);
+Router::get('/salaries/sortants',      [SalarieController::class, 'sortants']);
+Router::post('/salaries/{id}/sortir',  [SalarieController::class, 'sortir']);
+Router::post('/salaries/{id}/reintegrer', [SalarieController::class, 'reintegrer']);
 Router::get('/salaries/create',        [SalarieController::class, 'create']);
 Router::post('/salaries/create',       [SalarieController::class, 'create']);
 Router::get('/salaries/export',        [SalarieController::class, 'export']);

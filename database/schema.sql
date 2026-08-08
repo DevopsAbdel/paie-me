@@ -101,6 +101,7 @@ CREATE TABLE IF NOT EXISTS salaries (
     lieu_naissance      VARCHAR(100)        DEFAULT NULL,
     date_embauche       DATE,
     date_sortie         DATE                DEFAULT NULL,
+    motif_sortie        VARCHAR(100)        DEFAULT NULL,
     cin                 VARCHAR(255),
     cnss                VARCHAR(20),
     situation_familiale ENUM('celibataire', 'marie', 'divorce', 'veuf') NOT NULL DEFAULT 'celibataire',

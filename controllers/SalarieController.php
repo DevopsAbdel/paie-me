@@ -36,6 +36,7 @@ class SalarieController extends Controller
         if ($ctx) {
             $sql .= " AND s.societe_id = " . (int)$ctx['id'];
         }
+        $sql .= " AND s.actif = 1";
         $sql .= " ORDER BY LENGTH(s.matricule), s.matricule";
         $salaries = $this->db->query($sql)->fetchAll();
 
@@ -45,11 +46,96 @@ class SalarieController extends Controller
         }
         unset($s);
 
+        $nbSortants = (int) $this->db->query("
+            SELECT COUNT(*) FROM salaries s
+            JOIN societes so ON s.societe_id = so.id
+            WHERE so.user_id = $userId" . ($ctx ? " AND s.societe_id = " . (int)$ctx['id'] : '') . " AND s.actif = 0
+        ")->fetchColumn();
+
         $this->render('salaries/index.php', [
             'title'    => 'Salariés',
             'salaries' => $salaries,
             'ctx'      => $ctx,
+            'nbSortants' => $nbSortants,
         ]);
+    }
+
+    public function sortants(): void
+    {
+        $userId = Session::get('user_id');
+        $ctx = Session::get('societe_context');
+        $sql = "
+            SELECT s.*, so.raison_sociale, f.nom as fonction_nom, sv.nom as service_nom
+            FROM salaries s
+            JOIN societes so ON s.societe_id = so.id
+            LEFT JOIN fonctions f ON s.fonction_id = f.id
+            LEFT JOIN services sv ON s.service_id = sv.id
+            WHERE so.user_id = $userId AND s.actif = 0
+        ";
+        if ($ctx) {
+            $sql .= " AND s.societe_id = " . (int)$ctx['id'];
+        }
+        $sql .= " ORDER BY s.date_sortie DESC, LENGTH(s.matricule), s.matricule";
+        $salaries = $this->db->query($sql)->fetchAll();
+
+        foreach ($salaries as &$s) {
+            $s['cin'] = Crypto::tryDecrypt($s['cin'] ?? '');
+            $s['rib'] = Crypto::tryDecrypt($s['rib'] ?? '');
+        }
+        unset($s);
+
+        $this->render('salaries/sortants.php', [
+            'title'    => 'Salariés sortants',
+            'salaries' => $salaries,
+            'ctx'      => $ctx,
+        ]);
+    }
+
+    public function sortir(int $id): void
+    {
+        $this->checkCsrf();
+        $this->requireRole('admin');
+        $userId = Session::get('user_id');
+        $dateSortie = trim((string) ($_POST['date_sortie'] ?? ''));
+        $motif = trim((string) ($_POST['motif_sortie'] ?? ''));
+
+        $salarie = $this->db->query("SELECT nom_famille, prenom, societe_id FROM salaries WHERE id = $id")->fetch();
+        if (!$salarie || !$this->db->query("SELECT id FROM societes WHERE id = {$salarie['societe_id']} AND user_id = $userId")->fetch()) {
+            Session::setFlash('error', 'Salarié introuvable.');
+            $this->redirect('/paie-me/salaries');
+        }
+
+        if ($dateSortie === '') {
+            Session::setFlash('error', 'La date de sortie est obligatoire.');
+            $this->redirect($_SERVER['HTTP_REFERER'] ?? '/paie-me/salaries');
+        }
+
+        $stmt = $this->db->prepare("UPDATE salaries SET date_sortie = ?, motif_sortie = ?, actif = 0 WHERE id = ?");
+        $stmt->execute([$dateSortie, $motif !== '' ? $motif : null, $id]);
+
+        Audit::log($this->db, 'sortie', 'salarie', $id, 'Sortie salarié: ' . $salarie['nom_famille'] . ' ' . $salarie['prenom'] . ' (' . $dateSortie . ($motif !== '' ? ' — ' . $motif : '') . ')');
+        Session::setFlash('success', 'Salarié marqué sortant le ' . date('d/m/Y', strtotime($dateSortie)) . '.');
+        $this->redirect($_SERVER['HTTP_REFERER'] ?? '/paie-me/salaries');
+    }
+
+    public function reintegrer(int $id): void
+    {
+        $this->checkCsrf();
+        $this->requireRole('admin');
+        $userId = Session::get('user_id');
+
+        $salarie = $this->db->query("SELECT nom_famille, prenom, societe_id FROM salaries WHERE id = $id")->fetch();
+        if (!$salarie || !$this->db->query("SELECT id FROM societes WHERE id = {$salarie['societe_id']} AND user_id = $userId")->fetch()) {
+            Session::setFlash('error', 'Salarié introuvable.');
+            $this->redirect('/paie-me/salaries');
+        }
+
+        $stmt = $this->db->prepare("UPDATE salaries SET date_sortie = NULL, motif_sortie = NULL, actif = 1 WHERE id = ?");
+        $stmt->execute([$id]);
+
+        Audit::log($this->db, 'reintegration', 'salarie', $id, 'Réintégration salarié: ' . $salarie['nom_famille'] . ' ' . $salarie['prenom']);
+        Session::setFlash('success', 'Salarié réintégré dans les effectifs actifs.');
+        $this->redirect($_SERVER['HTTP_REFERER'] ?? '/paie-me/salaries/sortants');
     }
 
     public function create(): void

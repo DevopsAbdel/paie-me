@@ -47,10 +47,16 @@
             </a>
         </li>
         <li>
-            <a href="/paie-me/societes/<?= $ctx['id'] ?>/salaries" class="<?= str_contains($_SERVER['REQUEST_URI'], '/salaries') && !str_contains($_SERVER['REQUEST_URI'], 'create') && !str_contains($_SERVER['REQUEST_URI'], 'edit') ? 'active' : '' ?>">
+            <a href="/paie-me/societes/<?= $ctx['id'] ?>/salaries" class="<?= str_contains($_SERVER['REQUEST_URI'], '/salaries') && !str_contains($_SERVER['REQUEST_URI'], 'create') && !str_contains($_SERVER['REQUEST_URI'], 'edit') && !str_contains($_SERVER['REQUEST_URI'], '/sortants') ? 'active' : '' ?>">
                 <span class="icon" data-lucide="users"></span>
                 <span>Salariés</span>
             </a>
+            <?php if (str_contains($_SERVER['REQUEST_URI'], '/salaries')): ?>
+            <ul style="list-style:none; padding:0; margin:0.25rem 0 0 1.5rem; font-size:0.8125rem;">
+                <?php $uriS = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH); ?>
+                <li><a href="/paie-me/salaries/sortants" style="display:block; padding:0.3rem 0.5rem; color:<?= str_contains($uriS, '/sortants')?'var(--accent)':'var(--text-muted)'?>; text-decoration:none; border-radius:4px;">Salariés sortants</a></li>
+            </ul>
+            <?php endif; ?>
         </li>
         <li>
             <a href="/paie-me/societes/<?= $ctx['id'] ?>/conges" class="<?= str_contains($_SERVER['REQUEST_URI'], '/conges') ? 'active' : '' ?>">

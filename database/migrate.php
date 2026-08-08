@@ -913,6 +913,7 @@ if ($fixed > 0) echo "   + $fixed modèle(s) corrigé(s) (codes → numériques)
 // === Sexo, lieu de naissance, type contrat ANAPEC/TAHFIZ ===
 addCol($p, 'salaries', "sexe ENUM('M', 'F') DEFAULT NULL AFTER matricule");
 addCol($p, 'salaries', 'lieu_naissance VARCHAR(100) DEFAULT NULL AFTER date_naissance');
+addCol($p, 'salaries', 'motif_sortie VARCHAR(100) DEFAULT NULL AFTER date_sortie');
 try {
     $p->exec("ALTER TABLE salaries MODIFY COLUMN type_contrat ENUM('CDI', 'CDD', 'stage', 'interim', 'anapec', 'tahfiz') NOT NULL DEFAULT 'CDI'");
     echo "   + type_contrat: ANAPEC & TAHFIZ ajoutés\n";
