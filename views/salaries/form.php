@@ -1,6 +1,6 @@
 <div class="card">
     <div class="card-header">
-        <h3><?= $salarie ? 'Modifier' : 'Nouveau' ?> salarié</h3>
+        <h3>Informations du salarié</h3>
     </div>
     <form method="POST">
         <?= \Core\Session::csrfField() ?>

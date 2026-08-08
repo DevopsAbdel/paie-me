@@ -182,17 +182,144 @@
 <?php endif; ?>
 
 <main class="<?= isset($_SESSION['user_id']) ? 'main-content' : '' ?>">
-    <?php if (isset($_SESSION['user_id'])): ?>
+    <?php if (isset($_SESSION['user_id'])):
+        $topbarAlerts = [];
+        if ($ctx):
+            try {
+                $db = \Core\Model::db();
+                $sid = (int) $ctx['id'];
+                $anneeCourante = (int) date('Y');
+                $smig = $db->query("
+                    SELECT mensuel FROM bareme_smig_smag
+                    WHERE societe_id = $sid AND type = 'SMIG' AND annee = $anneeCourante
+                    ORDER BY id DESC LIMIT 1
+                ")->fetchColumn();
+                if (!$smig) {
+                    $smig = $db->query("
+                        SELECT mensuel FROM bareme_smig_smag
+                        WHERE societe_id IS NULL AND type = 'SMIG' AND annee = $anneeCourante
+                        ORDER BY id DESC LIMIT 1
+                    ")->fetchColumn();
+                }
+                if ($smig) {
+                    $nbSousSmig = (int) $db->query("
+                        SELECT COUNT(*) FROM salaries
+                        WHERE societe_id = $sid AND actif = 1 AND salaire_base > 0 AND salaire_base < " . (float) $smig
+                    )->fetchColumn();
+                    if ($nbSousSmig > 0) {
+                        $topbarAlerts[] = [
+                            'titre' => 'Salariés sous le SMIG',
+                            'texte' => $nbSousSmig . ' salarié(s) actif(s) avec un salaire de base inférieur au SMIG ' . $anneeCourante . ' (' . number_format((float) $smig, 2, ',', ' ') . ' MAD).',
+                            'href'  => '/paie-me/societes/' . $sid . '/salaries',
+                        ];
+                    }
+                }
+                $nbPaiesEnCours = (int) $db->query("
+                    SELECT COUNT(*) FROM periodes p
+                    WHERE p.societe_id = $sid AND p.cloturee = 0
+                ")->fetchColumn();
+                if ($nbPaiesEnCours > 0) {
+                    $topbarAlerts[] = [
+                        'titre' => 'Périodes de paie en cours',
+                        'texte' => $nbPaiesEnCours . ' période(s) de paie non clôturée(s).',
+                        'href'  => '/paie-me/societes/' . $sid . '/paies',
+                    ];
+                }
+            } catch (\Throwable $e) {}
+        endif;
+    ?>
     <div class="topbar">
+        <div class="tb-left">
+            <a href="<?= $ctx ? '/paie-me/societes/' . (int) $ctx['id'] : '/paie-me/societes' ?>" class="tb-brand" title="<?= $ctx ? htmlspecialchars($ctx['raison_sociale']) : 'Liste des sociétés' ?>">
+                <?php if ($ctx): ?>
+                    <?php if (!empty($ctx['logo'])): ?>
+                    <img src="/paie-me/<?= htmlspecialchars($ctx['logo']) ?>" alt="Logo de <?= htmlspecialchars($ctx['raison_sociale']) ?>" class="tb-logo">
+                    <?php else: ?>
+                    <span class="tb-logo tb-logo-initials"><?= htmlspecialchars(strtoupper(mb_substr(trim($ctx['raison_sociale']), 0, 1))) ?></span>
+                    <?php endif; ?>
+                    <span class="tb-brand-text">
+                        <span class="tb-brand-name"><?= htmlspecialchars($ctx['raison_sociale']) ?></span>
+                        <span class="tb-brand-cnss">N° Aff. CNSS : <?= htmlspecialchars($ctx['cnss'] ?? '—') ?></span>
+                    </span>
+                <?php else: ?>
+                    <span class="tb-logo tb-logo-initials">P</span>
+                    <span class="tb-brand-text">
+                        <span class="tb-brand-name">Paie Me</span>
+                        <span class="tb-brand-cnss">Gestion de paie</span>
+                    </span>
+                <?php endif; ?>
+            </a>
+            <?php if (!empty($_SESSION['demo_mode'])): ?>
+                <span class="badge" style="background:rgba(139,92,246,0.15); color:#a78bfa; border:1px solid rgba(139,92,246,0.4); font-size:0.7rem;">MODE DÉMO</span>
+            <?php endif; ?>
+        </div>
+
+        <div class="tb-right">
+            <div class="tb-dropdown" id="tb-alertes">
+                <button type="button" class="tb-icon" title="Alertes" onclick="toggleTbDropdown('tb-alertes')">
+                    <i data-lucide="bell"></i>
+                    <?php if (count($topbarAlerts) > 0): ?>
+                    <span class="tb-badge"><?= count($topbarAlerts) ?></span>
+                    <?php endif; ?>
+                </button>
+                <div class="tb-menu">
+                    <div class="tb-menu-title">Alertes</div>
+                    <?php if (empty($topbarAlerts)): ?>
+                        <div class="tb-empty">Aucune alerte pour cette société.</div>
+                    <?php else: ?>
+                        <?php foreach ($topbarAlerts as $a): ?>
+                        <a href="<?= $a['href'] ?>" class="tb-alert">
+                            <span class="tb-alert-dot"></span>
+                            <span class="tb-alert-body">
+                                <span class="tb-alert-titre"><?= htmlspecialchars($a['titre']) ?></span>
+                                <span class="tb-alert-texte"><?= htmlspecialchars($a['texte']) ?></span>
+                            </span>
+                        </a>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <div class="tb-dropdown" id="tb-notifs">
+                <button type="button" class="tb-icon" title="Notifications" onclick="toggleTbDropdown('tb-notifs')">
+                    <i data-lucide="bell-ring"></i>
+                </button>
+                <div class="tb-menu">
+                    <div class="tb-menu-title">Notifications</div>
+                    <div class="tb-empty">Aucune notification.</div>
+                </div>
+            </div>
+
+            <?php if ($ctx): ?>
+            <a href="/paie-me/societes/clear-context" class="tb-icon" title="Quitter la société">
+                <i data-lucide="log-out"></i>
+            </a>
+            <?php endif; ?>
+
+            <div class="tb-dropdown" id="tb-user">
+                <button type="button" class="tb-user" onclick="toggleTbDropdown('tb-user')">
+                    <span class="tb-avatar"><?= htmlspecialchars(strtoupper(mb_substr(trim($_SESSION['user_nom'] ?? 'U'), 0, 1))) ?></span>
+                    <span class="tb-user-name"><?= htmlspecialchars($_SESSION['user_nom'] ?? 'Utilisateur') ?></span>
+                    <i data-lucide="chevron-down" class="tb-user-caret"></i>
+                </button>
+                <div class="tb-menu tb-menu-user">
+                    <div class="tb-user-info">
+                        <div class="tb-user-role"><?= htmlspecialchars(ucfirst($_SESSION['user_role'] ?? 'utilisateur')) ?></div>
+                        <div class="tb-user-email"><?= htmlspecialchars($_SESSION['user_email'] ?? '') ?></div>
+                    </div>
+                    <a href="/paie-me/logout" class="tb-logout"><i data-lucide="log-out"></i> Déconnexion</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="page-header">
         <h1>
             <?= $title ?? 'Paie Me' ?>
-            <?php if (!empty($_SESSION['demo_mode'])): ?>
-                <span class="badge" style="background:rgba(139,92,246,0.15); color:#a78bfa; border:1px solid rgba(139,92,246,0.4); font-size:0.7rem; vertical-align:middle; margin-left:0.5rem;">MODE DÉMO</span>
-            <?php endif; ?>
         </h1>
-        <div class="topbar-actions">
-            <?= $actions ?? '' ?>
-        </div>
+        <?php if (!empty($actions)): ?>
+        <div class="page-actions"><?= $actions ?></div>
+        <?php endif; ?>
     </div>
     <?php endif; ?>
 
@@ -217,6 +344,20 @@
 
 <script>lucide.createIcons();</script>
 <script>if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', () => initCustomSelects()); } else { initCustomSelects(); }</script>
+<script>
+function toggleTbDropdown(id) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    var isOpen = el.classList.contains('open');
+    document.querySelectorAll('.tb-dropdown').forEach(function(d) { d.classList.remove('open'); });
+    if (!isOpen) el.classList.add('open');
+}
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('.tb-dropdown')) {
+        document.querySelectorAll('.tb-dropdown').forEach(function(d) { d.classList.remove('open'); });
+    }
+});
+</script>
 <script src="/paie-me/assets/js/sidebar.js"></script>
 <script src="/paie-me/assets/js/table-tools.js"></script>
 <?php if (isset($pageScripts)): foreach ((array)$pageScripts as $s): ?>

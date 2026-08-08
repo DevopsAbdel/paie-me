@@ -85,7 +85,7 @@ class SourceLegaleController extends Controller
         $baseUrl = '/paie-me/societes/' . $id . '/sources-legales';
 
         $this->render('societes/sources_legales.php', [
-            'title'     => 'Sources légales — ' . $societe['raison_sociale'],
+            'title'     => 'Sources légales',
             'societe'   => $societe,
             'sources'   => $sources,
             'rubriques' => $rubriques,

@@ -109,11 +109,8 @@ class SocieteController extends Controller
 
         $stats = $this->getStats((int) $id);
 
-        $title = 'Infos ' . $societe['raison_sociale'] . ' ' . $societe['forme_juridique'] . ' — ICE: ' . $societe['ice'];
-        $actions = '
-            <a href="/paie-me/societes/' . $id . '/edit" class="btn btn-secondary btn-sm" style="font-size:0.75rem;">Modifier</a>
-            <a href="/paie-me/societes/' . $id . '/delete" class="btn btn-danger btn-sm" style="font-size:0.75rem;" onclick="return confirm(\'Supprimer cette société ?\')">Supprimer</a>
-        ';
+        $title = 'Infos société';
+        $actions = '';
 
         $this->render('societes/show.php', [
             'title'        => $title,
@@ -172,11 +169,8 @@ class SocieteController extends Controller
         }
         unset($s);
 
-        $title = 'Salariés ' . $societe['raison_sociale'] . ' ' . $societe['forme_juridique'] . ' — ICE: ' . $societe['ice'];
-        $actions = '
-            <a href="/paie-me/societes/' . $id . '/edit" class="btn btn-secondary btn-sm" style="font-size:0.75rem;">Modifier</a>
-            <a href="/paie-me/societes/' . $id . '/delete" class="btn btn-danger btn-sm" style="font-size:0.75rem;" onclick="return confirm(\'Supprimer cette société ?\')">Supprimer</a>
-        ';
+        $title = 'Salariés';
+        $actions = '';
 
         $this->render('societes/salaries_list.php', [
             'title'        => $title,
@@ -207,11 +201,8 @@ class SocieteController extends Controller
 
         $periodes = $this->db->query("SELECT p.*, (SELECT COUNT(*) FROM paies WHERE periode_id = p.id) as nb_paies FROM periodes p WHERE p.societe_id = $id ORDER BY p.annee DESC, p.mois DESC")->fetchAll();
 
-        $title = 'Paies ' . $societe['raison_sociale'] . ' ' . $societe['forme_juridique'] . ' — ICE: ' . $societe['ice'];
-        $actions = '
-            <a href="/paie-me/societes/' . $id . '/edit" class="btn btn-secondary btn-sm" style="font-size:0.75rem;">Modifier</a>
-            <a href="/paie-me/societes/' . $id . '/delete" class="btn btn-danger btn-sm" style="font-size:0.75rem;" onclick="return confirm(\'Supprimer cette société ?\')">Supprimer</a>
-        ';
+        $title = 'Paies';
+        $actions = '';
 
         $this->render('societes/paies_list.php', [
             'title'        => $title,
@@ -250,11 +241,8 @@ class SocieteController extends Controller
             ORDER BY p.annee DESC, p.mois DESC, s.nom_famille
         ")->fetchAll();
 
-        $title = 'Bulletins ' . $societe['raison_sociale'] . ' ' . $societe['forme_juridique'] . ' — ICE: ' . $societe['ice'];
-        $actions = '
-            <a href="/paie-me/societes/' . $id . '/edit" class="btn btn-secondary btn-sm" style="font-size:0.75rem;">Modifier</a>
-            <a href="/paie-me/societes/' . $id . '/delete" class="btn btn-danger btn-sm" style="font-size:0.75rem;" onclick="return confirm(\'Supprimer cette société ?\')">Supprimer</a>
-        ';
+        $title = 'Bulletins';
+        $actions = '';
 
         $this->render('societes/bulletins_list.php', [
             'title'        => $title,
@@ -286,11 +274,8 @@ class SocieteController extends Controller
         $periodes = $this->db->query("SELECT p.*, (SELECT COUNT(*) FROM paies WHERE periode_id = p.id) as nb_paies FROM periodes p WHERE p.societe_id = $id ORDER BY p.annee DESC, p.mois DESC")->fetchAll();
         $societe['rib'] = Crypto::decrypt($societe['rib']);
 
-        $title = 'CNSS / Damancom ' . $societe['raison_sociale'] . ' ' . $societe['forme_juridique'] . ' — ICE: ' . $societe['ice'];
-        $actions = '
-            <a href="/paie-me/societes/' . $id . '/edit" class="btn btn-secondary btn-sm" style="font-size:0.75rem;">Modifier</a>
-            <a href="/paie-me/societes/' . $id . '/delete" class="btn btn-danger btn-sm" style="font-size:0.75rem;" onclick="return confirm(\'Supprimer cette société ?\')">Supprimer</a>
-        ';
+        $title = 'CNSS / Damancom';
+        $actions = '';
 
         $this->render('societes/cnss.php', [
             'title'        => $title,
@@ -330,11 +315,8 @@ class SocieteController extends Controller
             ORDER BY p.annee DESC, p.mois DESC, s.nom_famille
         ")->fetchAll();
 
-        $title = 'IR / SIMPL ' . $societe['raison_sociale'] . ' ' . $societe['forme_juridique'] . ' — ICE: ' . $societe['ice'];
-        $actions = '
-            <a href="/paie-me/societes/' . $id . '/edit" class="btn btn-secondary btn-sm" style="font-size:0.75rem;">Modifier</a>
-            <a href="/paie-me/societes/' . $id . '/delete" class="btn btn-danger btn-sm" style="font-size:0.75rem;" onclick="return confirm(\'Supprimer cette société ?\')">Supprimer</a>
-        ';
+        $title = 'IR / SIMPL';
+        $actions = '';
 
         $this->render('societes/ir.php', [
             'title'        => $title,
@@ -686,7 +668,7 @@ class SocieteController extends Controller
         $baseUrl = '/paie-me/societes/' . $id . '/parametres';
 
         $this->render('societes/parametres/' . $subView . '.php', [
-            'title'         => $titles[$subView] . ' — ' . $societe['raison_sociale'],
+            'title'         => 'Paramètres',
             'societe'       => $societe,
             'baseUrl'       => $baseUrl,
             'bareme'        => $baremeMensuel,
@@ -863,7 +845,7 @@ class SocieteController extends Controller
         $baseUrl = '/paie-me/societes/' . $id . '/baremes';
 
         $this->render('societes/baremes/' . $subView . '.php', [
-            'title'        => $titles[$subView] . ' — ' . $societe['raison_sociale'],
+            'title'        => 'Barèmes',
             'societe'      => $societe,
             'baseUrl'      => $baseUrl,
             'bareme'       => $baremeMensuel,

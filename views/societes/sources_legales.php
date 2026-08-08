@@ -1,13 +1,3 @@
-<div style="display:flex; gap:2rem; margin-bottom:1.5rem; align-items:center;">
-    <div>
-        <h2 style="color:var(--accent); margin:0;">Sources légales</h2>
-        <p style="color:var(--text-muted); font-size:0.875rem; margin:0.25rem 0 0 0;">
-            Références juridiques des rubriques de paie (CNSS, DGI, Code du Travail)
-        </p>
-    </div>
-</div>
-
-<!-- Sources legend -->
 <div class="card mb-4">
     <div class="card-header"><h3>Références légales</h3></div>
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; padding:1rem;">

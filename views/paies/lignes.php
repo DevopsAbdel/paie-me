@@ -1,6 +1,6 @@
 <div class="card">
     <div class="card-header">
-        <h3>Paies — <?= htmlspecialchars($periode['raison_sociale']) ?> — <?= str_pad($periode['mois'], 2, '0', STR_PAD_LEFT) . '/' . $periode['annee'] ?></h3>
+        <h3>Lignes de paie — <?= str_pad($periode['mois'], 2, '0', STR_PAD_LEFT) . '/' . $periode['annee'] ?></h3>
         <div style="display:flex; gap:0.5rem;">
             <?php if (!$periode['cloturee'] && !empty($disponibles)): ?>
             <button type="button" class="btn btn-primary btn-sm" id="btn-importer">Importer</button>

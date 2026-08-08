@@ -1,6 +1,6 @@
 <div class="card">
     <div class="card-header">
-        <h3>Attestation de congé</h3>
+        <h3>Sélection du congé</h3>
     </div>
 
     <div style="max-width:700px;">

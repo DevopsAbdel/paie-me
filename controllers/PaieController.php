@@ -388,7 +388,7 @@ class PaieController extends Controller
         $disponibles = $disponibles->fetchAll();
 
         $this->render('paies/lignes.php', [
-            'title'       => 'Paies — ' . $periode['raison_sociale'] . ' ' . str_pad($periode['mois'], 2, '0', STR_PAD_LEFT) . '/' . $periode['annee'],
+            'title'       => 'Paies — ' . str_pad($periode['mois'], 2, '0', STR_PAD_LEFT) . '/' . $periode['annee'],
             'periode'     => $periode,
             'paies'       => $paies,
             'disponibles' => $disponibles,
@@ -741,7 +741,7 @@ class PaieController extends Controller
         unset($v);
 
         $this->render('paies/journal.php', [
-            'title'  => 'Journal de paie — ' . $periode['raison_sociale'] . ' ' . str_pad($periode['mois'], 2, '0', STR_PAD_LEFT) . '/' . $periode['annee'],
+            'title'  => 'Journal de paie — ' . str_pad($periode['mois'], 2, '0', STR_PAD_LEFT) . '/' . $periode['annee'],
             'periode' => $periode,
             'paies'  => $paies,
             'totaux' => $totaux,

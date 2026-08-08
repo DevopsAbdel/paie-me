@@ -1,6 +1,6 @@
 <div class="card">
     <div class="card-header">
-        <h3><?= $societe ? 'Modifier' : 'Nouvelle' ?> société</h3>
+        <h3>Informations de la société</h3>
     </div>
     <form method="POST" enctype="multipart/form-data">
         <?= \Core\Session::csrfField() ?>

@@ -1,6 +1,6 @@
 <div class="card">
     <div class="card-header" style="display:flex; justify-content:space-between; align-items:center;">
-        <h3 style="margin:0;">Modèles Bulletins — <?= htmlspecialchars($societe['raison_sociale']) ?></h3>
+        <h3 style="margin:0;">Liste des modèles de bulletin</h3>
         <button type="button" class="btn btn-primary btn-sm" onclick="new bootstrap.Modal(document.getElementById('ajoutModele')).show()">
             + Ajouter
         </button>

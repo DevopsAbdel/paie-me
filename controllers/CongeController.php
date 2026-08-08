@@ -48,7 +48,7 @@ class CongeController extends Controller
         ")->fetchAll();
 
         $this->render('conges/conges.php', [
-            'title' => 'Gestion des congés — ' . $societe['raison_sociale'],
+            'title' => 'Gestion des congés',
             'societe' => $societe,
             'baseUrl' => '/paie-me/societes/' . $id . '/conges',
             'conges' => $conges,
@@ -137,7 +137,7 @@ class CongeController extends Controller
         ")->fetchAll();
 
         $this->render('conges/nouveau.php', [
-            'title' => 'Nouvelle demande de congé — ' . $societe['raison_sociale'],
+            'title' => 'Nouvelle demande de congé',
             'societe' => $societe,
             'baseUrl' => '/paie-me/societes/' . $id . '/conges',
             'salaries' => $salaries,
@@ -219,7 +219,7 @@ class CongeController extends Controller
         }
 
         $this->render('conges/nouveau.php', [
-            'title' => 'Modifier le congé — ' . $societe['raison_sociale'],
+            'title' => 'Modifier le congé',
             'societe' => $societe,
             'baseUrl' => '/paie-me/societes/' . $id . '/conges',
             'salaries' => [],
@@ -289,7 +289,7 @@ class CongeController extends Controller
         ")->fetchAll();
 
         $this->render('conges/solde_initial.php', [
-            'title' => 'Solde congé initial — ' . $societe['raison_sociale'],
+            'title' => 'Solde congé initial',
             'societe' => $societe,
             'baseUrl' => '/paie-me/societes/' . $id . '/conges',
             'salaries' => $salaries,
@@ -324,7 +324,7 @@ class CongeController extends Controller
         ")->fetchAll();
 
         $this->render('conges/attestation.php', [
-            'title' => 'Attestation de congé — ' . $societe['raison_sociale'],
+            'title' => 'Attestation de congé',
             'societe' => $societe,
             'baseUrl' => '/paie-me/societes/' . $id . '/conges',
             'conges' => $conges,

@@ -1,6 +1,6 @@
 <div class="card">
     <div class="card-header">
-        <h3>Nouvelle période de paie</h3>
+        <h3>Informations de la période</h3>
     </div>
     <form method="POST">
         <?= \Core\Session::csrfField() ?>

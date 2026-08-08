@@ -1,6 +1,6 @@
 <div class="card">
     <div class="card-header">
-        <h3>Salariés sortants</h3>
+        <h3>Liste des salariés sortants</h3>
         <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
             <a href="/paie-me/salaries" class="btn btn-secondary btn-sm">← Salariés actifs</a>
         </div>

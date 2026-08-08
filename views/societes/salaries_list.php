@@ -1,6 +1,6 @@
 <div class="card">
     <div class="card-header">
-        <h3>Salariés — <?= htmlspecialchars($societe['raison_sociale']) ?></h3>
+        <h3>Liste des salariés</h3>
         <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
             <?php include __DIR__ . '/../salaries/_import_ui.php'; ?>
             <a href="/paie-me/salaries/sortants" class="btn btn-secondary btn-sm">Sortants</a>

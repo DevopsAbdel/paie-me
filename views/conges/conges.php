@@ -1,6 +1,6 @@
 <div class="card">
     <div class="card-header" style="display:flex; justify-content:space-between; align-items:center; gap:1rem; flex-wrap:wrap;">
-        <h3 style="margin:0;">Gestion des congés</h3>
+        <h3 style="margin:0;">Liste des demandes de congé</h3>
         <div style="display:flex; gap:0.35rem; flex-wrap:wrap;">
             <a href="<?= $baseUrl ?>/nouveau" class="btn btn-primary btn-sm">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>

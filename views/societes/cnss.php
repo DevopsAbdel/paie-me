@@ -1,6 +1,6 @@
 <div class="card">
     <div class="card-header">
-        <h3>CNSS / Damancom — <?= htmlspecialchars($societe['raison_sociale']) ?></h3>
+        <h3>Déclarations CNSS / Damancom</h3>
         <a href="/paie-me/damancom" class="btn btn-info btn-sm">Générer fichier DS</a>
     </div>
     <?php if (empty($periodes)): ?>

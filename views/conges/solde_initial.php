@@ -1,6 +1,6 @@
 <div class="card">
     <div class="card-header">
-        <h3>Solde congé initial</h3>
+        <h3>Soldes initiaux des congés</h3>
     </div>
 
     <form method="post" action="<?= $baseUrl ?>/solde-initial">

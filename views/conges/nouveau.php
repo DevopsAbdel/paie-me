@@ -2,7 +2,7 @@
 
 <div class="card">
     <div class="card-header">
-        <h3><?= $editing ? 'Modifier le congé' : 'Nouvelle demande de congé' ?></h3>
+        <h3>Informations du congé</h3>
     </div>
 
     <form method="post" action="<?= $editing ? $baseUrl . '/modifier/' . $conge['id'] : $baseUrl . '/nouveau' ?>">
