@@ -57,9 +57,6 @@
         <div class="stat-label">IR prélevé</div>
         <div class="stat-value stat-strong"><?= number_format($totalIr, 0, ',', ' ') ?> DH</div>
     </div>
-    <div class="stat-card" style="justify-content:center; background:rgba(139,92,246,0.08); border-color:rgba(139,92,246,0.35);">
-        <a href="<?= $ctx ? '/paie-me/societes/' . (int)$ctx['id'] . '/paies' : '/paie-me/paies' ?>" class="btn btn-primary btn-sm">Voir les paies</a>
-    </div>
 </div>
 
 <?php if (!empty($monthlyNet)): ?>

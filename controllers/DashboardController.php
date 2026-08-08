@@ -79,6 +79,7 @@ class DashboardController extends Controller
 
         $this->render('dashboard.php', [
             'title'          => 'Dashboard',
+            'actions'        => '<a href="' . ($ctx ? '/paie-me/societes/' . (int)$ctx['id'] . '/paies' : '/paie-me/paies') . '" class="btn btn-primary btn-sm">Voir les paies</a>',
             'nbSocietes'     => $nbSocietes,
             'nbSalaries'     => $nbSalaries,
             'nbPeriodes'     => $nbPeriodes,
