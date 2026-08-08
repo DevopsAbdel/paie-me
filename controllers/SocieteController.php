@@ -748,8 +748,8 @@ class SocieteController extends Controller
                 $delaiAnciennete = max(6, (int)($_POST['delai_anciennete'] ?? 6));
                 $stmt->execute([$id, $_POST['jours_par_mois'] ?? 1.50, (int)($_POST['report_autorise'] ?? 0), $reportMax, $delaiAnciennete, $reportMaxAnnees]);
 
-                $this->db->exec("DELETE FROM droit_conge WHERE societe_id = $id");
-                if (!empty($_POST['dc_annees_min'])) {
+                if (!empty($_POST['dc_annees_min']) && is_array($_POST['dc_annees_min'])) {
+                    $this->db->exec("DELETE FROM droit_conge WHERE societe_id = $id");
                     $ins = $this->db->prepare("INSERT INTO droit_conge (societe_id, annees_min, annees_max, jours_par_mois, jours_supplementaires) VALUES (?, ?, ?, ?, ?)");
                     foreach ($_POST['dc_annees_min'] as $k => $min) {
                         $max = (int)($_POST['dc_annees_max'][$k] ?? 0);
@@ -823,6 +823,27 @@ class SocieteController extends Controller
         $anciennete    = $this->db->query("SELECT * FROM bareme_anciennete WHERE societe_id = $id ORDER BY annees_min")->fetchAll();
         $conge         = $this->db->query("SELECT * FROM conge_annuel WHERE societe_id = $id")->fetch();
         $droitConge    = $this->db->query("SELECT * FROM droit_conge WHERE societe_id = $id ORDER BY annees_min")->fetchAll();
+
+        // Seed des tranches par défaut si la société n'en a aucune
+        // (même logique que migrate.php — garantit un tableau correct à l'affichage)
+        if (empty($droitConge)) {
+            $defaultTranches = [
+                [0, 5, 1.50, 0.00],
+                [5, 10, 1.50, 1.50],
+                [10, 15, 1.50, 3.00],
+                [15, 20, 1.50, 4.50],
+                [20, 25, 1.50, 6.00],
+                [25, 30, 1.50, 7.50],
+                [30, 35, 1.50, 9.00],
+                [35, 40, 1.50, 10.50],
+                [40, 99, 1.50, 12.00],
+            ];
+            $ins = $this->db->prepare("INSERT INTO droit_conge (societe_id, annees_min, annees_max, jours_par_mois, jours_supplementaires) VALUES (?, ?, ?, ?, ?)");
+            foreach ($defaultTranches as $t) {
+                $ins->execute([$id, $t[0], $t[1], $t[2], $t[3]]);
+            }
+            $droitConge = $this->db->query("SELECT * FROM droit_conge WHERE societe_id = $id ORDER BY annees_min")->fetchAll();
+        }
         $joursFeries   = $this->db->query("SELECT * FROM jours_feries WHERE societe_id = $id ORDER BY mois, jour")->fetchAll();
         $heuresSup     = $this->db->query("SELECT * FROM bareme_heures_sup WHERE societe_id = $id")->fetch();
         $baremeSmigSmag = $this->db->query("SELECT * FROM bareme_smig_smag WHERE societe_id = $id ORDER BY annee DESC, type")->fetchAll();
