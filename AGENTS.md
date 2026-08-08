@@ -392,6 +392,23 @@ Net  = salaire - (CNSS + AMO + IR)
   - Routes : `GET /salaries/sortants`, `POST /salaries/{id}/sortir`, `POST /salaries/{id}/reintegrer` (avant `/salaries/{id}/...`)
   - Vues : `views/salaries/sortants.php` (nouvelle, toutes les infos + badge rouge motif + actions STC/Modifier/Réintégrer/Supprimer) ; `views/salaries/_sortie_modal.php` (nouvelle, modale partagée date+motif) ; `index.php` + `views/societes/salaries_list.php` (bouton « Sortants (N) » + action Sortir + include modale) ; `layout.php` sous-menu sidebar « Salariés sortants » (visible si URI contient `/salaries`)
   - Vérifié navigateur : sortie depuis liste globale + contexte société (redirect referer, flash, disparition liste active, badge), page sortants (motif « Décès » affiché), réintégration (retour effectifs actifs + liste vide), sous-menu sidebar présent
+- **Layout : topbar fixe plein-largeur + sidebar navigation seule** :
+  - Topbar (`.topbar`) fixe sur toute la largeur : logo + CNSS, recherche, alertes/notifications, user ; la sidebar ne porte que la navigation (retrait du bloc marque/pied `sidebar-brand`/`sidebar-footer`)
+  - `body` décalé à gauche (margin-left = largeur sidebar) ; `main-content` offset sous la topbar
+  - Nettoyage CSS : classes `.sidebar-brand`, `.sidebar-footer`, `.sidebar-logo` supprimées
+- **Dashboard enrichi** :
+  - Grille compacte `.stats-grid.compact` + `.stat-value.stat-strong` (style compact réutilisable)
+  - 7 cartes stats : Salariés, Périodes, Sociétés, Masse brute, Net payé, CNSS, IR (valeurs fortes en violet)
+  - Graphique barres « Évolution du net à payer — 6 derniers mois » (`monthly_net` depuis les paies)
+  - Carte « Vue d'ensemble » société (contexte uniquement) : dernière période + badge Clôturée/En cours + nb bulletins
+  - Bouton « Voir les paies » déplacé de la grille stats vers `.page-actions` (en-tête, à droite du titre) via `$actions` dans le layout
+- **Page `/societes/{id}` enrichie** :
+  - 7 cartes compactes : Salariés actifs, Périodes, Bulletins, Masse brute, Masse nette, CNSS, IR + carte « Salariés sortants » rouge conditionnelle (`nb_sortants`)
+  - Grille « Accès rapide » : 8 boutons modules (paies, salariés, bulletins, paramètres, barèmes, CNSS, IR, retenues)
+  - Carte « Dernière période traitée » détaillée : nb bulletins, net payé, bouton « Consulter les bulletins »
+  - Graphique évolution net 6 mois ; `getStats()` enrichi (`nb_sortants`, `masse_brute`, `total_cnss`, `total_ir`, `derniere_periode` avec `nb_paies`/`total_net`, `monthly_net`)
+- **Congé annuel** : champ `report_max_annees` CONSERVÉ (PAS supprimé), libellé « Report max » sans parenthèses ; grille compactée `repeat(4, minmax(0, 200px))` (champs 200×43px) ; backend restauré (CongeController + SocieteController)
+- **Fix migration rubriques gains** : le bloc de fusion gardait la PLUS PETITE id par code cible → quand la base portait l'ancien seed `PRIME_*` (ids 1-5, sans source) sans les canoniques 501–505, il conservait les mauvais codes. `migrate.php` choisit désormais la ligne canonique à conserver (code déjà au format cible hors `$primeMap` + `source` renseignée). Résultat vérifié sur `paie_me` + `paie_me_demo` : 48 rubriques globales, 0 `PRIME_*`, 0 rubrique sans source, 90 articles, 0 FK orphelin, références `salarie_gains` remappées (501/502)
 
 ### Pending
 - (none)
@@ -430,3 +447,11 @@ Net  = salaire - (CNSS + AMO + IR)
 | `views/salaries/_sortie_modal.php` | nouveau : modale partagée « Sortir de la société » (date + motif, CSRF) |
 | `views/salaries/index.php` + `views/societes/salaries_list.php` | bouton « Sortants (N) » + action « Sortir de la société » (icône) + include modale |
 | `views/layout.php` | sous-menu sidebar « Salariés sortants » sous « Salariés » |
+| `assets/css/style.css` | layout : topbar fixe plein-largeur, sidebar nav seule (`.sidebar-brand`/`.sidebar-footer` supprimés) ; + `.stats-grid.compact`, `.stat-value.stat-strong` |
+| `views/layout.php` | topbar fixe plein-largeur (logo+CNSS, recherche, alertes, user) ; sidebar = navigation seule ; pattern `$actions` dans `.page-header` |
+| `controllers/DashboardController.php` | + stats masse brute / CNSS / IR, `monthly_net` (6 mois), `derniere_periode` ; bouton « Voir les paies » déplacé dans `$actions` |
+| `views/dashboard.php` | 7 cartes compactes + graphique net 6 mois + carte « Vue d'ensemble » société |
+| `controllers/SocieteController.php` | `getStats()` enrichi (`nb_sortants`, `masse_brute`, `total_cnss`, `total_ir`, `derniere_periode`, `monthly_net`) |
+| `views/societes/show.php` | 7 cartes compactes + carte sortants rouge + accès rapide 8 modules + carte dernière période + graphique 6 mois |
+| `views/societes/baremes/conge_annuel.php` | champ `report_max_annees` conservé, libellé « Report max », grille compactée 200px |
+| `database/migrate.php` | fusion rubriques gains : choisit la ligne canonique à conserver (code au format cible + source) au lieu de la plus petite id ; migrations relancées sur `paie_me` + `paie_me_demo` (48 rubriques, 0 `PRIME_*`, 90 articles, 0 FK orphelin) |

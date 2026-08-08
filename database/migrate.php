@@ -418,12 +418,28 @@ $primeMap = [
 ];
 
 $allRubriques = $p->query("SELECT id, code, source FROM rubriques_gains WHERE is_global = 1 AND societe_id IS NULL")->fetchAll(PDO::FETCH_ASSOC);
+
+// Pour chaque code cible, choisir LA ligne canonique à conserver : priorité à une ligne
+// dont le code est déjà le code cible (hors $primeMap) ET dont la source est renseignée.
+// Le code PRIME_* (ids les plus petits) est écarté au profit de la ligne canonique.
 $keepByCode = [];
+$byTarget = [];
 foreach ($allRubriques as $r) {
     $code = $primeMap[$r['code']] ?? $r['code'];
-    if (!isset($keepByCode[$code])) {
-        $keepByCode[$code] = (int)$r['id'];
+    $byTarget[$code][] = $r;
+}
+foreach ($byTarget as $code => $rows) {
+    $best = null;
+    foreach ($rows as $row) {
+        if (!isset($primeMap[$row['code']]) && !empty($row['source'])) {
+            $best = (int)$row['id'];
+            break;
+        }
     }
+    if ($best === null) {
+        $best = (int)$rows[0]['id'];
+    }
+    $keepByCode[$code] = $best;
 }
 
 $nbFusion = 0;
