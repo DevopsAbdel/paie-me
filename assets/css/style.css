@@ -602,6 +602,43 @@ a:hover {
     color: var(--accent);
 }
 
+/* ── Stat cards compactes (Dashboard) ── */
+.stats-grid.compact {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 0.85rem;
+    margin-bottom: 1.5rem;
+}
+
+.stats-grid.compact .stat-card {
+    padding: 0.9rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.stats-grid.compact .stat-card .stat-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    margin-bottom: 0;
+}
+
+.stats-grid.compact .stat-card .stat-value {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--accent);
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+.stats-grid.compact .stat-card .stat-value.stat-strong {
+    color: var(--text);
+    font-size: 1.05rem;
+}
+
 /* ── Tables ── */
 .table-wrapper {
     overflow-x: auto;

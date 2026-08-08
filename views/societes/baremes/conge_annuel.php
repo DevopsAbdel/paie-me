@@ -27,7 +27,7 @@
         <h3>Paramètres généraux</h3>
     </div>
     <input type="hidden" name="jours_par_mois" value="<?= htmlspecialchars($conge['jours_par_mois'] ?? '1.50') ?>">
-    <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:0.9rem;">
+    <div style="display:grid; grid-template-columns:repeat(4, minmax(0, 200px)); gap:0.9rem;">
         <div class="form-group">
             <label style="font-size:0.72rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em;">Délai d'ancienneté</label>
             <input type="number" name="delai_anciennete" value="<?= htmlspecialchars($conge['delai_anciennete'] ?? '6') ?>" class="form-control" min="6">
@@ -47,7 +47,7 @@
             <small style="color:var(--text-muted); font-size:0.7rem; margin-top:0.25rem; display:block;">Plafond de jours reportables sur une année</small>
         </div>
         <div class="form-group">
-            <label style="font-size:0.72rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em;">Report max (années consécutives)</label>
+            <label style="font-size:0.72rem; font-weight:600; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.05em;">Report max</label>
             <input type="number" name="report_max_annees" value="<?= htmlspecialchars($conge['report_max_annees'] ?? '2') ?>" class="form-control" min="0" max="2">
             <small style="color:var(--text-muted); font-size:0.7rem; margin-top:0.25rem; display:block;">Nombre d'années successives de report autorisé</small>
         </div>
