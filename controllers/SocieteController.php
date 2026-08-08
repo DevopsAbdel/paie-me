@@ -124,24 +124,46 @@ class SocieteController extends Controller
     private function getStats(int $societeId): array
     {
         $nbSalaries = (int) $this->db->query("SELECT COUNT(*) FROM salaries WHERE societe_id = $societeId AND actif = 1")->fetchColumn();
+        $nbSortants = (int) $this->db->query("SELECT COUNT(*) FROM salaries WHERE societe_id = $societeId AND actif = 0")->fetchColumn();
         $nbPaies = (int) $this->db->query("SELECT COUNT(*) FROM paies WHERE societe_id = $societeId")->fetchColumn();
         $masseSalariale = (float) $this->db->query("SELECT COALESCE(SUM(net_a_payer), 0) FROM paies WHERE societe_id = $societeId")->fetchColumn();
+        $masseBrute = (float) $this->db->query("SELECT COALESCE(SUM(salaire_brut), 0) FROM paies WHERE societe_id = $societeId")->fetchColumn();
+        $totalCnss = (float) $this->db->query("SELECT COALESCE(SUM(cnss_salariale), 0) FROM paies WHERE societe_id = $societeId")->fetchColumn();
+        $totalIr = (float) $this->db->query("SELECT COALESCE(SUM(ir), 0) FROM paies WHERE societe_id = $societeId")->fetchColumn();
         $nbPeriodes = (int) $this->db->query("SELECT COUNT(*) FROM periodes WHERE societe_id = $societeId")->fetchColumn();
 
         $dernierePeriode = $this->db->query(
-            "SELECT p.mois, p.annee, p.cloturee
+            "SELECT p.mois, p.annee, p.cloturee,
+                    (SELECT COUNT(*) FROM paies pa WHERE pa.periode_id = p.id) AS nb_paies,
+                    (SELECT COALESCE(SUM(pa.net_a_payer), 0) FROM paies pa WHERE pa.periode_id = p.id) AS total_net
              FROM periodes p
              WHERE p.societe_id = $societeId
              ORDER BY p.annee DESC, p.mois DESC
              LIMIT 1"
         )->fetch();
 
+        $monthlyNet = $this->db->query("
+            SELECT p.annee, p.mois, COALESCE(SUM(pa.net_a_payer), 0) AS total_net, COUNT(DISTINCT pa.salarie_id) AS nb_salaries
+            FROM periodes p
+            JOIN paies pa ON pa.periode_id = p.id
+            WHERE p.societe_id = $societeId
+            GROUP BY p.annee, p.mois
+            ORDER BY p.annee DESC, p.mois DESC
+            LIMIT 6
+        ")->fetchAll();
+        $monthlyNet = array_reverse($monthlyNet);
+
         return [
-            'nb_salaries'    => $nbSalaries,
-            'nb_paies'       => $nbPaies,
-            'nb_periodes'    => $nbPeriodes,
+            'nb_salaries'     => $nbSalaries,
+            'nb_sortants'     => $nbSortants,
+            'nb_paies'        => $nbPaies,
+            'nb_periodes'     => $nbPeriodes,
             'masse_salariale' => $masseSalariale,
+            'masse_brute'     => $masseBrute,
+            'total_cnss'      => $totalCnss,
+            'total_ir'        => $totalIr,
             'derniere_periode' => $dernierePeriode,
+            'monthly_net'     => $monthlyNet,
         ];
     }
 
